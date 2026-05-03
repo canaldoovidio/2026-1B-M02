@@ -1,0 +1,357 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 11 — Plano de Ensino — Mergulhando nas Redes — Inteli</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../css/inteli-styles.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --ac:#4b5563; --hi:#b2b6bf; --dk:#2e2640; --gr:#0d9488; --re:#dc2626; --am:#d97706; --text:#1e293b; --muted:#64748b; --border:#e2e8f0; --bg:#f8fafc; --card:#ffffff; }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family:'Manrope',sans-serif; color:var(--text); background:var(--bg); }
+    #progress-bar { position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--ac),var(--hi)); width:0%; z-index:9999; transition:width .1s; }
+    #float-nav { position:fixed; bottom:28px; right:28px; display:flex; flex-direction:column; gap:8px; z-index:9998; opacity:0; pointer-events:none; transform:translateY(12px); transition:opacity .3s,transform .3s; }
+    #float-nav.visible { opacity:1; pointer-events:auto; transform:translateY(0); }
+    .fn-btn { display:flex; align-items:center; gap:6px; padding:10px 16px; border-radius:999px; font-size:.82rem; font-weight:700; text-decoration:none; box-shadow:0 4px 18px rgba(0,0,0,.25); transition:transform .15s,box-shadow .15s; white-space:nowrap; }
+    .fn-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,.32); text-decoration:none; }
+    .fn-btn-back { background:var(--dk); color:white; }
+    .fn-btn-slides { background:white; color:var(--ac); border:2px solid var(--ac); }
+    .fn-btn-mat { background:white; color:var(--gr); border:2px solid var(--gr); }
+    .mat-header { background:linear-gradient(135deg,#1f2937 0%,#4b5563 50%,#b2b6bf 100%); color:white; padding:44px 0 36px; }
+    .mat-header h1 { font-size:2.2rem; font-weight:800; margin:0 0 8px; }
+    .mat-header .subtitle { font-size:1.02rem; opacity:.88; margin:0 0 20px; max-width:780px; }
+    .mat-badge { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); color:white; padding:4px 14px; border-radius:999px; font-size:.78rem; font-weight:700; display:inline-block; margin-bottom:12px; margin-right:6px; }
+    .mat-layout { display:grid; grid-template-columns:260px 1fr; gap:32px; max-width:1200px; margin:0 auto; padding:36px 24px; }
+    @media(max-width:900px){ .mat-layout { grid-template-columns:1fr; } .mat-sidebar { display:none; } }
+    .mat-sidebar { position:sticky; top:24px; max-height:calc(100vh - 48px); overflow-y:auto; }
+    .mat-toc { background:var(--card); border-radius:14px; padding:20px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,.05); }
+    .mat-toc h4 { font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 12px; }
+    .mat-toc a { display:block; color:var(--muted); text-decoration:none; font-size:.82rem; padding:5px 0 5px 12px; border-left:2px solid transparent; transition:all .2s; line-height:1.3; }
+    .mat-toc a:hover, .mat-toc a.active { color:var(--ac); border-left-color:var(--ac); }
+    .mat-article { min-width:0; }
+    .mat-section { margin-bottom:44px; }
+    .mat-section h2 { font-size:1.5rem; font-weight:800; color:var(--dk); padding-bottom:10px; border-bottom:2px solid var(--border); margin:0 0 18px; scroll-margin-top:80px; }
+    .mat-section h3 { font-size:1.05rem; font-weight:700; color:var(--dk); margin:22px 0 8px; scroll-margin-top:80px; }
+    .mat-section p { line-height:1.75; margin-bottom:12px; font-size:.96rem; color:#374151; }
+    .mat-section ul, .mat-section ol { padding-left:1.4rem; margin-bottom:14px; }
+    .mat-section li { line-height:1.7; font-size:.94rem; color:#374151; margin-bottom:6px; }
+    .mat-section strong { color:var(--dk); }
+    .mat-section code { background:#eef2f7; color:#1f2937; padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:.84em; }
+    .intro-card { background:var(--card); border:1px solid var(--border); border-left:4px solid var(--dk); border-radius:12px; padding:18px 22px; margin-bottom:28px; }
+    .intro-card p { margin-bottom:8px; } .intro-card p:last-child { margin-bottom:0; }
+    .id-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:8px 0 0; }
+    @media(max-width:560px){ .id-grid { grid-template-columns:1fr; } }
+    .id-cell { background:#f1f5f9; border-radius:10px; padding:10px 14px; }
+    .id-cell .id-lbl { font-size:.7rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+    .id-cell .id-val { font-size:.92rem; font-weight:700; color:var(--dk); margin-top:2px; }
+    .day-timeline { display:grid; gap:14px; margin-top:12px; }
+    .day-block { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 22px; box-shadow:0 2px 6px rgba(0,0,0,.04); border-left:5px solid var(--ac); }
+    .day-block.autoest { border-left-color:#3b82f6; }
+    .day-block.pe      { border-left-color:#8b5cf6; }
+    .day-block.lunch   { border-left-color:#eab308; background:#fefce8; }
+    .day-block.dev     { border-left-color:#0d9488; }
+    .day-block .blk-head { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px; }
+    .day-block .blk-time { font-family:'JetBrains Mono',monospace; font-size:.85rem; font-weight:700; color:var(--dk); background:#f1f5f9; padding:3px 10px; border-radius:6px; white-space:nowrap; }
+    .day-block .blk-title { font-size:1.05rem; font-weight:800; color:var(--dk); margin:0; }
+    .day-block p { margin:0 0 6px; font-size:.93rem; }
+    .day-block ul { margin:6px 0 0; padding-left:1.3rem; }
+    .class-line { display:grid; grid-template-columns:90px 1fr; gap:14px; padding:12px 0; border-bottom:1px dashed var(--border); }
+    .class-line:last-child { border-bottom:none; }
+    .class-line .cl-time { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--ac); font-size:.85rem; padding-top:2px; }
+    .class-line .cl-content h4 { font-size:.95rem; font-weight:800; color:var(--dk); margin:0 0 4px; }
+    .class-line .cl-content p { margin:0 0 4px; font-size:.9rem; line-height:1.6; }
+    .class-line .cl-tag { display:inline-block; padding:1px 8px; border-radius:5px; font-size:.7rem; font-weight:700; margin-right:6px; }
+    .cl-tag-am  { background:#ede9fe; color:#7c3aed; }
+    .cl-tag-tk  { background:#dbeafe; color:#1d4ed8; }
+    .cl-tag-co  { background:#dcfce7; color:#15803d; }
+    .cl-tag-dy  { background:#fef3c7; color:#92400e; }
+    .obj-list, .crit-list { list-style:none; padding:0; margin:0; }
+    .obj-list li, .crit-list li { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--border); font-size:.93rem; color:#374151; }
+    .obj-list li:last-child, .crit-list li:last-child { border-bottom:none; }
+    .obj-tag { font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:800; background:var(--dk); color:white; padding:2px 8px; border-radius:5px; flex-shrink:0; margin-top:1px; min-width:54px; text-align:center; }
+    .res-table { width:100%; border-collapse:collapse; font-size:.9rem; background:var(--card); border:1px solid var(--border); border-radius:12px; overflow:hidden; margin:10px 0 0; }
+    .res-table th, .res-table td { padding:10px 14px; text-align:left; border-bottom:1px solid var(--border); line-height:1.55; vertical-align:top; }
+    .res-table th { background:#f1f5f9; font-size:.74rem; font-weight:800; text-transform:uppercase; letter-spacing:.06em; color:var(--muted); }
+    .res-table tr:last-child td { border-bottom:none; }
+    .res-table code { font-size:.82em; }
+    .callout { border-radius:12px; padding:14px 18px; margin:14px 0; border-left:4px solid; }
+    .callout-info { background:#eff6ff; border-color:#3b82f6; }
+    .callout-tip  { background:#f0fdf4; border-color:#22c55e; }
+    .callout-warn { background:#fffbeb; border-color:#f59e0b; }
+    .callout-label { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px; }
+    .callout-info .callout-label { color:#1d4ed8; }
+    .callout-tip  .callout-label { color:#15803d; }
+    .callout-warn .callout-label { color:#b45309; }
+    .callout p { margin:0; font-size:.92rem; line-height:1.65; color:#374151; }
+    .back-cta { text-align:center; padding:26px 0 6px; }
+    .back-cta a { color:var(--dk); font-weight:700; text-decoration:none; border:2px solid var(--dk); padding:9px 22px; border-radius:999px; transition:all .2s; }
+    .back-cta a:hover { background:var(--dk); color:white; }
+  </style>
+</head>
+<body>
+  <div id="progress-bar"></div>
+  <div id="float-nav">
+    <a href="../slides/slide-lesson-11.html" class="fn-btn fn-btn-slides">🎞️ Slides</a>
+    <a href="../materials/lesson-11-material.html" class="fn-btn fn-btn-mat">📝 Material</a>
+    <a href="../../index.html" class="fn-btn fn-btn-back">← Módulo</a>
+  </div>
+
+  <header class="mat-header">
+    <div class="container">
+      <span class="mat-badge">Módulo 2 · Ciclo Comum · IN02</span>
+      <span class="mat-badge">Plano de Ensino</span>
+      <span class="mat-badge">Encerramento do Módulo</span>
+      <h1>Aula 11 — Mergulhando nas Redes</h1>
+      <p class="subtitle">Plano operacional do dia: atravessar TCP/IP, DNS, TLS, HTTP, cache, CDN e padrões de tolerância a falhas — e fechar o módulo amarrando tudo no nosso stack <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">TS+Express+EJS+SSR+pg</code>.</p>
+      <a href="../../index.html" class="btn btn-outline-light btn-sm">← Voltar ao Módulo</a>
+    </div>
+  </header>
+
+  <div class="mat-layout">
+    <aside class="mat-sidebar">
+      <div class="mat-toc">
+        <h4>Neste plano</h4>
+        <a href="#sec-id">Identificação</a>
+        <a href="#sec-resumo">Resumo</a>
+        <a href="#sec-obj">Objetivos de aprendizagem</a>
+        <a href="#sec-pre">Pré-requisitos</a>
+        <a href="#sec-day">Cronograma do dia</a>
+        <a href="#sec-class">Detalhamento da instrução PE</a>
+        <a href="#sec-am">Estratégias de metodologia ativa</a>
+        <a href="#sec-rec">Recursos e ferramentas</a>
+        <a href="#sec-aval">Verificação de aprendizagem</a>
+        <a href="#sec-next">Encerramento do módulo</a>
+      </div>
+    </aside>
+
+    <article class="mat-article">
+      <section class="mat-section" id="sec-id">
+        <h2>Identificação</h2>
+        <div class="id-grid">
+          <div class="id-cell"><div class="id-lbl">Disciplina</div><div class="id-val">IN02 · Desenvolvimento Web</div></div>
+          <div class="id-cell"><div class="id-lbl">Módulo</div><div class="id-val">2 — Ciclo Comum</div></div>
+          <div class="id-cell"><div class="id-lbl">Aula</div><div class="id-val">11 de 11 (encerramento)</div></div>
+          <div class="id-cell"><div class="id-lbl">Carga horária do dia</div><div class="id-val">6h (2h + 2h + 2h)</div></div>
+          <div class="id-cell"><div class="id-lbl">Modalidade</div><div class="id-val">Presencial · Metodologia ativa</div></div>
+          <div class="id-cell"><div class="id-lbl">Pré-aula</div><div class="id-val">Autoestudo guiado</div></div>
+        </div>
+      </section>
+
+      <section class="mat-section" id="sec-resumo">
+        <h2>Resumo</h2>
+        <div class="intro-card">
+          <p>A aula 11 conecta a stack à <strong>internet real</strong>. Os alunos atravessam o <strong>modelo TCP/IP de 4 camadas</strong>, comparam <strong>TCP × UDP</strong> com 3-way handshake, percorrem o <strong>DNS</strong> registro por registro, entendem o <strong>TLS handshake</strong> conceitual, exploram <strong>HTTP/1.1 × 2 × 3</strong>, dominam <strong>cache HTTP</strong> (<code>Cache-Control</code>, <code>ETag</code>, <code>304</code>), atravessam uma <strong>CDN</strong> (origem/edge/PoP) e fecham com <strong>padrões de tolerância a falhas</strong> (retry com backoff exponencial + jitter, timeout, idempotência, circuit breaker, fallback, health checks, observabilidade RED).</p>
+          <p>O encerramento amarra tudo no nosso stack <strong>TS + Express + EJS + SSR + pg</strong> — a infraestrutura de rede deixa de ser caixa-preta para virar superfície de design.</p>
+        </div>
+      </section>
+
+      <section class="mat-section" id="sec-obj">
+        <h2>Objetivos de aprendizagem</h2>
+        <ul class="obj-list">
+          <li><span class="obj-tag">OA-1</span><span><strong>Posicionar</strong> HTTP, TLS, TCP e IP nas camadas TCP/IP de 4 níveis.</span></li>
+          <li><span class="obj-tag">OA-2</span><span><strong>Distinguir</strong> TCP de UDP e justificar a escolha conforme o caso de uso.</span></li>
+          <li><span class="obj-tag">OA-3</span><span><strong>Resolver</strong> um nome via DNS passo a passo, identificando registros A / CNAME / MX / TXT.</span></li>
+          <li><span class="obj-tag">OA-4</span><span><strong>Aplicar</strong> cache HTTP correto (<code>Cache-Control</code>, <code>ETag</code>, <code>304</code>) por tipo de recurso.</span></li>
+          <li><span class="obj-tag">OA-5</span><span><strong>Desenhar</strong> a interação navegador → CDN → origem com hit/miss explícitos.</span></li>
+          <li><span class="obj-tag">OA-6</span><span><strong>Aplicar</strong> retry com backoff+jitter, timeout, idempotência e circuit breaker no nosso stack TS.</span></li>
+        </ul>
+      </section>
+
+      <section class="mat-section" id="sec-pre">
+        <h2>Pré-requisitos</h2>
+        <ul>
+          <li>Aulas 1–10 concluídas: o projeto já está em produção (ou pronto para deploy) com testes e CI verdes.</li>
+          <li>Domínio próprio do projeto acessível (mesmo que ainda em ambiente de staging).</li>
+          <li>Ambiente local com <code>dig</code> ou <code>nslookup</code> disponível e acesso ao DevTools do navegador.</li>
+        </ul>
+        <div class="callout callout-info">
+          <div class="callout-label">Importante</div>
+          <p>Aqui a equipe <strong>blinda o projeto contra falhas reais de rede</strong> — não é teoria abstrata: cada conceito vira mudança de código no projeto integrador antes das 16h.</p>
+        </div>
+      </section>
+
+      <section class="mat-section" id="sec-day">
+        <h2>Cronograma do dia</h2>
+        <div class="day-timeline">
+          <div class="day-block autoest">
+            <div class="blk-head"><h3 class="blk-title">📚 Bloco 1 · Autoestudo</h3><span class="blk-time">08h00 — 10h00</span></div>
+            <p>Estudo individual orientado pelo material da aula 11.</p>
+            <ul>
+              <li>Leitura completa do <strong>Material da Aula 11</strong> (TCP/IP, DNS, TLS, HTTP, cache, CDN, resiliência).</li>
+              <li>Rodar <code>dig</code> (ou <code>nslookup</code>) no domínio do projeto e registrar os registros encontrados (A, CNAME, MX, NS, TTL).</li>
+              <li>Mapear quais respostas do back-end fazem sentido cachear e <strong>por quanto tempo</strong> (HTML SSR, estáticos, JSON dinâmico, JSON privado).</li>
+              <li>Caderno de bordo: anotar dúvidas sobre TLS handshake e diferenças HTTP/1.1 × 2 × 3.</li>
+            </ul>
+          </div>
+          <div class="day-block pe">
+            <div class="blk-head"><h3 class="blk-title">🎓 Bloco 2 · Instrução PE — Aula em metodologia ativa</h3><span class="blk-time">10h00 — 12h00</span></div>
+            <p>Encontro síncrono com o professor especialista. 15 minutos de daily seguidos de 1h45 de aula.</p>
+            <ul>
+              <li><strong>10h00 — 10h15</strong> · Daily: registros DNS e plano de cache trazidos do autoestudo.</li>
+              <li><strong>10h15 — 12h00</strong> · TCP/IP, DNS, TLS, cache, retry/timeout, idempotência e circuit breaker.</li>
+            </ul>
+          </div>
+          <div class="day-block lunch">
+            <div class="blk-head"><h3 class="blk-title">🍴 Intervalo · Almoço</h3><span class="blk-time">12h00 — 14h00</span></div>
+            <p>Janela livre.</p>
+          </div>
+          <div class="day-block dev">
+            <div class="blk-head"><h3 class="blk-title">🛠️ Bloco 3 · Desenvolvimento do projeto</h3><span class="blk-time">14h00 — 16h00</span></div>
+            <p>Janela de trabalho da equipe sobre o projeto integrador.</p>
+            <ul>
+              <li>Aplicar <code>Cache-Control</code> coerente nos endpoints (HTML SSR, estáticos, JSON público, JSON privado).</li>
+              <li>Configurar <strong>timeout</strong> via <code>AbortController</code> em todos os <code>fetch</code> internos.</li>
+              <li>Aplicar <strong>retry com backoff exponencial + jitter</strong> na chamada externa principal do projeto.</li>
+              <li>Documentar plano de tolerância a falhas em <code>docs/redes/resiliencia.md</code> (timeouts, retries, idempotência, circuit breaker, fallback).</li>
+              <li>Abrir Merge Request <code>feat(net): cache + resiliência</code> com evidência (DevTools mostrando <code>304</code> e logs de retry).</li>
+            </ul>
+          </div>
+        </div>
+      </section>
+
+      <section class="mat-section" id="sec-class">
+        <h2>Detalhamento da instrução PE (10h00 — 12h00)</h2>
+        <div class="class-line">
+          <div class="cl-time">10h00<br>10h15</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-dy">Daily</span>Daily de abertura</h4><p>Cada aluno apresenta, em 1 minuto, o resultado do <code>dig</code> no domínio do projeto e o item mais surpreendente que encontrou (TTL alto demais, CNAME inesperado, etc).</p></div>
+        </div>
+        <div class="class-line">
+          <div class="cl-time">10h15<br>10h30</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>Por que um dev backend precisa entender redes</h4><p>Casos reais: timeout sem retry derrubando produção, cache mal configurado mostrando dado errado para outro usuário, falta de idempotência cobrando duas vezes. Rede não é problema do "ops", é design de API.</p></div>
+        </div>
+        <div class="class-line">
+          <div class="cl-time">10h30<br>10h45</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>TCP/IP 4 camadas + TCP × UDP + 3-way handshake</h4><p>Apresentação do modelo de 4 camadas (Acesso, Internet, Transporte, Aplicação), diferença entre TCP (confiável, ordenado) e UDP (rápido, sem garantia), e desenho do 3-way handshake (SYN / SYN-ACK / ACK).</p></div>
+        </div>
+        <div class="class-line">
+          <div class="cl-time">10h45<br>11h00</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>DNS — registros + resolução + TTL</h4><p>Caminho completo: stub resolver → recursivo → root → TLD → autoritativo. Tipos de registro (A, AAAA, CNAME, MX, TXT, NS) e o papel do <strong>TTL</strong> em cache de resolução.</p></div>
+        </div>
+        <div class="class-line">
+          <div class="cl-time">11h00<br>11h15</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>TLS handshake conceitual + Let's Encrypt</h4><p>Visão conceitual do handshake TLS (ClientHello → ServerHello → certificado → key exchange → Finished). Como o Let's Encrypt emite certificados via ACME e por que renovação automática é mandatória.</p></div>
+        </div>
+        <div class="class-line">
+          <div class="cl-time">11h15<br>11h30</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Cache-Control + ETag + 304</h4><p>Demo ao vivo: aplicar <code>Cache-Control: public, max-age=...</code> em estáticos, <code>no-store</code> em JSON privado, e <code>ETag</code> + revalidação <code>304</code> em endpoint dinâmico. DevTools com <em>Disable cache</em> ON/OFF para ver a diferença.</p></div>
+        </div>
+        <div class="class-line">
+          <div class="cl-time">11h30<br>11h45</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Timeout + retry com backoff exponencial + jitter (TS)</h4><p>Em pares: implementar wrapper TS com <code>AbortController</code> para timeout e função de retry com backoff exponencial (2^n) + jitter aleatório. Discussão sobre quando retry é seguro (idempotente) e quando é catastrófico.</p></div>
+        </div>
+        <div class="class-line">
+          <div class="cl-time">11h45<br>11h55</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>Idempotência + circuit breaker</h4><p>Por que <code>PUT</code> e <code>DELETE</code> são idempotentes por design e <code>POST</code> precisa de <code>Idempotency-Key</code>. Conceito de circuit breaker (closed → open → half-open) e quando ele protege a origem de cascata de falhas.</p></div>
+        </div>
+        <div class="class-line">
+          <div class="cl-time">11h55<br>12h00</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Encerramento do módulo + entrega da tarde</h4><p>Retrospectiva relâmpago das 11 aulas (1 frase por aluno: <em>"o módulo me ensinou que..."</em>). O professor anuncia a entrega da tarde: cache + timeout + retry + <code>docs/redes/resiliencia.md</code> no MR <code>feat(net): cache + resiliência</code>.</p></div>
+        </div>
+      </section>
+
+      <section class="mat-section" id="sec-am">
+        <h2>Estratégias de metodologia ativa</h2>
+        <ul>
+          <li><strong>Simulação de falha</strong> — o professor "mata" um endpoint da CDN ou da origem; cada equipe diagnostica pelo comportamento (status, headers, latência) qual camada falhou.</li>
+          <li><strong>Competição de cache</strong> — em rodadas rápidas, qual time acerta o <code>Cache-Control</code> ideal para cada rota (HTML SSR, estáticos, JSON público, JSON privado, redirect)?</li>
+          <li><strong>Debate retry seguro × perigoso</strong> — turma classifica chamadas reais do projeto em "pode dar retry" vs "nunca dar retry sem Idempotency-Key", justificando.</li>
+        </ul>
+      </section>
+
+      <section class="mat-section" id="sec-rec">
+        <h2>Recursos e ferramentas</h2>
+        <table class="res-table">
+          <thead><tr><th>Categoria</th><th>Recurso</th><th>Uso</th></tr></thead>
+          <tbody>
+            <tr><td>Slides</td><td><code>slides/slide-lesson-11.html</code></td><td>Exposição na instrução PE</td></tr>
+            <tr><td>Material</td><td><code>materials/lesson-11-material.html</code></td><td>Autoestudo</td></tr>
+            <tr><td>DNS</td><td><code>dig</code> / <code>nslookup</code></td><td>Inspeção de registros (A, CNAME, MX, TXT, NS)</td></tr>
+            <tr><td>HTTP</td><td>DevTools Network</td><td><em>Disable cache</em>, <em>Throttling</em>, inspeção de headers</td></tr>
+            <tr><td>Timeout</td><td><code>AbortController</code> (TS)</td><td>Cancelar fetch interno antes do limite</td></tr>
+            <tr><td>Retry</td><td>Backoff exponencial + jitter</td><td>Wrapper TS para chamada externa principal</td></tr>
+            <tr><td>Documentação</td><td><code>docs/redes/resiliencia.md</code></td><td>Plano de tolerância a falhas do projeto</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <section class="mat-section" id="sec-aval">
+        <h2>Verificação de aprendizagem</h2>
+        <ul class="crit-list">
+          <li><span class="obj-tag">CR-1</span><span><code>Cache-Control</code> coerente aplicado por tipo de recurso (HTML SSR, estáticos, JSON público, JSON privado).</span></li>
+          <li><span class="obj-tag">CR-2</span><span><strong>ETag</strong> e revalidação <code>304</code> funcionando em pelo menos 1 endpoint do projeto.</span></li>
+          <li><span class="obj-tag">CR-3</span><span><strong>Timeout</strong> via <code>AbortController</code> aplicado em <strong>todos</strong> os fetch internos.</span></li>
+          <li><span class="obj-tag">CR-4</span><span><strong>Retry</strong> com backoff exponencial + jitter na chamada externa principal do projeto.</span></li>
+          <li><span class="obj-tag">CR-5</span><span><code>docs/redes/resiliencia.md</code> com plano de tolerância a falhas + MR <code>feat(net): cache + resiliência</code> aberto até as 16h.</span></li>
+        </ul>
+        <div class="callout callout-warn">
+          <div class="callout-label">Critério mínimo</div>
+          <p>Aluno que sair às 16h sem <strong>Cache-Control coerente</strong>, <strong>timeout em todos os fetch</strong> e <strong>retry com jitter na chamada externa principal</strong> está em débito técnico — o projeto não pode ser entregue ao avaliador final sem rede de proteção contra falhas reais de rede.</p>
+        </div>
+      </section>
+
+      <section class="mat-section" id="sec-next">
+        <h2>Encerramento do módulo</h2>
+        <p>A aula 11 fecha o Módulo 2. Em vez de uma "próxima aula", esta seção amarra a trajetória: o módulo começou em <strong>HTML/CSS/JS</strong>, passou por <strong>banco de dados relacional</strong> e <strong>SQL</strong>, construiu um <strong>back-end TypeScript com Express + EJS em SSR</strong> sobre arquitetura MVC de 6 camadas, cobriu o sistema com <strong>testes e CI</strong> e agora blindou contra falhas de rede.</p>
+        <h3>Retrospectiva das 11 aulas</h3>
+        <ul>
+          <li><strong>Aulas 1–4</strong> · Front estático e fundação relacional: HTML/CSS/JS, modelagem, SQL, JOINs.</li>
+          <li><strong>Aulas 5–8</strong> · Back-end MVC: Node.js + Express, controllers, services, repositories, helpers e EJS+SSR.</li>
+          <li><strong>Aulas 9–10</strong> · Qualidade: tipagem TS estrita, testes por camada, Husky e CI verde.</li>
+          <li><strong>Aula 11</strong> · Infraestrutura de rede: cache, CDN, TLS, resiliência e idempotência.</li>
+        </ul>
+        <h3>Ponte para os próximos módulos</h3>
+        <p>O Módulo 3 (e os módulos seguintes do ciclo) parte deste projeto integrador como base — o stack TS + Express + EJS + SSR + pg permanece, e os próximos módulos vão adicionar autenticação, observabilidade, deploy avançado e arquiteturas distribuídas.</p>
+        <h3>Checklist final para entrega do projeto integrador</h3>
+        <ul>
+          <li>DER + minimundo + dicionário de dados publicados em <code>docs/banco/</code>.</li>
+          <li>CRUD funcional em todas as entidades principais via Express + EJS (SSR).</li>
+          <li>Camadas MVC respeitadas (<code>controllers</code> / <code>services</code> / <code>repositories</code> / <code>helpers</code> / <code>views</code>).</li>
+          <li>Cobertura de testes mínima por camada + workflow GitHub Actions verde.</li>
+          <li>Cache + timeout + retry aplicados; <code>docs/redes/resiliencia.md</code> presente.</li>
+          <li>README com instruções claras de execução local + deploy.</li>
+        </ul>
+        <div class="callout callout-tip">
+          <div class="callout-label">Encerramento</div>
+          <p>Você sai do Módulo 2 sabendo construir um sistema web inteiro — do banco até o cache da CDN — com qualidade testável e tolerância a falhas. É a fundação sobre a qual todo o resto do ciclo será construído.</p>
+        </div>
+      </section>
+
+      <div class="back-cta"><a href="../../index.html">← Voltar ao Módulo</a></div>
+    </article>
+  </div>
+
+  <div class="logo-container text-center py-4">
+    <img src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1769427095/9c2796bb-d4da-4f4e-846a-d38d547249ee_pwwh3l.png" alt="Inteli Logo" style="max-width: 150px;">
+  </div>
+
+  <footer class="inteli-footer mt-auto py-4 bg-light border-top">
+    <div class="container text-center">
+      <p class="mb-1">Material criado pelo professor <strong>Afonso Brandão</strong> para o <strong>Inteli</strong>.</p>
+      <small class="text-muted">🔓 Licença de leitura aberta</small>
+    </div>
+  </footer>
+
+  <script>
+    const progressBar = document.getElementById('progress-bar');
+    const floatNav = document.getElementById('float-nav');
+    window.addEventListener('scroll', () => {
+      const scrolled = window.scrollY;
+      const total = document.documentElement.scrollHeight - window.innerHeight;
+      progressBar.style.width = (scrolled / total * 100) + '%';
+      if (scrolled > 320) floatNav.classList.add('visible');
+      else floatNav.classList.remove('visible');
+    });
+    const tocLinks = document.querySelectorAll('.mat-toc a');
+    const sections = document.querySelectorAll('.mat-section');
+    const spy = () => {
+      let current = '';
+      sections.forEach((s) => { const top = s.getBoundingClientRect().top; if (top < 120) current = s.id; });
+      tocLinks.forEach((a) => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+    };
+    window.addEventListener('scroll', spy);
+  </script>
+</body>
+</html>

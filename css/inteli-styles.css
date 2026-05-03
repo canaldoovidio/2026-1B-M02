@@ -1,0 +1,302 @@
+@import url("https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700&family=Space+Mono:wght@400;700&display=swap");
+
+/* Inteli Color Variables */
+:root {
+  --inteli-purple: #2e2640;
+  --inteli-dark-purple: #2e2640;
+  --inteli-light-purple: #caced6;
+  --inteli-blue: #89cea5;
+  --inteli-green: #89cea5;
+  --inteli-coral: #ff4545;
+  --inteli-dark-gray: #b2b6bf;
+  --inteli-gray: #caced6;
+  --inteli-light-gray: #e6eaeb;
+  --inteli-white: #ffffff;
+  --inteli-black: #2e2640;
+
+  /* Course Colors */
+  --adm-tech-navy: #2e2640;
+  --si-blue: #89cea5;
+  --eng-software-yellow: #ff4545;
+
+  /* Bootstrap Overrides */
+  --bs-primary: #2e2640;
+  --bs-secondary: #b2b6bf;
+  --bs-success: #89cea5;
+  --bs-danger: #ff4545;
+  --bs-warning: #ff4545;
+  --bs-info: #89cea5;
+  --bs-light: #e6eaeb;
+  --bs-dark: #2e2640;
+  --bs-body-color: #2e2640;
+  --bs-body-bg: #ffffff;
+}
+
+/* Body Styles */
+body {
+  background-color: var(--inteli-white);
+  min-height: 100vh;
+  padding-bottom: 0;
+  /* Changed from 50px since we have a footer now */
+  display: flex;
+  flex-direction: column;
+  font-family: "Azurio", "Manrope", sans-serif;
+  color: var(--inteli-purple);
+}
+
+/* Logo Container */
+.logo-container {
+  text-align: center;
+  padding: 40px 0;
+}
+
+.logo-container img {
+  max-width: 150px;
+  height: auto;
+}
+
+h1,
+h2,
+h3,
+h4,
+h5,
+h6,
+.card-title,
+.card-header {
+  font-family: "Manrope", sans-serif;
+}
+
+code,
+pre,
+.text-mono {
+  font-family: "Space Mono", monospace;
+}
+
+/* Card Styles */
+.card {
+  transition: transform 0.3s ease, box-shadow 0.3s ease;
+  border: 2px solid var(--inteli-gray);
+  border-radius: 15px;
+  overflow: hidden;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  box-shadow: 0 2px 8px rgba(46, 38, 64, 0.12);
+}
+
+.card:hover {
+  transform: translateY(-10px);
+  box-shadow: 0 10px 30px rgba(46, 38, 64, 0.35);
+}
+
+.card-header {
+  background-color: var(--inteli-purple);
+  color: var(--inteli-white);
+  font-weight: bold;
+  padding: 20px;
+}
+
+.card-body {
+  background-color: var(--inteli-white);
+  flex-grow: 1;
+  display: flex;
+  flex-direction: column;
+}
+
+/* Button Styles */
+.btn-inteli {
+  background-color: var(--inteli-purple);
+  color: var(--inteli-white);
+  border: none;
+  padding: 10px 30px;
+  border-radius: 25px;
+  transition: background-color 0.3s ease;
+  margin-top: auto;
+}
+
+.btn-inteli:hover {
+  background-color: var(--inteli-green);
+  color: var(--inteli-white);
+}
+
+/* Professor Card */
+.professor-card .card-header {
+  background-color: var(--inteli-dark-purple);
+}
+
+.professor-card img {
+  max-height: 150px;
+  width: auto;
+  object-fit: contain;
+}
+
+/* Module Badge */
+.module-badge {
+  background-color: var(--inteli-green);
+  color: white;
+  padding: 5px 15px;
+  border-radius: 20px;
+  font-size: 0.9rem;
+  display: inline-block;
+  margin-bottom: 10px;
+}
+
+/* Course Specific Backgrounds */
+.bg-adm-tech {
+  background-color: var(--adm-tech-navy) !important;
+}
+
+.bg-si {
+  background-color: var(--si-blue) !important;
+}
+
+.text-adm-tech {
+  color: var(--adm-tech-navy) !important;
+}
+
+.text-si {
+  color: var(--si-blue) !important;
+}
+
+/* Specific Header Overrides */
+.card-header-adm-tech {
+  background-color: var(--adm-tech-navy);
+  color: var(--inteli-white);
+}
+
+.card-header-si {
+  background-color: var(--si-blue);
+  color: var(--inteli-white);
+}
+
+.bg-eng-software {
+  background-color: var(--eng-software-yellow) !important;
+}
+
+.bg-common {
+  background-color: var(--inteli-dark-gray) !important;
+}
+
+.text-eng-software {
+  color: var(--eng-software-yellow) !important;
+}
+
+.card-header-eng-software {
+  background-color: var(--eng-software-yellow);
+  color: var(--inteli-white);
+}
+
+.text-common {
+  color: var(--inteli-dark-gray) !important;
+}
+
+.card-header-common {
+  background-color: var(--inteli-dark-gray);
+  color: var(--inteli-white);
+}
+
+/* Course Specific Buttons */
+.btn-adm {
+  background-color: var(--adm-tech-navy);
+  border-color: var(--adm-tech-navy);
+  color: white;
+}
+.btn-adm:hover {
+  background-color: #1a172a;
+  color: white;
+}
+.btn-outline-adm {
+  border-color: var(--adm-tech-navy);
+  color: var(--adm-tech-navy);
+}
+.btn-outline-adm:hover {
+  background-color: var(--adm-tech-navy);
+  color: white;
+}
+
+.btn-si {
+  background-color: var(--si-blue);
+  border-color: var(--si-blue);
+  color: white;
+}
+.btn-si:hover {
+  background-color: #6fb88c;
+  color: white;
+}
+.btn-outline-si {
+  border-color: var(--si-blue);
+  color: var(--si-blue);
+}
+.btn-outline-si:hover {
+  background-color: var(--si-blue);
+  color: white;
+}
+
+.btn-common {
+  background-color: var(--inteli-dark-gray);
+  border-color: var(--inteli-dark-gray);
+  color: white;
+}
+.btn-common:hover {
+  background-color: #979da8;
+  color: white;
+}
+.btn-outline-common {
+  border-color: var(--inteli-dark-gray);
+  color: var(--inteli-dark-gray);
+}
+.btn-outline-common:hover {
+  background-color: var(--inteli-dark-gray);
+  color: white;
+}
+
+.btn-eng {
+  background-color: var(--eng-software-yellow);
+  border-color: var(--eng-software-yellow);
+  color: white;
+}
+.btn-eng:hover {
+  background-color: #e63e3e;
+  color: white;
+}
+.btn-outline-eng {
+  border-color: var(--eng-software-yellow);
+  color: var(--eng-software-yellow);
+}
+.btn-outline-eng:hover {
+  background-color: var(--eng-software-yellow);
+  color: white;
+}
+
+/* Course Specific Badges and Lesson Numbers */
+.badge-adm { background-color: var(--adm-tech-navy) !important; color: white; border: 1px solid rgba(255,255,255,0.3); }
+.lesson-number-adm { background-color: var(--adm-tech-navy) !important; color: white; }
+
+.badge-si { background-color: var(--si-blue) !important; color: white; border: 1px solid rgba(255,255,255,0.3); }
+.lesson-number-si { background-color: var(--si-blue) !important; color: white; }
+
+.badge-eng { background-color: var(--eng-software-yellow) !important; color: white; border: 1px solid rgba(255,255,255,0.3); }
+.lesson-number-eng { background-color: var(--eng-software-yellow) !important; color: white; }
+
+/* Fullscreen Button */
+.fullscreen-btn {
+  background: #f3f4f6;
+  border: none;
+  color: var(--inteli-purple);
+  width: 40px;
+  height: 40px;
+  border-radius: 50%;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  font-size: 1.2rem;
+  transition: all 0.2s;
+  margin-left: 10px;
+}
+
+.fullscreen-btn:hover {
+  background: var(--inteli-purple);
+  color: white;
+  transform: scale(1.1);
+}

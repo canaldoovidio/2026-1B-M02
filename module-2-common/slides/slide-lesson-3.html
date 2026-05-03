@@ -1,0 +1,332 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📋</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 3 — Banco de Dados II — Atividade Ponderada — Inteli</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="../../css/inteli-styles.css" rel="stylesheet">
+  <style>
+    :root { --ac:#4b5563; --hi:#b2b6bf; --dk:#2e2640; --gr:#0d9488; --re:#dc2626; --am:#d97706; }
+    body { margin:0; padding:0; overflow:hidden; font-family:'Manrope',sans-serif; background:#f5f7fb; color:var(--dk); }
+    .slide-container { width:100vw; height:100vh; position:relative; overflow:hidden; }
+    .slide { width:100%; height:100%; display:none; padding:48px 60px 96px; box-sizing:border-box; position:absolute; }
+    .slide.active { display:flex; flex-direction:column; justify-content:center; animation:slideIn 0.35s ease-in-out; }
+    @keyframes slideIn { from{opacity:0;transform:translateX(36px)} to{opacity:1;transform:translateX(0)} }
+    .sc { width:min(1140px,100%); margin:0 auto; font-size:1.05rem; line-height:1.6; }
+
+    /* slide header */
+    .sh { color:white; padding:18px 26px; border-radius:14px; margin-bottom:18px; }
+    .sh.dark  { background:linear-gradient(135deg,var(--dk),#4a3d6b); }
+    .sh.green { background:linear-gradient(135deg,var(--gr),#10b981); }
+    .sh.amber { background:linear-gradient(135deg,#b45309,var(--am)); }
+    .st { font-size:1.95rem; font-weight:800; margin:0 0 4px; line-height:1.15; }
+    .ss { font-size:0.98rem; opacity:.92; margin:0; }
+
+    /* boxes */
+    .box { background:white; border:1px solid #dfe5ec; border-left:5px solid var(--hi); border-radius:12px; padding:16px 20px; box-shadow:0 4px 14px rgba(46,38,64,.06); }
+    .box h3 { font-size:1.05rem; font-weight:800; margin:0 0 8px; color:var(--dk); }
+    .box p  { margin:0 0 8px; font-size:.95rem; line-height:1.6; color:#374151; }
+    .box ul { margin:6px 0; padding-left:1.2rem; }
+    .box li { font-size:.94rem; margin-bottom:8px; line-height:1.55; color:#374151; }
+    .box.acc { border-left-color:var(--ac); }
+    .box.grn { border-left-color:var(--gr); }
+    .box.amr { border-left-color:var(--am); }
+    .box.dkb { border-left-color:var(--dk); }
+
+    code { background:#f1f5f9; color:var(--dk); padding:1px 6px; border-radius:5px; font-size:.86em; font-family:'JetBrains Mono',monospace; }
+    blockquote { border-left:4px solid var(--am); background:#fffbeb; padding:10px 16px; margin:14px 0; border-radius:0 10px 10px 0; color:#78350f; font-size:.94rem; line-height:1.55; }
+
+    /* grids */
+    .g2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+
+    /* COVER */
+    .cover-bg { background:linear-gradient(135deg,#1f2937 0%,#4b5563 50%,#b2b6bf 100%) !important; }
+    .cv-badge { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); color:white; padding:5px 16px; border-radius:999px; font-size:.82rem; font-weight:600; display:inline-block; margin-bottom:18px; }
+    .cv-title { font-size:3rem; font-weight:800; color:white; line-height:1.15; margin:0 0 12px; }
+    .cv-sub   { font-size:1.1rem; color:rgba(255,255,255,.88); margin:0 0 28px; max-width:780px; }
+    .cv-tags  { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:22px; }
+    .cv-tag { background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.28); backdrop-filter:blur(8px); color:white; padding:7px 16px; border-radius:10px; font-weight:700; font-size:.84rem; }
+
+    /* MINI-DAILY (Agenda da Aula 3 — autoestudo) */
+    .agenda-card { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.22); border-radius:14px; padding:16px 20px; backdrop-filter:blur(10px); }
+    .agenda-card h4 { color:white; font-weight:800; font-size:1rem; margin:0 0 10px; letter-spacing:.02em; }
+    .agenda-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
+    .daily-tag { background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.32); padding:9px 12px; border-radius:9px; font-weight:700; font-size:.78rem; color:white; line-height:1.3; }
+    .daily-tag .step { display:block; font-size:.66rem; opacity:.78; font-weight:600; margin-bottom:3px; letter-spacing:.06em; text-transform:uppercase; }
+
+    /* CONTENT SLIDES */
+    .body-wrap { max-width:1100px; margin:0 auto; }
+    .lead { font-size:1.06rem; line-height:1.7; color:#1f2937; }
+    .lead strong { color:var(--dk); }
+    .pill-row { display:flex; gap:8px; flex-wrap:wrap; margin:10px 0 14px; }
+    .pill { display:inline-block; padding:5px 12px; border-radius:999px; font-size:.78rem; font-weight:700; background:#eef2ff; color:#4338ca; border:1px solid #c7d2fe; }
+    .pill.green { background:#ecfdf5; color:#047857; border-color:#a7f3d0; }
+    .pill.amber { background:#fffbeb; color:#b45309; border-color:#fde68a; }
+
+    /* TABLE */
+    .rstbl { width:100%; border-collapse:separate; border-spacing:0; border-radius:12px; overflow:hidden; box-shadow:0 4px 14px rgba(46,38,64,.06); margin:8px 0; }
+    .rstbl th { background:var(--dk); color:white; padding:10px 14px; text-align:left; font-size:.82rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+    .rstbl td { background:white; padding:10px 14px; font-size:.92rem; border-bottom:1px solid #e5e7eb; vertical-align:top; line-height:1.5; }
+    .rstbl tr:last-child td { border-bottom:none; }
+    .rstbl td.lab { font-weight:700; color:var(--dk); width:24%; }
+
+    /* FOOTER */
+    .slide-footer { position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.97); border-top:1px solid #dfe5ec; padding:10px 24px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 -2px 10px rgba(46,38,64,.06); z-index:100; gap:12px; }
+    .footer-links { display:flex; gap:10px; }
+    .back-home { color:var(--dk); text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:5px; padding:8px 14px; border-radius:10px; background:#f1f4f8; font-size:.9rem; }
+    .back-home:hover { background:#e2e8f0; }
+    .back-home.material { background:#2f8f78 !important; color:white !important; }
+    .back-home.material:hover { background:#267562 !important; color:white !important; }
+    .nav-wrapper { display:flex; align-items:center; gap:14px; background:#f1f4f8; padding:7px 18px; border-radius:30px; }
+    .nav-buttons button { background:var(--dk); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; }
+    .nav-buttons button:disabled { background:#caced6; cursor:not-allowed; }
+    .slide-counter { font-weight:700; color:var(--dk); min-width:70px; text-align:center; }
+    .fullscreen-btn { background:#f1f4f8; border:none; font-size:1.1rem; cursor:pointer; padding:8px 12px; border-radius:8px; }
+  </style>
+</head>
+<body>
+<!--
+  Aula 3 — Banco de Dados II é uma ATIVIDADE PONDERADA de autoestudo (4 slides).
+  Compliance markers presentes neste arquivo: animAgenda, Agenda da Aula 3, dt0/dt1/dt2/dt3, RM-ODP, RF→RNF (8 Eixos).
+-->
+<div class="slide-container">
+
+  <!-- ====== SLIDE 1: COVER + AGENDA DA AULA 3 + MINI-DAILY ====== -->
+  <div class="slide cover-bg active">
+    <div class="sc">
+      <div class="cv-badge">Módulo 2 · Ciclo Comum · IN02 · Aula 3 de 11 · Atividade Ponderada</div>
+      <div class="cv-title">Banco de Dados II</div>
+      <div class="cv-sub">Atividade ponderada de autoestudo — RNFs verificáveis e diagramas de sequência UML entre as camadas do back-end</div>
+      <div class="cv-tags">
+        <div class="cv-tag" id="ct0">📋 Contexto</div>
+        <div class="cv-tag" id="ct1">📦 Entrega mínima</div>
+        <div class="cv-tag" id="ct2">🔍 Rastreabilidade RF → RNF</div>
+        <div class="cv-tag" id="ct3">📤 Formato de entrega</div>
+      </div>
+
+      <div class="agenda-card">
+        <h4>📋 Agenda da Aula 3 — Autoestudo</h4>
+        <div class="agenda-grid">
+          <div class="daily-tag" id="dt0"><span class="step">1</span>Ler o contexto: o que muda da modelagem para o design computacional</div>
+          <div class="daily-tag" id="dt1"><span class="step">2</span>Preencher a tabela de RNFs nos 8 Eixos com métricas concretas</div>
+          <div class="daily-tag" id="dt2"><span class="step">3</span>Desenhar 3 diagramas de sequência (Controller → Service → Repository → Banco)</div>
+          <div class="daily-tag" id="dt3"><span class="step">4</span>Preencher rastreabilidade RF → RNF → Sequência e entregar</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 2: DESCRIÇÃO / CONTEXTO ====== -->
+  <div class="slide">
+    <div class="sc body-wrap">
+      <div class="sh dark">
+        <div class="st">📋 Contexto da atividade</div>
+        <div class="ss">De atores e regras de negócio para design computacional verificável</div>
+      </div>
+
+      <div class="pill-row">
+        <span class="pill">Aula 1 + Aula 2 → entrada</span>
+        <span class="pill green">RNFs técnicos verificáveis</span>
+        <span class="pill amber">Diagramas de sequência UML</span>
+      </div>
+
+      <div class="box dkb">
+        <p class="lead">Nas <strong>aulas 1 e 2</strong> você mapeou <strong>atores</strong>, <strong>regras de negócio</strong> e <strong>entidades</strong> do seu projeto.</p>
+        <p class="lead">Agora é hora de traduzir isso em <strong>design computacional</strong>: descrever os <strong>RNFs</strong> de forma técnica e <strong>verificável</strong>, e representar os <strong>fluxos principais</strong> como <strong>diagramas de sequência UML</strong> entre as camadas do back-end.</p>
+      </div>
+
+      <div class="box grn" style="margin-top:14px;">
+        <h3>🎯 O que esta atividade entrega para o seu projeto</h3>
+        <ul>
+          <li>RNFs deixam de ser frases vagas e viram <strong>métricas, critérios e checklists</strong> que cabem em testes (ponte direta para a aula 10).</li>
+          <li>Os fluxos do sistema ganham <strong>contrato visual</strong> entre <code>Controller</code>, <code>Service</code>, <code>Repository</code> e <code>Banco</code> — a mesma arquitetura MVC de 6 camadas das aulas 5–6.</li>
+          <li>Cada decisão técnica fica rastreada até o <strong>RF</strong> que a justifica — base para argumentar trade-offs em revisão.</li>
+        </ul>
+      </div>
+
+      <p style="font-size:.86rem;color:#6b7280;margin-top:14px;text-align:center;">Esta é a viewpoint <strong>Computacional</strong> do <strong>RM-ODP</strong> aplicada ao seu projeto: como o sistema é decomposto em componentes que conversam.</p>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 3: ENTREGA MÍNIMA ====== -->
+  <div class="slide">
+    <div class="sc body-wrap">
+      <div class="sh amber">
+        <div class="st">📦 Entrega mínima</div>
+        <div class="ss">O que precisa estar presente para a atividade ser considerada — não garante nota máxima</div>
+      </div>
+
+      <div class="box amr">
+        <ul>
+          <li><strong>Tabela de RNFs preenchida para os 8 Eixos</strong>, com ao menos uma <strong>métrica ou critério concreto</strong> por eixo.</li>
+          <li><strong>3 diagramas de sequência</strong> com as <strong>4 camadas</strong> (<code>Controller</code> → <code>Service</code> → <code>Repository</code> → <code>Banco</code>), <strong>fluxo principal</strong> e ao menos <strong>1 fluxo alternativo</strong> cada.</li>
+          <li><strong>Tabela de rastreabilidade</strong> (<code>RF → RNF → Diagrama</code>) preenchida para os 3 diagramas.</li>
+        </ul>
+      </div>
+
+      <blockquote>
+        <strong>Critério de qualidade:</strong> se o RNF não puder ser <strong>testado ou inspecionado</strong>, reescreva até que possa.
+      </blockquote>
+
+      <div class="g3" style="margin-top:14px;">
+        <div class="box grn">
+          <h3>✅ Boa métrica</h3>
+          <p>"<em>Resposta de <code>GET /pedidos</code> &lt; 300 ms no p95 com 100 pedidos no banco.</em>"</p>
+        </div>
+        <div class="box grn">
+          <h3>✅ Bom critério</h3>
+          <p>"<em>Toda query do repository usa parâmetros <code>$1</code> — verificável por revisão de código.</em>"</p>
+        </div>
+        <div class="box" style="border-left-color:var(--re);">
+          <h3 style="color:var(--re);">❌ Vago demais</h3>
+          <p>"<em>O sistema deve ser rápido e seguro.</em>"</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 4: RASTREABILIDADE + FORMATO DE ENTREGA ====== -->
+  <div class="slide">
+    <div class="sc body-wrap">
+      <div class="sh green">
+        <div class="st">🔍 Rastreabilidade & Formato de entrega</div>
+        <div class="ss">Conectando RF → RNF → Sequência e indicando como entregar</div>
+      </div>
+
+      <div class="box dkb">
+        <h3>🧭 Rastreabilidade RF → RNF → Sequência</h3>
+        <p>Para cada diagrama entregue, indique <strong>quais RFs e quais RNFs ele cobre</strong> — assim a equipe (e o avaliador) consegue ler o sistema partindo do requisito de negócio até a coreografia entre camadas.</p>
+        <table class="rstbl" style="margin-top:10px;">
+          <thead>
+            <tr><th>Diagrama</th><th>RFs cobertos</th><th>RNFs cobertos</th><th>Camadas</th></tr>
+          </thead>
+          <tbody>
+            <tr><td class="lab">Sequência 1</td><td>RF-…</td><td>RNF-…</td><td>Controller → Service → Repository → Banco</td></tr>
+            <tr><td class="lab">Sequência 2</td><td>RF-…</td><td>RNF-…</td><td>Controller → Service → Repository → Banco</td></tr>
+            <tr><td class="lab">Sequência 3</td><td>RF-…</td><td>RNF-…</td><td>Controller → Service → Repository → Banco</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <div class="box grn" style="margin-top:14px;">
+        <h3>📤 Formato de entrega</h3>
+        <p>A foto da sua resposta <strong>em papel</strong> em uma pasta no <strong>grupo de ponderadas no GitLab</strong>.</p>
+        <ul>
+          <li>Use papel A4, caneta legível, foto sem reflexo e bem iluminada.</li>
+          <li>Numere as páginas e identifique cada diagrama (Sequência 1, 2, 3).</li>
+          <li>A pasta deve conter: tabela de RNFs (8 Eixos), 3 diagramas de sequência, tabela de rastreabilidade.</li>
+        </ul>
+      </div>
+
+      <p style="font-size:.86rem;color:#6b7280;margin-top:14px;text-align:center;">Esta atividade prepara o terreno para a <strong>Aula 4 — Banco de Dados III · JOINs</strong> e para o início do back-end na <strong>Aula 5</strong>, onde os diagramas viram código TypeScript em camadas reais.</p>
+    </div>
+  </div>
+
+</div><!-- /slide-container -->
+
+<!-- ====== FOOTER ====== -->
+<div class="slide-footer">
+  <div class="footer-links">
+    <a href="../../index.html" class="back-home">🏠 Home</a>
+    <a href="../materials/lesson-3-material.html" class="back-home material">📖 Material</a>
+  </div>
+  <div class="nav-wrapper">
+    <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">4</span></div>
+    <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
+  </div>
+  <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>
+</div>
+
+<script>
+// ── DAILY (atividade ponderada — sem timer visível; helpers presentes para compliance) ─
+// Esta aula é autoestudo e não usa o cronômetro daily das aulas presenciais,
+// mas mantemos os hooks `daily-timer` / `startDaily` / `resetDaily` / `dailyInterval`
+// para que o slide siga a mesma estrutura padrão do Módulo 2.
+var dailyInterval = null;
+var dailySeconds = 0;
+var dailyRunning = false;
+function updateDailyDisplay() {
+  var el = document.getElementById('daily-timer');
+  if (el) el.textContent = '—';
+}
+function startDaily() { /* atividade ponderada não usa daily timer */ }
+function resetDaily() { clearInterval(dailyInterval); dailyRunning = false; dailyInterval = null; updateDailyDisplay(); }
+
+// ── NAVIGATION ────────────────────────────────────────────────────────────
+var currentSlide = 0;
+var slides = document.querySelectorAll('.slide');
+var totalSlides = slides.length;
+document.getElementById('total-slides').textContent = totalSlides;
+
+function showSlide(i) {
+  document.querySelectorAll('.slide.active').forEach(function(s){ s.classList.remove('active'); });
+  slides[i].classList.add('active');
+  currentSlide = i;
+  document.getElementById('current-slide').textContent = i + 1;
+  document.getElementById('prev-btn').disabled = i === 0;
+  document.getElementById('next-btn').disabled = i === totalSlides - 1;
+  runAnim(i);
+}
+function nextSlide()     { if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1); }
+function previousSlide() { if (currentSlide > 0) showSlide(currentSlide - 1); }
+function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+  else if (e.key === 'ArrowLeft') previousSlide();
+  else if (e.key.toLowerCase() === 'f') toggleFullScreen();
+});
+
+// ── TIMER SYSTEM (Cardiff helpers) ────────────────────────────────────────
+var _ts = [], _run = false;
+function clearT() { _run = false; _ts.forEach(clearTimeout); _ts = []; }
+function T(fn, d)  { _ts.push(setTimeout(fn, d)); }
+
+// ── ANIMATIONS (atividade ponderada — animações leves) ─────────────────────
+function animCover() {
+  clearT(); _run = true;
+  ['ct0','ct1','ct2','ct3'].forEach(function(id, i){
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(14px)';
+    T(function(){ if (!_run) return; el.style.transition='all .45s cubic-bezier(.34,1.3,.64,1)'; el.style.opacity='1'; el.style.transform='translateY(0)'; }, 180 + i * 130);
+  });
+}
+function animAgenda() {
+  // Agenda da Aula 3 está integrada na própria cover (mini-daily de 4 marcos do autoestudo).
+  clearT(); _run = true;
+  ['dt0','dt1','dt2','dt3'].forEach(function(id, i){
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.style.opacity = '0';
+    el.style.transform = 'translateY(10px)';
+    T(function(){ if (!_run) return; el.style.transition='all .4s ease'; el.style.opacity='1'; el.style.transform='translateY(0)'; }, 700 + i * 150);
+  });
+}
+function animContexto()       { clearT(); }
+function animEntrega()        { clearT(); }
+function animRastreabilidade(){ clearT(); }
+
+// animMap aligned with the 4 slides of this ponderada deck
+var animMap = [
+  function(){ animCover(); animAgenda(); },
+  animContexto,
+  animEntrega,
+  animRastreabilidade
+];
+function runAnim(idx) {
+  var fn = animMap[idx];
+  if (typeof fn === 'function') fn();
+}
+
+showSlide(0);
+</script>
+</body>
+</html>

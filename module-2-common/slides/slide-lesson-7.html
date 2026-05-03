@@ -1,0 +1,847 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 7 — Front-End I — HTML, DOM e JS com SSR + EJS — Inteli</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="../../css/inteli-styles.css" rel="stylesheet">
+  <style>
+    :root { --ac:#4b5563; --hi:#b2b6bf; --dk:#2e2640; --gr:#0d9488; --re:#dc2626; --am:#d97706; }
+    body { margin:0; padding:0; overflow:hidden; font-family:'Manrope',sans-serif; background:#f5f7fb; color:var(--dk); }
+    .slide-container { width:100vw; height:100vh; position:relative; overflow:hidden; }
+    .slide { width:100%; height:100%; display:none; padding:44px 52px 88px; box-sizing:border-box; position:absolute; }
+    .slide.active { display:flex; flex-direction:column; justify-content:center; animation:slideIn 0.35s ease-in-out; }
+    @keyframes slideIn { from{opacity:0;transform:translateX(36px)} to{opacity:1;transform:translateX(0)} }
+    .sc { width:min(1140px,100%); margin:0 auto; font-size:1.05rem; line-height:1.55; }
+    .sh { color:white; padding:16px 22px; border-radius:14px; margin-bottom:14px; }
+    .sh.blue  { background:linear-gradient(135deg,#374151,#b2b6bf); }
+    .sh.dark  { background:linear-gradient(135deg,var(--dk),#4a3d6b); }
+    .sh.green { background:linear-gradient(135deg,var(--gr),#10b981); }
+    .st { font-size:1.9rem; font-weight:800; margin:0 0 4px; line-height:1.15; }
+    .ss { font-size:0.95rem; opacity:.9; margin:0; }
+    .box { background:white; border:1px solid #dfe5ec; border-left:5px solid var(--hi); border-radius:12px; padding:14px 18px; box-shadow:0 4px 14px rgba(46,38,64,.06); }
+    .box h3 { font-size:1rem; font-weight:700; margin:0 0 6px; color:var(--dk); }
+    .box p  { margin:0 0 5px; font-size:.88rem; line-height:1.5; color:#374151; }
+    .box ul { margin:3px 0; padding-left:1.1rem; }
+    .box li { font-size:.87rem; margin-bottom:3px; line-height:1.4; color:#374151; }
+    .box.acc { border-left-color:var(--ac); }
+    .box.grn { border-left-color:var(--gr); }
+    .box.amr { border-left-color:var(--am); }
+    .box.red { border-left-color:var(--re); }
+    code { background:#f1f5f9; color:var(--dk); padding:1px 6px; border-radius:5px; font-size:.86em; }
+    .g2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+    .g4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; }
+
+    .cover-bg { background:linear-gradient(135deg,#1f2937 0%,#4b5563 50%,#b2b6bf 100%) !important; }
+    .cv-badge { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); color:white; padding:5px 16px; border-radius:999px; font-size:.82rem; font-weight:600; display:inline-block; margin-bottom:18px; }
+    .cv-title { font-size:3rem; font-weight:800; color:white; line-height:1.15; margin:0 0 14px; }
+    .cv-sub   { font-size:1.1rem; color:rgba(255,255,255,.82); margin:0 0 28px; }
+    .cv-tags  { display:flex; flex-wrap:wrap; gap:8px; }
+    .cv-tag { background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.28); backdrop-filter:blur(8px); color:white; padding:7px 16px; border-radius:10px; font-weight:700; font-size:.84rem; opacity:0; transform:translateY(18px); transition:all .5s cubic-bezier(.34,1.3,.64,1); }
+    .cv-tag.vis { opacity:1; transform:translateY(0); }
+
+    .term { background:#1e1e2e; border-radius:14px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.3); display:flex; flex-direction:column; }
+    .term-bar { background:#313244; padding:7px 12px; display:flex; align-items:center; gap:6px; }
+    .dot { width:10px; height:10px; border-radius:50%; }
+    .dot.r{background:#f38ba8;} .dot.y{background:#f9e2af;} .dot.g{background:#a6e3a1;}
+    .term-ttl { color:#6c7086; font-size:.7rem; font-weight:600; margin-left:7px; font-family:monospace; }
+    .term-body { padding:12px 14px; font-family:'Courier New',monospace; font-size:.8rem; line-height:1.65; flex:1; overflow:hidden; }
+    .tl { white-space:pre; min-height:1.65em; opacity:0; transform:translateY(3px); transition:opacity .25s ease,transform .25s ease; }
+    .tl.vis { opacity:1; transform:translateY(0); }
+    .kw{color:#89b4fa;font-weight:700;} .pth{color:#a6e3a1;} .ver{color:#f9e2af;}
+    .hn{color:#cba6f7;} .hv{color:#cdd6f4;} .hok{color:#a6e3a1;font-weight:700;}
+    .jk{color:#cba6f7;} .js{color:#a6e3a1;} .jn{color:#fab387;} .jb{color:#89b4fa;}
+    .cmt{color:#6c7086;font-style:italic;} .txt{color:#cdd6f4;}
+    .tag{color:#f38ba8;} .att{color:#fab387;} .val{color:#a6e3a1;}
+    .tcur{display:inline-block;width:7px;height:1.1em;background:#89b4fa;vertical-align:text-bottom;animation:tblink .7s step-end infinite;}
+    @keyframes tblink{0%,100%{opacity:1}50%{opacity:0}}
+
+    .mc { background:white; border-radius:11px; padding:12px 14px; border-top:4px solid var(--mc,var(--ac)); box-shadow:0 4px 14px rgba(46,38,64,.08); opacity:0; transform:translateY(18px) scale(.93); transition:all .5s cubic-bezier(.34,1.3,.64,1); }
+    .mc.vis { opacity:1; transform:translateY(0) scale(1); }
+    .mb { font-size:.74rem; font-weight:800; padding:2px 9px; border-radius:5px; background:var(--mc,var(--ac)); color:white; display:inline-block; margin-bottom:6px; font-family:monospace; }
+    .mt { font-size:.84rem; font-weight:700; color:var(--dk); margin-bottom:3px; }
+    .md { font-size:.76rem; color:#64748b; line-height:1.35; }
+    .mex{ font-family:monospace; font-size:.68rem; color:#475569; background:#f8fafc; padding:3px 7px; border-radius:5px; margin-top:5px; }
+
+    .ri { display:flex; align-items:flex-start; gap:10px; padding:9px 12px; border-radius:10px; background:white; border:1px solid #e2e8f0; opacity:0; transform:translateX(-14px); transition:all .4s ease; margin-bottom:5px; }
+    .ri.vis { opacity:1; transform:translateX(0); }
+    .ri.cur { background:linear-gradient(135deg,rgba(75,85,99,.09),rgba(107,114,128,.09)); border-color:var(--ac); }
+    .rn { width:26px; height:26px; border-radius:50%; background:var(--dk); color:white; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.78rem; flex-shrink:0; margin-top:1px; }
+    .ri.cur .rn { background:linear-gradient(135deg,#374151,#b2b6bf); }
+    .rtl { font-size:.86rem; font-weight:700; color:var(--dk); margin-bottom:1px; }
+    .rds { font-size:.76rem; color:#64748b; }
+
+    .pipe { display:flex; align-items:flex-start; justify-content:center; gap:0; margin:14px 0; }
+    .ps { flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; }
+    .pn { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:white; font-weight:800; z-index:2; box-shadow:0 4px 14px rgba(0,0,0,.18); flex-shrink:0; }
+    .pl { font-size:.8rem; font-weight:700; color:var(--dk); margin-top:7px; }
+    .ps2 { font-size:.68rem; color:#64748b; margin-top:2px; }
+    .pc { position:absolute; top:26px; left:calc(50% + 26px); width:calc(100% - 52px); height:4px; z-index:1; }
+    .pcb { width:100%; height:100%; border-radius:2px; background:linear-gradient(90deg,var(--fc,#4b5563),var(--tc,#b2b6bf)); }
+    .ps:last-child .pc { display:none; }
+    .ps.an .pn { opacity:0; transform:scale(.3); transition:all .5s cubic-bezier(.34,1.56,.64,1); }
+    .ps.an .pl,.ps.an .ps2 { opacity:0; transform:translateY(7px); transition:all .4s ease .18s; }
+    .ps.an .pcb { transform:scaleX(0); transform-origin:left; transition:transform .6s cubic-bezier(.22,1,.36,1); }
+    .ps.an.sv .pn { opacity:1; transform:scale(1); box-shadow:0 4px 14px rgba(0,0,0,.18),0 0 20px rgba(24,99,220,.25); }
+    .ps.an.sv .pl,.ps.an.sv .ps2 { opacity:1; transform:translateY(0); }
+    .ps.an.sv .pcb { transform:scaleX(1); }
+
+    .tree { background:#1e1e2e; border-radius:12px; padding:14px 18px; font-family:'Courier New',monospace; font-size:.82rem; color:#cdd6f4; line-height:1.55; }
+    .tree .tn { color:#89b4fa; font-weight:700; }
+    .tree .tf { color:#a6e3a1; }
+    .tree .td { color:#fab387; }
+    .tree .tcm { color:#6c7086; font-style:italic; }
+
+    .slide-footer { position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.97); border-top:1px solid #dfe5ec; padding:10px 24px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 -2px 10px rgba(46,38,64,.06); z-index:100; gap:12px; }
+    .footer-links { display:flex; gap:10px; }
+    .back-home { color:var(--dk); text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:5px; padding:8px 14px; border-radius:10px; background:#f1f4f8; font-size:.9rem; }
+    .back-home:hover { background:#e2e8f0; }
+    .back-home.material { background: #2f8f78 !important; color: white !important; }
+    .back-home.material:hover { background:#267562 !important; color:white !important; }
+    .nav-wrapper { display:flex; align-items:center; gap:14px; background:#f1f4f8; padding:7px 18px; border-radius:30px; }
+    .nav-buttons button { background:var(--dk); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; }
+    .nav-buttons button:disabled { background:#caced6; cursor:not-allowed; }
+    .slide-counter { font-weight:700; color:var(--dk); min-width:70px; text-align:center; }
+    .fullscreen-btn { background:#f1f4f8; border:none; font-size:1.1rem; cursor:pointer; padding:8px 12px; border-radius:8px; }
+
+    .daily-timer { font-size:3.5rem; font-weight:800; font-family:monospace; background:rgba(255,255,255,.15); border-radius:16px; padding:10px 28px; display:inline-block; margin-bottom:16px; letter-spacing:4px; color:white; }
+    .daily-tag { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); padding:6px 16px; border-radius:8px; font-weight:700; font-size:.85rem; color:white; opacity:0; transform:translateY(14px); transition:all .45s cubic-bezier(.34,1.3,.64,1); display:inline-block; margin:4px; }
+    .daily-tag.vis { opacity:1; transform:translateY(0); }
+
+    .vs-grid { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .vs-card { background:white; border:1px solid #dfe5ec; border-top:5px solid var(--vc,var(--ac)); border-radius:12px; padding:14px 18px; }
+    .vs-card h3 { font-size:1.1rem; font-weight:800; margin:0 0 6px; color:var(--dk); }
+    .vs-card .vs-sub { font-size:.78rem; color:#64748b; margin-bottom:8px; }
+    .vs-card ul { margin:6px 0; padding-left:1.1rem; }
+    .vs-card li { font-size:.82rem; margin-bottom:3px; line-height:1.45; color:#374151; }
+
+    .ej-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; }
+    .ej-card { background:white; border:1px solid #dfe5ec; border-radius:11px; padding:12px 14px; opacity:0; transform:translateY(14px); transition:all .45s cubic-bezier(.34,1.3,.64,1); }
+    .ej-card.vis { opacity:1; transform:translateY(0); }
+    .ej-tag { font-family:monospace; font-size:.85rem; font-weight:800; color:#fab387; background:#1e1e2e; padding:4px 10px; border-radius:6px; display:inline-block; margin-bottom:6px; }
+    .ej-name { font-size:.86rem; font-weight:700; color:var(--dk); margin-bottom:3px; }
+    .ej-desc { font-size:.78rem; color:#64748b; line-height:1.4; }
+  </style>
+</head>
+<body>
+<div class="slide-container">
+
+  <!-- ====== SLIDE 1: COVER ====== -->
+  <div class="slide cover-bg">
+    <div class="sc">
+      <div class="cv-badge">Módulo 2 · Ciclo Comum · IN02 · Aula 7 de 11</div>
+      <div class="cv-title">Front-End I — HTML, DOM e JS com SSR + EJS</div>
+      <div class="cv-sub">O servidor monta a página com EJS · HTML semântico · DOM e eventos no cliente</div>
+      <div class="cv-tags">
+        <div class="cv-tag" id="ct0">🖥️ SSR</div>
+        <div class="cv-tag" id="ct1">📜 EJS</div>
+        <div class="cv-tag" id="ct2">🧱 HTML semântico</div>
+        <div class="cv-tag" id="ct3">🌳 DOM</div>
+        <div class="cv-tag" id="ct4">⚡ Eventos</div>
+        <div class="cv-tag" id="ct5">🧩 Partials</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 2: DAILY ====== -->
+  <div class="slide cover-bg" style="background:linear-gradient(135deg,#1f2937 0%,#4b5563 50%,#b2b6bf 100%)!important;">
+    <div class="sc" style="text-align:center;">
+      <div style="background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:28px 32px;">
+        <div style="font-size:2rem;font-weight:800;color:white;margin-bottom:6px;">⏱️ Daily — 15 Minutos</div>
+        <div style="font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:18px;">Hoje vamos consumir o back-end das aulas 5 e 6 — a API está pronta?</div>
+        <div class="daily-timer" id="daily-timer">15:00</div>
+        <div style="margin-bottom:18px;">
+          <button id="daily-start-btn" onclick="startDaily()" style="background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">▶ Iniciar</button>
+          <button onclick="resetDaily()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">↺ Reset</button>
+        </div>
+        <div>
+          <span class="daily-tag" id="dt0">📡 Endpoints prontos?</span>
+          <span class="daily-tag" id="dt1">🧪 Validados com REST Client?</span>
+          <span class="daily-tag" id="dt2">🚧 Algum bloqueio?</span>
+          <span class="daily-tag" id="dt3">🎯 Quais telas vão consumir?</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 2.5: AGENDA ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">📋 Agenda da Aula 7</div><div class="ss">Estrutura e objetivos da aula de hoje</div></div>
+      <div class="g2" style="gap:12px;">
+        <div id="ag0" class="box" style="opacity:0;">
+          <h3>🕐 Bloco 1 — Autoestudo (revisão e dúvidas)</h3>
+          <p>Recap do material — SSR, EJS, fluxo MVC, estrutura de views.</p>
+        </div>
+        <div id="ag1" class="box" style="opacity:0;">
+          <h3>🕑 Bloco 2 — Instrução (Professor)</h3>
+          <p>Setup EJS, sintaxe de templates, partials, render no controller e HTML semântico.</p>
+        </div>
+        <div id="ag2" class="box" style="opacity:0;">
+          <h3>🕒 Bloco 3 — Almoço</h3>
+          <p>Pausa para refeição — cabeça leve para o desenvolvimento da tarde.</p>
+        </div>
+        <div id="ag3" class="box acc" style="opacity:0;">
+          <h3>🎯 Bloco 4 — Desenvolvimento (Projeto)</h3>
+          <p>Adicionar a camada de Views renderizadas no servidor para o recurso central do projeto.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 3: ROADMAP ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">🗺️ Roadmap do Módulo 2</div><div class="ss">Onde estamos: encerramos o back-end e abrimos o front-end SSR</div></div>
+      <div class="g2" style="gap:6px;">
+        <div>
+          <div class="ri" id="rm0"><div class="rn">1</div><div><div class="rtl">Banco I — Modelagem</div><div class="rds">Entidades e relacionamentos</div></div></div>
+          <div class="ri" id="rm1"><div class="rn">2</div><div><div class="rtl">Banco II — DDL e DML</div><div class="rds">Criação e CRUD em SQL</div></div></div>
+          <div class="ri" id="rm2"><div class="rn">3</div><div><div class="rtl">Banco III — JOINs</div><div class="rds">Consultas avançadas</div></div></div>
+          <div class="ri" id="rm3"><div class="rn">5</div><div><div class="rtl">Back-End I — Express + MVC</div><div class="rds">6 camadas em TypeScript</div></div></div>
+          <div class="ri" id="rm4"><div class="rn">6</div><div><div class="rtl">Back-End II — REST</div><div class="rds">Endpoints e validação</div></div></div>
+        </div>
+        <div>
+          <div class="ri cur" id="rm5"><div class="rn">7</div><div><div class="rtl">⭐ Front-End I — HTML, DOM e JS com SSR + EJS</div><div class="rds">Hoje: o servidor monta a página</div></div></div>
+          <div class="ri" id="rm6"><div class="rn">8</div><div><div class="rtl">Front-End II — fetch e formulários</div><div class="rds">Comunicação cliente ↔ servidor</div></div></div>
+          <div class="ri" id="rm7"><div class="rn">9</div><div><div class="rtl">Front-End III — UX/UI</div><div class="rds">Estilo e usabilidade</div></div></div>
+          <div class="ri" id="rm8"><div class="rn">10</div><div><div class="rtl">Integração e Deploy</div><div class="rds">Servir EJS em produção</div></div></div>
+          <div class="ri" id="rm9"><div class="rn">11</div><div><div class="rtl">Apresentação Final</div><div class="rds">Demo do projeto</div></div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 4: SSR vs CSR ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">SSR vs CSR — Quem monta o HTML?</div><div class="ss">Server-Side Rendering, Client-Side Rendering e o conceito de hydration</div></div>
+      <div class="vs-grid" style="margin-bottom:10px;">
+        <div class="vs-card" style="--vc:#0d9488;">
+          <h3>🖥️ SSR — Server-Side Rendering</h3>
+          <div class="vs-sub">O servidor monta o HTML completo e envia pronto.</div>
+          <ul>
+            <li><strong>Primeiro paint imediato</strong> — chega HTML, não bundle JS</li>
+            <li><strong>SEO nativo</strong> — buscadores leem o HTML diretamente</li>
+            <li><strong>Sem build pesado</strong> — Express + EJS e está rodando</li>
+            <li>Cada requisição é uma página completa nova</li>
+          </ul>
+        </div>
+        <div class="vs-card" style="--vc:#d97706;">
+          <h3>🌐 CSR — Client-Side Rendering</h3>
+          <div class="vs-sub">O servidor manda um HTML vazio + bundle JS gigante.</div>
+          <ul>
+            <li>Tela branca até o JS baixar e executar</li>
+            <li>Build complexo (Vite, webpack, etc.)</li>
+            <li>SEO precisa de tratamento extra</li>
+            <li>Após carregar, transições rápidas no cliente</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box acc">
+        <h3>💧 Hydration (híbrido)</h3>
+        <p>Frameworks como Next.js fazem SSR <em>e</em> em seguida "hidratam" o HTML com JS, virando uma SPA. Para o nosso projeto, SSR puro com EJS é mais didático e rápido — sem build, sem complicação.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 5: SETUP EJS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">Setup do EJS no Express</div><div class="ss">Duas linhas e seu Express já renderiza templates</div></div>
+      <div class="g2" style="gap:12px;align-items:start;">
+        <div class="term" style="height:300px;">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/app.ts</div></div>
+          <div class="term-body">
+            <div class="tl" id="su0"></div><div class="tl" id="su1"></div><div class="tl" id="su2"></div>
+            <div class="tl" id="su3"></div><div class="tl" id="su4"></div><div class="tl" id="su5"></div>
+            <div class="tl" id="su6"></div><div class="tl" id="su7"></div><div class="tl" id="su8"></div>
+            <div class="tl" id="su9"></div><div class="tl" id="su10"></div>
+          </div>
+        </div>
+        <div>
+          <div class="box grn" style="margin-bottom:8px;">
+            <h3>📦 Instalação</h3>
+            <p><code>npm install ejs</code> — pronto. EJS é uma dependência simples, sem step de build.</p>
+          </div>
+          <div class="box acc" style="margin-bottom:8px;">
+            <h3>🛣️ <code>app.set('view engine', 'ejs')</code></h3>
+            <p>Diz ao Express: "qualquer <code>res.render('home')</code> vai procurar <code>views/home.ejs</code>".</p>
+          </div>
+          <div class="box amr">
+            <h3>📂 <code>app.set('views', ...)</code></h3>
+            <p>Define o diretório base dos templates. Fixar com <code>path.join</code> evita problemas em produção.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 6: ESTRUTURA DE VIEWS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">Estrutura de <code style="color:white;background:rgba(255,255,255,.18);">views/</code> com partials</div><div class="ss">Layouts, partials reutilizáveis e organização por recurso</div></div>
+      <div class="g2" style="gap:12px;align-items:start;">
+        <div class="tree">
+          <div><span class="tn">src/views/</span></div>
+          <div>├── <span class="td">layouts/</span></div>
+          <div>│   └── <span class="tf">main.ejs</span>            <span class="tcm"># shell HTML &lt;html&gt; ... &lt;/html&gt;</span></div>
+          <div>├── <span class="td">partials/</span></div>
+          <div>│   ├── <span class="tf">header.ejs</span>          <span class="tcm"># &lt;header&gt; + nav</span></div>
+          <div>│   └── <span class="tf">footer.ejs</span>          <span class="tcm"># &lt;footer&gt;</span></div>
+          <div>├── <span class="tf">home.ejs</span>                <span class="tcm"># GET /</span></div>
+          <div>└── <span class="td">users/</span></div>
+          <div>&nbsp;&nbsp;&nbsp; ├── <span class="tf">index.ejs</span>           <span class="tcm"># GET /users</span></div>
+          <div>&nbsp;&nbsp;&nbsp; └── <span class="tf">show.ejs</span>            <span class="tcm"># GET /users/:id</span></div>
+        </div>
+        <div>
+          <div class="box grn" style="margin-bottom:8px;">
+            <h3>🧩 Partials</h3>
+            <p>Pedaços de HTML reusados em várias páginas — <strong>header, footer, nav, sidebar</strong>. Importados com <code>&lt;%- include('partials/header') %&gt;</code>.</p>
+          </div>
+          <div class="box acc">
+            <h3>📐 Convenção</h3>
+            <ul>
+              <li><strong>Por recurso</strong>: <code>users/index.ejs</code>, <code>users/show.ejs</code></li>
+              <li><strong>Layouts</strong>: estrutura base do HTML</li>
+              <li><strong>Partials</strong>: componentes pequenos e repetíveis</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 7: SINTAXE EJS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">Sintaxe EJS — As 4 tags principais</div><div class="ss">Interpolação, lógica e includes em uma sintaxe minimalista</div></div>
+      <div class="ej-grid" style="margin-bottom:10px;">
+        <div class="ej-card" id="ej0">
+          <span class="ej-tag">&lt;%= var %&gt;</span>
+          <div class="ej-name">Interpolação escapada (segura)</div>
+          <div class="ej-desc">Imprime o valor já <strong>escapando HTML</strong> — primeira defesa contra XSS. Use sempre que o dado vier do usuário.</div>
+        </div>
+        <div class="ej-card" id="ej1">
+          <span class="ej-tag">&lt;%- var %&gt;</span>
+          <div class="ej-name">Interpolação raw (não escapada)</div>
+          <div class="ej-desc">Imprime <strong>HTML cru</strong>. Use apenas para conteúdo confiável (ex.: includes), nunca para input do usuário.</div>
+        </div>
+        <div class="ej-card" id="ej2">
+          <span class="ej-tag">&lt;% if (...) { %&gt;</span>
+          <div class="ej-name">Lógica e laços</div>
+          <div class="ej-desc">Bloco JavaScript puro: <code>if</code>, <code>forEach</code>, <code>map</code>. Não imprime nada — só controla fluxo.</div>
+        </div>
+        <div class="ej-card" id="ej3">
+          <span class="ej-tag">&lt;%- include(...) %&gt;</span>
+          <div class="ej-name">Composição via partials</div>
+          <div class="ej-desc">Inclui outro template no lugar atual. Aceita objeto de variáveis adicionais como segundo argumento.</div>
+        </div>
+      </div>
+      <div class="term" style="height:170px;">
+        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/views/users/index.ejs</div></div>
+        <div class="term-body">
+          <div class="tl" id="ex0"></div><div class="tl" id="ex1"></div><div class="tl" id="ex2"></div>
+          <div class="tl" id="ex3"></div><div class="tl" id="ex4"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 8: FLUXO MVC + RES.RENDER ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">Fluxo MVC com <code style="color:white;background:rgba(255,255,255,.18);">res.render</code></div><div class="ss">Controller → Service → Repository → render → HTML no browser</div></div>
+      <div class="pipe" style="margin:14px 0;">
+        <div class="ps an" id="pp0"><div class="pn" style="background:linear-gradient(135deg,#4b5563,#6b7280);">🌐</div><div class="pl">Browser</div><div class="ps2">GET /users</div><div class="pc"><div class="pcb" style="--fc:#4b5563;--tc:#0d9488;"></div></div></div>
+        <div class="ps an" id="pp1"><div class="pn" style="background:linear-gradient(135deg,#0d9488,#10b981);">🎮</div><div class="pl">Controller</div><div class="ps2">UsersController</div><div class="pc"><div class="pcb" style="--fc:#0d9488;--tc:#d97706;"></div></div></div>
+        <div class="ps an" id="pp2"><div class="pn" style="background:linear-gradient(135deg,#d97706,#f59e0b);">🧠</div><div class="pl">Service</div><div class="ps2">UsersService</div><div class="pc"><div class="pcb" style="--fc:#d97706;--tc:#dc2626;"></div></div></div>
+        <div class="ps an" id="pp3"><div class="pn" style="background:linear-gradient(135deg,#dc2626,#ef4444);">🗃️</div><div class="pl">Repository</div><div class="ps2">UsersRepo (pg)</div><div class="pc"><div class="pcb" style="--fc:#dc2626;--tc:#2e2640;"></div></div></div>
+        <div class="ps an" id="pp4"><div class="pn" style="background:linear-gradient(135deg,#2e2640,#4a3d6b);">📜</div><div class="pl">res.render</div><div class="ps2">EJS → HTML</div></div>
+      </div>
+      <div class="term" style="height:230px;">
+        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/controllers/users.controller.ts</div></div>
+        <div class="term-body">
+          <div class="tl" id="ct-0"></div><div class="tl" id="ct-1"></div><div class="tl" id="ct-2"></div>
+          <div class="tl" id="ct-3"></div><div class="tl" id="ct-4"></div><div class="tl" id="ct-5"></div>
+          <div class="tl" id="ct-6"></div><div class="tl" id="ct-7"></div><div class="tl" id="ct-8"></div>
+          <div class="tl" id="ct-9"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 9: HTML SEMANTICO ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">HTML Semântico</div><div class="ss">Tags que descrevem o significado do conteúdo — não a aparência</div></div>
+      <div class="g2" style="gap:12px;align-items:start;">
+        <div class="term" style="height:300px;">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">layouts/main.ejs</div></div>
+          <div class="term-body">
+            <div class="tl vis"><span class="tag">&lt;!DOCTYPE html&gt;</span></div>
+            <div class="tl vis"><span class="tag">&lt;html</span> <span class="att">lang</span>=<span class="val">"pt-BR"</span><span class="tag">&gt;</span></div>
+            <div class="tl vis"><span class="tag">&lt;body&gt;</span></div>
+            <div class="tl vis">  <span class="tag">&lt;header&gt;</span>...<span class="tag">&lt;/header&gt;</span>     <span class="cmt">// topo + branding</span></div>
+            <div class="tl vis">  <span class="tag">&lt;nav&gt;</span>...<span class="tag">&lt;/nav&gt;</span>           <span class="cmt">// menu</span></div>
+            <div class="tl vis">  <span class="tag">&lt;main&gt;</span></div>
+            <div class="tl vis">    <span class="tag">&lt;section&gt;</span></div>
+            <div class="tl vis">      <span class="tag">&lt;article&gt;</span>...<span class="tag">&lt;/article&gt;</span></div>
+            <div class="tl vis">    <span class="tag">&lt;/section&gt;</span></div>
+            <div class="tl vis">    <span class="tag">&lt;aside&gt;</span>...<span class="tag">&lt;/aside&gt;</span>     <span class="cmt">// sidebar</span></div>
+            <div class="tl vis">  <span class="tag">&lt;/main&gt;</span></div>
+            <div class="tl vis">  <span class="tag">&lt;footer&gt;</span>...<span class="tag">&lt;/footer&gt;</span></div>
+            <div class="tl vis"><span class="tag">&lt;/body&gt;</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="box grn" style="margin-bottom:8px;">
+            <h3>♿ Por que importa?</h3>
+            <ul>
+              <li><strong>Leitores de tela</strong> navegam por marcos (header, main, nav)</li>
+              <li><strong>SEO</strong> — buscadores entendem hierarquia</li>
+              <li><strong>Manutenção</strong> — código se autoexplica</li>
+            </ul>
+          </div>
+          <div class="box red">
+            <h3>❌ Evite a "soup of divs"</h3>
+            <p>Página inteira com <code>&lt;div class="header"&gt;</code> e <code>&lt;div class="menu"&gt;</code> ignora a semântica. Use a tag certa.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 10: DOM ESSENCIAL ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">DOM Essencial — JavaScript no Cliente</div><div class="ss">Selecionar, escutar eventos e manipular classes</div></div>
+      <div class="g3" style="margin-bottom:10px;">
+        <div class="mc" id="dm0" style="--mc:#0d9488;">
+          <div class="mb">querySelector</div>
+          <div class="mt">Selecionar elementos</div>
+          <div class="md">Aceita qualquer seletor CSS. Use <code>querySelectorAll</code> para múltiplos.</div>
+          <div class="mex">document.querySelector('#btn')</div>
+        </div>
+        <div class="mc" id="dm1" style="--mc:#4b5563;">
+          <div class="mb">addEventListener</div>
+          <div class="mt">Escutar eventos</div>
+          <div class="md">Anexa um handler: <code>click</code>, <code>submit</code>, <code>input</code>, <code>keydown</code>...</div>
+          <div class="mex">btn.addEventListener('click', fn)</div>
+        </div>
+        <div class="mc" id="dm2" style="--mc:#d97706;">
+          <div class="mb">classList</div>
+          <div class="mt">Manipular classes</div>
+          <div class="md"><code>add</code>, <code>remove</code>, <code>toggle</code>, <code>contains</code> — sem mexer no <code>className</code> string.</div>
+          <div class="mex">menu.classList.toggle('open')</div>
+        </div>
+      </div>
+      <div class="term" style="height:200px;">
+        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">public/js/app.js</div></div>
+        <div class="term-body">
+          <div class="tl" id="dm3"></div><div class="tl" id="dm4"></div><div class="tl" id="dm5"></div>
+          <div class="tl" id="dm6"></div><div class="tl" id="dm7"></div><div class="tl" id="dm8"></div>
+          <div class="tl" id="dm9"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 11: STATIC + SCRIPTS COM DADOS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">Static files e dados do servidor no script</div><div class="ss">CSS, JS e imagens públicos · passar dados do back-end para o JS de cliente</div></div>
+      <div class="g2" style="gap:12px;align-items:start;">
+        <div class="term" style="height:120px;">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/app.ts — static</div></div>
+          <div class="term-body">
+            <div class="tl vis"><span class="kw">app</span>.<span class="kw">use</span>(<span class="kw">express</span>.<span class="kw">static</span>(<span class="js">'public'</span>));</div>
+            <div class="tl vis"><span class="cmt">// /css/site.css, /js/app.js, /img/logo.png funcionam</span></div>
+          </div>
+        </div>
+        <div class="term" style="height:120px;">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">layouts/main.ejs — link e script</div></div>
+          <div class="term-body">
+            <div class="tl vis"><span class="tag">&lt;link</span> <span class="att">rel</span>=<span class="val">"stylesheet"</span> <span class="att">href</span>=<span class="val">"/css/site.css"</span><span class="tag">&gt;</span></div>
+            <div class="tl vis"><span class="tag">&lt;script</span> <span class="att">src</span>=<span class="val">"/js/app.js"</span><span class="tag">&gt;&lt;/script&gt;</span></div>
+          </div>
+        </div>
+      </div>
+      <div class="term" style="height:200px;margin-top:10px;">
+        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">views/users/index.ejs — passando dados do server</div></div>
+        <div class="term-body">
+          <div class="tl" id="sd0"></div><div class="tl" id="sd1"></div><div class="tl" id="sd2"></div>
+          <div class="tl" id="sd3"></div><div class="tl" id="sd4"></div><div class="tl" id="sd5"></div>
+          <div class="tl" id="sd6"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 12: VALIDACAO DUPLA ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">Validação dupla · cliente + servidor</div><div class="ss">Cliente para UX · servidor para segurança · cliente NUNCA substitui servidor</div></div>
+      <div class="g2" style="gap:12px;align-items:start;">
+        <div class="vs-card" style="--vc:#0d9488;">
+          <h3>🟢 Validação no cliente</h3>
+          <div class="vs-sub">UX rápida — feedback imediato.</div>
+          <ul>
+            <li>Atributos HTML: <code>required</code>, <code>min</code>, <code>maxlength</code>, <code>type="email"</code></li>
+            <li><code>event.preventDefault()</code> para travar submit inválido</li>
+            <li>Mensagens de erro próximas ao campo</li>
+            <li>NÃO substitui o servidor — pode ser desabilitada via DevTools</li>
+          </ul>
+        </div>
+        <div class="vs-card" style="--vc:#dc2626;">
+          <h3>🔴 Validação no servidor</h3>
+          <div class="vs-sub">Segurança — última linha de defesa.</div>
+          <ul>
+            <li><code>express-validator</code> nas rotas (visto na aula 6)</li>
+            <li>Verificação de tipos, tamanhos, formatos e regras de negócio</li>
+            <li>Resposta com status 4xx e mensagens claras</li>
+            <li><strong>Sempre obrigatória</strong> — mesmo que o cliente já tenha validado</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box amr" style="margin-top:10px;">
+        <h3>⚠️ Princípio</h3>
+        <p>Trate o cliente como adversário: ele pode mandar qualquer coisa. O servidor é o único lugar onde a validação tem valor de segurança.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 12.5: RM-ODP — AS 5 VISÕES ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">RM-ODP — As 5 Visões do Sistema</div><div class="ss">ISO/IEC 10746 · SSR e templates EJS nas 5 visões</div></div>
+      <div class="pipe" style="flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0;">
+        <div class="alayer" id="rmo0" style="background:linear-gradient(135deg,#2e2640,#4b5563);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>🏢 Enterprise</strong><br><small>Conteúdo entregue ao usuário</small></div>
+        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="rma0">→</div>
+        <div class="alayer" id="rmo1" style="background:linear-gradient(135deg,#0d9488,#10b981);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>📋 Information</strong><br><small>Modelos passados ao template</small></div>
+        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="rma1">→</div>
+        <div class="alayer" id="rmo2" style="background:linear-gradient(135deg,#1863dc,#3b82f6);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>⚙️ Computational</strong><br><small>Controllers + res.render</small></div>
+        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="rma2">→</div>
+        <div class="alayer" id="rmo3" style="background:linear-gradient(135deg,#d97706,#f59e0b);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>🔧 Engineering</strong><br><small>Static, partials, layout</small></div>
+        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="rma3">→</div>
+        <div class="alayer" id="rmo4" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>💻 Technology</strong><br><small>EJS, Express, HTML</small></div>
+      </div>
+      <div class="box acc" style="margin-top:8px;"><p><strong>Esta aula:</strong> Visão <strong>Computational/Engineering</strong> — adicionamos a camada de Views renderizadas no servidor.</p></div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 12.6: RF + RNF + Artefato ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">Esta Aula: Views</div><div class="ss">RM-ODP · RF, RNF e Artefato — 8 Eixos da camada de Views</div></div>
+      <div class="g2" style="gap:12px;">
+        <div>
+          <div class="box grn" style="margin-bottom:10px;"><h3>📌 Requisito Funcional</h3><p>Disponibilizar páginas HTML renderizadas pelo servidor exibindo dados do recurso central do projeto.</p></div>
+          <div class="box" style="border-left-color:var(--am);"><h3>📦 Artefato</h3><ul>
+            <li id="art0" style="opacity:0;transition:all .4s ease;">📄 <strong>Templates EJS</strong> (list, detail, form)</li>
+            <li id="art1" style="opacity:0;transition:all .4s ease;">🧩 <strong>Partials</strong> (header/footer)</li>
+            <li id="art2" style="opacity:0;transition:all .4s ease;">🔗 <strong>Rotas SSR</strong> integradas ao MVC</li>
+          </ul></div>
+        </div>
+        <div>
+          <div class="box acc"><h3>⚖️ RNF — 8 Eixos ISO/IEC 25010</h3>
+            <table class="stbl" id="rnf-tbl" style="border-spacing:0 3px;width:100%;">
+              <tr><td class="scc" data-s="0" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>USAB</strong> Usabilidade</td><td class="scc" data-s="1" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#dcfce7;font-size:.8rem;">✅ HTML semântico</td></tr>
+              <tr><td class="scc" data-s="2" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>ACES</strong> Acessibilidade</td><td class="scc" data-s="3" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#dcfce7;font-size:.8rem;">✅ Tags + atributos certos</td></tr>
+              <tr><td class="scc" data-s="4" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>DES</strong> Desempenho</td><td class="scc" data-s="5" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#dcfce7;font-size:.8rem;">✅ SSR rápido + cache</td></tr>
+              <tr><td class="scc" data-s="6" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>SEG</strong> Segurança</td><td class="scc" data-s="7" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f9f9f9;font-size:.8rem;">→ Escape no template</td></tr>
+              <tr><td class="scc" data-s="8" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>MANT</strong> Manutenibilidade</td><td class="scc" data-s="9" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f9f9f9;font-size:.8rem;">→ Partials reusáveis</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 13: ENCERRAMENTO ====== -->
+  <div class="slide cover-bg" style="background:linear-gradient(135deg,#12082c 0%,#0d9488 55%,#10b981 100%)!important;">
+    <div class="sc" style="text-align:center;">
+      <div style="font-size:2.8rem;margin-bottom:12px;">📜</div>
+      <div style="font-size:2.2rem;font-weight:800;color:white;margin-bottom:10px;">A página vem do servidor!</div>
+      <div style="font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:20px;max-width:620px;margin-left:auto;margin-right:auto;">
+        Você sabe renderizar EJS, compor com partials, escrever HTML semântico e adicionar interatividade no cliente. Na próxima aula, o cliente vai conversar com o servidor sem recarregar — chega o <strong>fetch</strong>.
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:18px;">
+        <div class="cv-tag" id="rt0">✅ SSR vs CSR</div>
+        <div class="cv-tag" id="rt1">✅ Setup EJS</div>
+        <div class="cv-tag" id="rt2">✅ Partials e layouts</div>
+        <div class="cv-tag" id="rt3">✅ Sintaxe EJS</div>
+        <div class="cv-tag" id="rt4">✅ res.render</div>
+        <div class="cv-tag" id="rt5">✅ HTML semântico</div>
+        <div class="cv-tag" id="rt6">✅ DOM e eventos</div>
+        <div class="cv-tag" id="rt7">✅ Validação dupla</div>
+      </div>
+      <div style="background:rgba(255,255,255,.12);backdrop-filter:blur(8px);border:1px solid rgba(255,255,255,.25);border-radius:12px;padding:12px 18px;display:inline-block;margin-bottom:12px;">
+        <div style="font-size:.86rem;color:rgba(255,255,255,.78);margin-bottom:4px;">🎯 Entrega da tarde</div>
+        <div style="font-size:.94rem;font-weight:700;color:white;">Páginas EJS para listar e exibir os recursos do projeto, consumindo a API da aula 6</div>
+      </div>
+      <div style="font-size:.84rem;color:rgba(255,255,255,.6);">Módulo 2 · Ciclo Comum · Aula 7 de 11 · Próxima: fetch + formulários</div>
+    </div>
+  </div>
+
+</div><!-- /slide-container -->
+
+<!-- ====== FOOTER ====== -->
+<div class="slide-footer">
+  <div class="footer-links">
+    <a href="../../index.html" class="back-home">🏠 Home</a>
+    <a href="../materials/lesson-7-material.html" class="back-home material">📖 Material</a>
+  </div>
+  <div class="nav-wrapper">
+    <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">13</span></div>
+    <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
+  </div>
+  <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>
+</div>
+
+<script src="../js/human-type.js"></script>
+<script>
+// ── DAILY TIMER ───────────────────────────────────────────────────────────
+var dailyInterval = null;
+var dailySeconds = 900;
+var dailyRunning = false;
+function updateDailyDisplay() {
+  var m = Math.floor(dailySeconds / 60);
+  var s = dailySeconds % 60;
+  var el = document.getElementById('daily-timer');
+  if (el) el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+function startDaily() {
+  if (dailyRunning) { clearInterval(dailyInterval); dailyRunning = false; document.getElementById('daily-start-btn').textContent = '▶ Continuar'; return; }
+  dailyRunning = true;
+  document.getElementById('daily-start-btn').textContent = '⏸ Pausar';
+  dailyInterval = setInterval(function() {
+    if (dailySeconds <= 0) { clearInterval(dailyInterval); dailyRunning = false; document.getElementById('daily-start-btn').textContent = '✅ Fim!'; return; }
+    dailySeconds--;
+    updateDailyDisplay();
+  }, 1000);
+}
+function resetDaily() {
+  clearInterval(dailyInterval);
+  dailyRunning = false;
+  dailySeconds = 900;
+  updateDailyDisplay();
+  document.getElementById('daily-start-btn').textContent = '▶ Iniciar';
+}
+
+// ── NAVIGATION ──────────────────────────────────────────────────────────────
+var currentSlide = 0;
+var slides = document.querySelectorAll('.slide');
+var totalSlides = slides.length;
+document.getElementById('total-slides').textContent = totalSlides;
+
+function showSlide(i) {
+  document.querySelectorAll('.slide.active').forEach(function(s){ s.classList.remove('active'); });
+  slides[i].classList.add('active');
+  currentSlide = i;
+  document.getElementById('current-slide').textContent = i + 1;
+  document.getElementById('prev-btn').disabled = i === 0;
+  document.getElementById('next-btn').disabled = i === totalSlides - 1;
+  runAnim(i);
+}
+function nextSlide()     { if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1); }
+function previousSlide() { if (currentSlide > 0) showSlide(currentSlide - 1); }
+function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+  else if (e.key === 'ArrowLeft') previousSlide();
+  else if (e.key.toLowerCase() === 'f') toggleFullScreen();
+});
+
+// ── TIMER SYSTEM ──────────────────────────────────────────────────────────
+var _ts = [], _run = false;
+function clearT() { _run = false; _ts.forEach(clearTimeout); _ts = []; }
+function T(fn, d)  { _ts.push(setTimeout(fn, d)); }
+function escH(s)   { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function mkHtml(tokens) { return tokens.map(function(t){ return '<span class="'+t.c+'">'+escH(t.v)+'</span>'; }).join(''); }
+function showLine(id, tokens, delay) {
+  T(function() {
+    if (!_run) return;
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = mkHtml(tokens);
+    el.classList.add('vis');
+  }, delay);
+}
+function resetLines(ids) {
+  ids.forEach(function(id) { var el=document.getElementById(id); if(el){ el.innerHTML=''; el.classList.remove('vis'); } });
+}
+
+// ── SLIDE 1 — Cover ───────────────────────────────────────────────────────
+function animCover() {
+  ['ct0','ct1','ct2','ct3','ct4','ct5'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
+  ['ct0','ct1','ct2','ct3','ct4','ct5'].forEach(function(id,i){
+    T(function(){ var el=document.getElementById(id); if(el&&_run) el.classList.add('vis'); }, 200+i*160);
+  });
+}
+
+// ── SLIDE 2 — Daily ───────────────────────────────────────────────────────
+function animDaily() {
+  ['dt0','dt1','dt2','dt3'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
+  ['dt0','dt1','dt2','dt3'].forEach(function(id,i){
+    T(function(){ var el=document.getElementById(id); if(el&&_run) el.classList.add('vis'); }, 150+i*200);
+  });
+}
+
+// ── SLIDE 3 — Roadmap ─────────────────────────────────────────────────────
+function animRoadmap() {
+  for(var i=0;i<10;i++){var el=document.getElementById('rm'+i);if(el){ el.classList.remove('vis'); }}
+  for(var j=0;j<10;j++){
+    (function(idx){ T(function(){ var el=document.getElementById('rm'+idx); if(el&&_run) el.classList.add('vis'); }, 100+idx*120); })(j);
+  }
+}
+
+// ── SLIDE 4 — SSR vs CSR ──────────────────────────────────────────────────
+function animVS() {}
+
+// ── SLIDE 5 — Setup EJS ───────────────────────────────────────────────────
+function animSetup() {
+  var ids=['su0','su1','su2','su3','su4','su5','su6','su7','su8','su9','su10'];
+  resetLines(ids);
+  var d=0, G=40;
+  d = typeLine('su0',[{c:'kw',v:'import'},{c:'txt',v:' express '},{c:'kw',v:'from'},{c:'txt',v:' '},{c:'js',v:"'express'"},{c:'txt',v:';'}],d)+G;
+  d = typeLine('su1',[{c:'kw',v:'import'},{c:'txt',v:' path '},{c:'kw',v:'from'},{c:'txt',v:' '},{c:'js',v:"'path'"},{c:'txt',v:';'}],d)+G;
+  d = typeLine('su2',[{c:'cmt',v:''}],d)+G;
+  d = typeLine('su3',[{c:'kw',v:'const'},{c:'txt',v:' app = '},{c:'jb',v:'express'},{c:'txt',v:'();'}],d)+G;
+  d = typeLine('su4',[{c:'cmt',v:''}],d)+G;
+  d = typeLine('su5',[{c:'cmt',v:'// Diz ao Express qual engine usar para .render'}],d)+G;
+  d = typeLine('su6',[{c:'txt',v:'app.'},{c:'jb',v:'set'},{c:'txt',v:'('},{c:'js',v:"'view engine'"},{c:'txt',v:', '},{c:'js',v:"'ejs'"},{c:'txt',v:');'}],d)+G;
+  d = typeLine('su7',[{c:'txt',v:'app.'},{c:'jb',v:'set'},{c:'txt',v:'('},{c:'js',v:"'views'"},{c:'txt',v:', path.'},{c:'jb',v:'join'},{c:'txt',v:'(__dirname, '},{c:'js',v:"'views'"},{c:'txt',v:'));'}],d)+G;
+  d = typeLine('su8',[{c:'cmt',v:''}],d)+G;
+  d = typeLine('su9',[{c:'cmt',v:'// body parser para forms e static para CSS/JS'}],d)+G;
+  d = typeLine('su10',[{c:'txt',v:'app.'},{c:'jb',v:'use'},{c:'txt',v:'(express.'},{c:'jb',v:'urlencoded'},{c:'txt',v:'({ extended: '},{c:'kw',v:'true'},{c:'txt',v:' }));'}],d);
+}
+
+// ── SLIDE 7 — Sintaxe EJS ─────────────────────────────────────────────────
+function animEjs() {
+  ['ej0','ej1','ej2','ej3'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
+  ['ej0','ej1','ej2','ej3'].forEach(function(id,i){
+    T(function(){ var el=document.getElementById(id); if(el&&_run) el.classList.add('vis'); }, 120+i*180);
+  });
+  var ids=['ex0','ex1','ex2','ex3','ex4'];
+  resetLines(ids);
+  var d=900, G=40;
+  d = typeLine('ex0',[{c:'cmt',v:'<%- include(\'../partials/header\') %>'}],d)+G;
+  d = typeLine('ex1',[{c:'tag',v:'<h1>'},{c:'txt',v:'Olá, '},{c:'cmt',v:'<%= currentUser.nome %>'},{c:'tag',v:'</h1>'}],d)+G;
+  d = typeLine('ex2',[{c:'cmt',v:'<% if (users.length === 0) { %>'}],d)+G;
+  d = typeLine('ex3',[{c:'tag',v:'  <p>'},{c:'txt',v:'Nenhum usuário ainda.'},{c:'tag',v:'</p>'}],d)+G;
+  d = typeLine('ex4',[{c:'cmt',v:'<% } else { users.forEach(u => { %>'}],d);
+}
+
+// ── SLIDE 8 — Fluxo MVC com res.render ────────────────────────────────────
+function animMvc() {
+  ['pp0','pp1','pp2','pp3','pp4'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('sv'); });
+  ['pp0','pp1','pp2','pp3','pp4'].forEach(function(id,i){
+    T(function(){ var el=document.getElementById(id); if(el&&_run) el.classList.add('sv'); }, 120+i*240);
+  });
+  var ids=['ct-0','ct-1','ct-2','ct-3','ct-4','ct-5','ct-6','ct-7','ct-8','ct-9'];
+  resetLines(ids);
+  var d=1400, G=40;
+  d = typeLine('ct-0',[{c:'cmt',v:'// src/controllers/users.controller.ts'}],d)+G;
+  d = typeLine('ct-1',[{c:'kw',v:'export class'},{c:'txt',v:' '},{c:'jb',v:'UsersController'},{c:'txt',v:' {'}],d)+G;
+  d = typeLine('ct-2',[{c:'txt',v:'  '},{c:'kw',v:'constructor'},{c:'txt',v:'('},{c:'kw',v:'private'},{c:'txt',v:' service: '},{c:'jb',v:'UsersService'},{c:'txt',v:') {}'}],d)+G;
+  d = typeLine('ct-3',[{c:'cmt',v:''}],d)+G;
+  d = typeLine('ct-4',[{c:'txt',v:'  '},{c:'kw',v:'async'},{c:'txt',v:' '},{c:'jb',v:'index'},{c:'txt',v:'(req: Request, res: Response) {'}],d)+G;
+  d = typeLine('ct-5',[{c:'txt',v:'    '},{c:'kw',v:'const'},{c:'txt',v:' users = '},{c:'kw',v:'await'},{c:'txt',v:' '},{c:'kw',v:'this'},{c:'txt',v:'.service.'},{c:'jb',v:'list'},{c:'txt',v:'();'}],d)+G;
+  d = typeLine('ct-6',[{c:'txt',v:'    '},{c:'kw',v:'const'},{c:'txt',v:' currentUser = req.session?.user;'}],d)+G;
+  d = typeLine('ct-7',[{c:'txt',v:'    res.'},{c:'jb',v:'render'},{c:'txt',v:'('},{c:'js',v:"'users/index'"},{c:'txt',v:', { users, currentUser });'}],d)+G;
+  d = typeLine('ct-8',[{c:'txt',v:'  }'}],d)+G;
+  d = typeLine('ct-9',[{c:'txt',v:'}'}],d);
+}
+
+// ── SLIDE 10 — DOM essencial ──────────────────────────────────────────────
+function animDom() {
+  ['dm0','dm1','dm2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
+  ['dm0','dm1','dm2'].forEach(function(id,i){
+    T(function(){ var el=document.getElementById(id); if(el&&_run) el.classList.add('vis'); }, 120+i*200);
+  });
+  var ids=['dm3','dm4','dm5','dm6','dm7','dm8','dm9'];
+  resetLines(ids);
+  var d=900, G=40;
+  d = typeLine('dm3',[{c:'cmt',v:'// public/js/app.js — toggle de menu'}],d)+G;
+  d = typeLine('dm4',[{c:'kw',v:'const'},{c:'txt',v:' btn = document.'},{c:'jb',v:'querySelector'},{c:'txt',v:'('},{c:'js',v:"'#menu-btn'"},{c:'txt',v:');'}],d)+G;
+  d = typeLine('dm5',[{c:'kw',v:'const'},{c:'txt',v:' menu = document.'},{c:'jb',v:'querySelector'},{c:'txt',v:'('},{c:'js',v:"'.menu'"},{c:'txt',v:');'}],d)+G;
+  d = typeLine('dm6',[{c:'cmt',v:''}],d)+G;
+  d = typeLine('dm7',[{c:'txt',v:'btn.'},{c:'jb',v:'addEventListener'},{c:'txt',v:'('},{c:'js',v:"'click'"},{c:'txt',v:', '},{c:'kw',v:'(e)'},{c:'txt',v:' => {'}],d)+G;
+  d = typeLine('dm8',[{c:'txt',v:'  menu.classList.'},{c:'jb',v:'toggle'},{c:'txt',v:'('},{c:'js',v:"'open'"},{c:'txt',v:');'}],d)+G;
+  d = typeLine('dm9',[{c:'txt',v:'});'}],d);
+}
+
+// ── SLIDE 11 — Static + dados do server ───────────────────────────────────
+function animStatic() {
+  var ids=['sd0','sd1','sd2','sd3','sd4','sd5','sd6'];
+  resetLines(ids);
+  var d=200, G=40;
+  d = typeLine('sd0',[{c:'tag',v:'<ul>'}],d)+G;
+  d = typeLine('sd1',[{c:'cmt',v:'  <% users.forEach(u => { %>'}],d)+G;
+  d = typeLine('sd2',[{c:'tag',v:'    <li>'},{c:'cmt',v:'<%= u.nome %>'},{c:'tag',v:'</li>'}],d)+G;
+  d = typeLine('sd3',[{c:'cmt',v:'  <% }) %>'}],d)+G;
+  d = typeLine('sd4',[{c:'tag',v:'</ul>'}],d)+G;
+  d = typeLine('sd5',[{c:'tag',v:'<script>'},{c:'txt',v:' '},{c:'kw',v:'const'},{c:'txt',v:' DATA = '},{c:'cmt',v:'<%- JSON.stringify(users) %>'},{c:'txt',v:'; '},{c:'tag',v:'</script>'}],d)+G;
+  d = typeLine('sd6',[{c:'cmt',v:'// agora window.DATA está disponível em /js/app.js'}],d);
+}
+
+// ── SLIDE 13 — Recap ──────────────────────────────────────────────────────
+function animRecap() {
+  for(var i=0;i<8;i++){var el=document.getElementById('rt'+i);if(el)el.classList.remove('vis');}
+  for(var j=0;j<8;j++){
+    (function(idx){ T(function(){ var el=document.getElementById('rt'+idx); if(el&&_run) el.classList.add('vis'); }, 160+idx*150); })(j);
+  }
+}
+
+// ── DISPATCH ─────────────────────────────────────────────────────────────
+function animAgenda() {
+  ['ag0','ag1','ag2','ag3'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.style.opacity='0'; el.style.transform='translateY(18px)'; } });
+  ['ag0','ag1','ag2','ag3'].forEach(function(id,i){
+    T(function(){ var el=document.getElementById(id); if(el&&_run){ el.style.opacity='1'; el.style.transform='translateY(0)'; el.style.transition='all .4s ease'; } }, i*160);
+  });
+}
+function animRmOdp() {
+  ['rmo0','rma0','rmo1','rma1','rmo2','rma2','rmo3','rma3','rmo4'].forEach(function(id){
+    var el=document.getElementById(id); if(el){ el.style.opacity='0'; el.style.transform='translateY(16px)'; }
+  });
+  ['rmo0','rma0','rmo1','rma1','rmo2','rma2','rmo3','rma3','rmo4'].forEach(function(id,i){
+    T(function(lid){ var el=document.getElementById(lid); if(el&&_run){ el.style.opacity='1'; el.style.transform='translateY(0)'; } }.bind(null,id), 120+i*320);
+  });
+}
+function animRfRnf() {
+  var cells=document.querySelectorAll('#rnf-tbl .scc');
+  cells.forEach(function(el){ el.style.opacity='0'; });
+  ['art0','art1','art2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.opacity='0'; });
+  cells.forEach(function(el){
+    var step=parseInt(el.getAttribute('data-s'),10);
+    T(function(c){ if(_run) c.style.opacity='1'; }.bind(null,el), 100+step*160);
+  });
+  ['art0','art1','art2'].forEach(function(id,i){
+    T(function(lid){ var el=document.getElementById(lid); if(el&&_run) el.style.opacity='1'; }.bind(null,id), 200+i*200);
+  });
+}
+
+var animMap = [
+  animCover, animDaily, animAgenda, animRoadmap, animVS, animSetup,
+  null, animEjs, animMvc, null, animDom,
+  animStatic, null, animRmOdp, animRfRnf, animRecap
+];
+
+function runAnim(idx) {
+  clearT();
+  _run = true;
+  var fn = animMap[idx];
+  if (fn) T(fn, 150);
+}
+
+showSlide(0);
+</script>
+</body>
+</html>

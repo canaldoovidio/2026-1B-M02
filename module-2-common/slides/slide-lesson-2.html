@@ -1,0 +1,1714 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 2 - Banco de Dados I - Inteli</title>
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="../../css/inteli-styles.css" rel="stylesheet">
+  <style>
+    :root { --ac:#4b5563; --hi:#b2b6bf; --dk:#2e2640; --gr:#0d9488; --re:#dc2626; --am:#d97706; }
+    body { margin:0; padding:0; overflow:hidden; font-family:'Manrope',sans-serif; background:#f5f7fb; color:var(--dk); }
+    .slide-container { width:100vw; height:100vh; position:relative; overflow:hidden; }
+    .slide { width:100%; height:100%; display:none; padding:44px 52px 88px; box-sizing:border-box; position:absolute; }
+    .slide.active { display:flex; flex-direction:column; justify-content:center; animation:slideIn 0.35s ease-in-out; }
+    @keyframes slideIn { from{opacity:0;transform:translateX(36px)} to{opacity:1;transform:translateX(0)} }
+    .sc { width:min(1140px,100%); margin:0 auto; font-size:1.05rem; line-height:1.55; }
+    /* slide header */
+    .sh { color:white; padding:16px 22px; border-radius:14px; margin-bottom:14px; }
+    .sh.blue  { background:linear-gradient(135deg,#374151,#b2b6bf); }
+    .sh.dark  { background:linear-gradient(135deg,var(--dk),#4a3d6b); }
+    .sh.green { background:linear-gradient(135deg,var(--gr),#10b981); }
+    .st { font-size:1.9rem; font-weight:800; margin:0 0 4px; line-height:1.15; }
+    .ss { font-size:0.95rem; opacity:.9; margin:0; }
+    /* boxes */
+    .box { background:white; border:1px solid #dfe5ec; border-left:5px solid var(--hi); border-radius:12px; padding:14px 18px; box-shadow:0 4px 14px rgba(46,38,64,.06); }
+    .box h3 { font-size:1rem; font-weight:700; margin:0 0 6px; color:var(--dk); }
+    .box p  { margin:0 0 5px; font-size:.88rem; line-height:1.5; color:#374151; }
+    .box ul { margin:3px 0; padding-left:1.1rem; }
+    .box li { font-size:.87rem; margin-bottom:3px; line-height:1.4; color:#374151; }
+    .box.acc { border-left-color:var(--ac); }
+    .box.grn { border-left-color:var(--gr); }
+    code { background:#f1f5f9; color:var(--dk); padding:1px 6px; border-radius:5px; font-size:.86em; }
+    /* grids */
+    .g2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
+    .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
+    .g5 { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+
+    /* ===== COVER ===== */
+    .cover-bg { background:linear-gradient(135deg,#1f2937 0%,#4b5563 50%,#b2b6bf 100%) !important; }
+    .cv-badge { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); color:white; padding:5px 16px; border-radius:999px; font-size:.82rem; font-weight:600; display:inline-block; margin-bottom:18px; }
+    .cv-title { font-size:3rem; font-weight:800; color:white; line-height:1.15; margin:0 0 14px; }
+    .cv-sub   { font-size:1.1rem; color:rgba(255,255,255,.82); margin:0 0 28px; }
+    .cv-tags  { display:flex; flex-wrap:wrap; gap:8px; }
+    .cv-tag { background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.28); backdrop-filter:blur(8px); color:white; padding:7px 16px; border-radius:10px; font-weight:700; font-size:.84rem; opacity:0; transform:translateY(18px); transition:all .5s cubic-bezier(.34,1.3,.64,1); }
+    .cv-tag.vis { opacity:1; transform:translateY(0); }
+
+    /* ===== PIPELINE ===== */
+    .pipe { display:flex; align-items:flex-start; justify-content:center; gap:0; margin:14px 0; }
+    .ps { flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; }
+    .pn { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:white; font-weight:800; z-index:2; box-shadow:0 4px 14px rgba(0,0,0,.18); flex-shrink:0; }
+    .pl { font-size:.8rem; font-weight:700; color:var(--dk); margin-top:7px; }
+    .ps2 { font-size:.68rem; color:#64748b; margin-top:2px; }
+    .pc { position:absolute; top:26px; left:calc(50% + 26px); width:calc(100% - 52px); height:4px; z-index:1; }
+    .pcb { width:100%; height:100%; border-radius:2px; background:linear-gradient(90deg,var(--fc,#4b5563),var(--tc,#b2b6bf)); }
+    .ps:last-child .pc { display:none; }
+    .pcl { position:absolute; top:-14px; left:50%; transform:translateX(-50%); font-size:.6rem; font-weight:700; color:#64748b; white-space:nowrap; }
+    /* pipeline anim */
+    .ps.an .pn { opacity:0; transform:scale(.3); transition:all .5s cubic-bezier(.34,1.56,.64,1); }
+    .ps.an .pl,.ps.an .ps2 { opacity:0; transform:translateY(7px); transition:all .4s ease .18s; }
+    .ps.an .pcb { transform:scaleX(0); transform-origin:left; transition:transform .6s cubic-bezier(.22,1,.36,1); }
+    .ps.an.sv .pn { opacity:1; transform:scale(1); box-shadow:0 4px 14px rgba(0,0,0,.18),0 0 20px rgba(24,99,220,.25); }
+    .ps.an.sv .pl,.ps.an.sv .ps2 { opacity:1; transform:translateY(0); }
+    .ps.an.sv .pcb { transform:scaleX(1); }
+
+    /* ===== TERMINAL ===== */
+    .term { background:#1e1e2e; border-radius:14px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.3); display:flex; flex-direction:column; }
+    .term-bar { background:#313244; padding:7px 12px; display:flex; align-items:center; gap:6px; }
+    .dot { width:10px; height:10px; border-radius:50%; }
+    .dot.r{background:#f38ba8;} .dot.y{background:#f9e2af;} .dot.g{background:#a6e3a1;}
+    .term-ttl { color:#6c7086; font-size:.7rem; font-weight:600; margin-left:7px; font-family:monospace; }
+    .term-body { padding:12px 14px; font-family:'Courier New',monospace; font-size:.8rem; line-height:1.65; flex:1; overflow:hidden; }
+    .tl { white-space:pre; min-height:1.65em; opacity:0; transform:translateY(3px); transition:opacity .25s ease,transform .25s ease; }
+    .tl.vis { opacity:1; transform:translateY(0); }
+    .kw{color:#89b4fa;font-weight:700;} .pth{color:#a6e3a1;} .ver{color:#f9e2af;}
+    .hn{color:#cba6f7;} .hv{color:#cdd6f4;} .hok{color:#a6e3a1;font-weight:700;}
+    .jk{color:#cba6f7;} .js{color:#a6e3a1;} .jn{color:#fab387;} .jb{color:#89b4fa;}
+    .cmt{color:#6c7086;font-style:italic;} .txt{color:#cdd6f4;}
+    .tcur{display:inline-block;width:7px;height:1.1em;background:#89b4fa;vertical-align:text-bottom;animation:tblink .7s step-end infinite;}
+    @keyframes tblink{0%,100%{opacity:1}50%{opacity:0}}
+    .tdiv { border:none; border-top:1px solid #313244; margin:8px 0; }
+
+    /* ===== METHOD CARDS ===== */
+    .mc { background:white; border-radius:11px; padding:12px 14px; border-top:4px solid var(--mc,var(--ac)); box-shadow:0 4px 14px rgba(46,38,64,.08); opacity:0; transform:translateY(18px) scale(.93); transition:all .5s cubic-bezier(.34,1.3,.64,1); }
+    .mc.vis { opacity:1; transform:translateY(0) scale(1); }
+    .mb { font-size:.74rem; font-weight:800; padding:2px 9px; border-radius:5px; background:var(--mc,var(--ac)); color:white; display:inline-block; margin-bottom:6px; font-family:monospace; }
+    .mt { font-size:.84rem; font-weight:700; color:var(--dk); margin-bottom:3px; }
+    .md { font-size:.76rem; color:#64748b; line-height:1.35; }
+    .mex{ font-family:monospace; font-size:.68rem; color:#475569; background:#f8fafc; padding:3px 7px; border-radius:5px; margin-top:5px; }
+
+    /* ===== STATUS BARS ===== */
+    .sbr { display:flex; align-items:center; gap:10px; opacity:0; transform:translateX(-18px); transition:all .5s cubic-bezier(.34,1.56,.64,1); margin-bottom:7px; }
+    .sbr.vis { opacity:1; transform:translateX(0); }
+    .scg { width:48px; font-size:.78rem; font-weight:800; font-family:monospace; color:var(--dk); text-align:right; flex-shrink:0; }
+    .str { flex:1; height:26px; background:#f1f5f9; border-radius:8px; overflow:hidden; }
+    .sf  { height:100%; border-radius:8px; display:flex; align-items:center; padding-left:10px; transition:width .85s cubic-bezier(.34,1.56,.64,1); }
+    .sfl { font-size:.74rem; font-weight:700; color:white; }
+    .sds { font-size:.76rem; color:#64748b; width:200px; flex-shrink:0; line-height:1.3; }
+
+    /* ===== STORY TABLE ===== */
+    .stbl { width:100%; border-collapse:separate; border-spacing:0 5px; }
+    .stbl th { padding:9px 12px; font-size:.86rem; font-weight:800; text-align:left; border-radius:9px; }
+    .stbl th:nth-child(1){background:var(--dk);color:white;width:22%;}
+    .stbl th:nth-child(2){background:linear-gradient(135deg,#4b5563,#6b7280);color:white;}
+    .stbl th:nth-child(3){background:linear-gradient(135deg,var(--gr),#10b981);color:white;}
+    .stbl th:nth-child(4){background:linear-gradient(135deg,var(--am),#f59e0b);color:white;}
+    .stbl td { padding:9px 12px; font-size:.86rem; vertical-align:top; border-radius:8px; }
+    .stbl td:nth-child(1){background:var(--dk);color:white;font-weight:700;}
+    .stbl td:nth-child(2){background:rgba(24,99,220,.07);color:var(--dk);}
+    .stbl td:nth-child(3){background:rgba(13,148,136,.07);color:var(--dk);}
+    .stbl td:nth-child(4){background:rgba(217,119,6,.07);color:var(--dk);}
+    .scc { opacity:0; transform:translateY(8px); transition:all .4s cubic-bezier(.34,1.3,.64,1); display:inline-block; }
+    .scc.vis { opacity:1; transform:translateY(0); }
+    .scc.pop { animation:scpop .5s ease; }
+    @keyframes scpop { 0%{transform:scale(.85) translateY(10px);opacity:0} 60%{transform:scale(1.04) translateY(-2px);opacity:1} 100%{transform:scale(1) translateY(0);opacity:1} }
+
+    /* ===== LAYERS ===== */
+    .lstack { display:flex; flex-direction:column; gap:8px; margin:8px 0; }
+    .alayer { border-radius:12px; padding:13px 18px; display:flex; align-items:center; gap:14px; opacity:0; transform:translateX(-28px) scale(.95); transition:all .6s cubic-bezier(.34,1.3,.64,1); }
+    .alayer.vis { opacity:1; transform:translateX(0) scale(1); }
+    .li { font-size:1.9rem; flex-shrink:0; }
+    .ln { font-size:1rem; font-weight:800; color:white; margin-bottom:2px; }
+    .lt { font-size:.78rem; color:rgba(255,255,255,.88); }
+    .ld { font-size:.76rem; color:rgba(255,255,255,.72); margin-top:2px; }
+    .larr { text-align:center; font-size:1rem; color:#94a3b8; opacity:0; transition:opacity .4s ease; line-height:1; padding:2px 0; }
+    .larr.vis { opacity:1; }
+
+    /* ===== ROADMAP ITEMS ===== */
+    .ri { display:flex; align-items:flex-start; gap:10px; padding:9px 12px; border-radius:10px; background:white; border:1px solid #e2e8f0; opacity:0; transform:translateX(-14px); transition:all .4s ease; margin-bottom:5px; }
+    .ri.vis { opacity:1; transform:translateX(0); }
+    .ri.cur { background:linear-gradient(135deg,rgba(75,85,99,.09),rgba(107,114,128,.09)); border-color:var(--ac); }
+    .rn { width:26px; height:26px; border-radius:50%; background:var(--dk); color:white; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.78rem; flex-shrink:0; margin-top:1px; }
+    .ri.cur .rn { background:linear-gradient(135deg,#374151,#b2b6bf); }
+    .rtl { font-size:.86rem; font-weight:700; color:var(--dk); margin-bottom:1px; }
+    .rds { font-size:.76rem; color:#64748b; }
+
+    /* ===== ER ENTITY CARDS ===== */
+    .er-wrap { display:flex; align-items:flex-start; justify-content:center; gap:18px; margin:14px 0; }
+    .er-ent { border-radius:12px; overflow:hidden; box-shadow:0 4px 18px rgba(46,38,64,.12); opacity:0; transform:translateY(20px) scale(.93); transition:all .55s cubic-bezier(.34,1.3,.64,1); min-width:150px; }
+    .er-ent.vis { opacity:1; transform:translateY(0) scale(1); }
+    .er-head { padding:8px 14px; font-weight:800; font-size:.9rem; color:white; text-align:center; }
+    .er-attr { background:white; padding:6px 14px; font-size:.78rem; color:#374151; border-bottom:1px solid #f1f5f9; }
+    .er-attr:last-child { border-bottom:none; }
+    .er-attr .pk { color:var(--am); font-weight:800; font-size:.68rem; margin-left:4px; }
+    .er-conn { display:flex; align-items:center; padding:0 4px; opacity:0; transition:opacity .4s ease; font-size:.75rem; color:#94a3b8; font-weight:700; flex-direction:column; gap:4px; }
+    .er-conn.vis { opacity:1; }
+    .er-line { width:40px; height:3px; border-radius:2px; }
+
+    /* ===== SELECT RESULT TABLE ===== */
+    .rtable { width:100%; border-collapse:collapse; font-size:.8rem; }
+    .rtable th { background:var(--dk); color:white; padding:7px 10px; font-size:.78rem; }
+    .rtable td { padding:7px 10px; border-bottom:1px solid #e2e8f0; color:#374151; }
+    .rtable tr { opacity:0; transform:translateY(6px); transition:all .35s ease; }
+    .rtable tr.vis { opacity:1; transform:translateY(0); }
+    .rtable tr:nth-child(even) td { background:#f8fafc; }
+
+    /* ===== FOOTER ===== */
+    .slide-footer { position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.97); border-top:1px solid #dfe5ec; padding:10px 24px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 -2px 10px rgba(46,38,64,.06); z-index:100; gap:12px; }
+    .footer-links { display:flex; gap:10px; }
+    .back-home { color:var(--dk); text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:5px; padding:8px 14px; border-radius:10px; background:#f1f4f8; font-size:.9rem; }
+    .back-home:hover { background:#e2e8f0; }
+    .back-home.material { background: #2f8f78 !important; color: white !important; }
+    .back-home.material:hover { background:#267562 !important; color:white !important; }
+    .nav-wrapper { display:flex; align-items:center; gap:14px; background:#f1f4f8; padding:7px 18px; border-radius:30px; }
+    .nav-buttons button { background:var(--dk); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; }
+    .nav-buttons button:disabled { background:#caced6; cursor:not-allowed; }
+    .slide-counter { font-weight:700; color:var(--dk); min-width:70px; text-align:center; }
+    .fullscreen-btn { background:#f1f4f8; border:none; font-size:1.1rem; cursor:pointer; padding:8px 12px; border-radius:8px; }
+
+    .daily-timer { font-size:3.5rem; font-weight:800; font-family:monospace; background:rgba(255,255,255,.15); border-radius:16px; padding:10px 28px; display:inline-block; margin-bottom:16px; letter-spacing:4px; color:white; }
+    .daily-tag { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); padding:6px 16px; border-radius:8px; font-weight:700; font-size:.85rem; color:white; opacity:0; transform:translateY(14px); transition:all .45s cubic-bezier(.34,1.3,.64,1); display:inline-block; margin:4px; }
+    .daily-tag.vis { opacity:1; transform:translateY(0); }
+
+    /* ===== CHEN ER DIAGRAM ===== */
+    .chen-canvas { width:100%; display:flex; align-items:center; justify-content:center; padding:8px 0; }
+    .chen-canvas svg { width:100%; height:auto; display:block; }
+    .chen-canvas .cs { opacity:0; transition:opacity .5s ease; }
+    .chen-canvas .cs.vis { opacity:1; }
+
+    /* ===== LOGICAL MODEL TABLE CARDS ===== */
+    .lt-star { display:grid; grid-template-columns:1fr 160px 1fr; grid-template-rows:auto 70px auto; margin-bottom:8px; align-items:stretch; }
+    .lt-star .lt-tl { grid-column:1; grid-row:1; }
+    .lt-star .lt-tr { grid-column:3; grid-row:1; }
+    .lt-star .lt-vl { grid-column:1; grid-row:2; }
+    .lt-star .lt-vr { grid-column:3; grid-row:2; }
+    .lt-star .lt-bl { grid-column:1; grid-row:3; }
+    .lt-star .lt-hb { grid-column:2; grid-row:3; }
+    .lt-star .lt-br { grid-column:3; grid-row:3; }
+    .lt-card { border-radius:10px; overflow:hidden; box-shadow:0 4px 14px rgba(46,38,64,.08); border:1px solid #e2e8f0; background:#fff; opacity:0; transform:translateY(20px); transition:all .45s cubic-bezier(.34,1.3,.64,1); }
+    .lt-card.vis { opacity:1; transform:translateY(0); }
+    .lt-card.assoc { border:2px dashed #dc2626; box-shadow:0 4px 18px rgba(220,38,38,.18); }
+    .lt-head { padding:9px 12px; color:#fff; font-weight:800; font-size:.92rem; text-align:center; letter-spacing:.3px; font-family:'JetBrains Mono',monospace; }
+    .lt-row { display:flex; padding:6px 11px; border-bottom:1px solid #f1f5f9; font-size:.76rem; gap:6px; align-items:center; }
+    .lt-row:last-child { border-bottom:none; }
+    .lt-col { font-weight:700; color:#374151; flex:1; font-family:'JetBrains Mono',monospace; }
+    .lt-typ { color:#64748b; font-family:'JetBrains Mono',monospace; font-size:.68rem; }
+    .lt-tag { font-size:.58rem; font-weight:800; padding:2px 5px; border-radius:4px; text-transform:uppercase; letter-spacing:.4px; flex-shrink:0; }
+    .lt-tag.pk { background:#fef3c7; color:#92400e; }
+    .lt-tag.fk { background:#dbeafe; color:#1e40af; }
+    .lt-tag.un { background:#dcfce7; color:#166534; }
+    /* connectors (FK arrows) */
+    .lt-conn { position:relative; display:flex; align-items:center; justify-content:center; opacity:0; transition:opacity .5s ease; }
+    .lt-conn.vis { opacity:1; }
+    .lt-conn .lbl { background:rgba(255,255,255,.97); border:1px solid #1e40af; color:#1e40af; padding:3px 9px; border-radius:6px; font-size:.66rem; font-weight:800; z-index:2; white-space:nowrap; box-shadow:0 2px 6px rgba(30,64,175,.15); }
+    .lt-conn .lbl code { font-family:'JetBrains Mono',monospace; font-size:.62rem; color:#1e3a8a; margin-left:4px; font-weight:700; }
+    .lt-conn-v::before { content:''; position:absolute; left:50%; top:0; bottom:0; width:2px; background:#1e40af; transform:translateX(-50%); }
+    .lt-conn-v::after { content:''; position:absolute; top:-2px; left:50%; transform:translateX(-50%); width:0; height:0; border-left:6px solid transparent; border-right:6px solid transparent; border-bottom:10px solid #1e40af; }
+    .lt-conn-h::before { content:''; position:absolute; top:50%; left:0; right:0; height:2px; background:#1e40af; transform:translateY(-50%); }
+    .lt-conn-h::after { content:''; position:absolute; left:-2px; top:50%; transform:translateY(-50%); width:0; height:0; border-top:6px solid transparent; border-bottom:6px solid transparent; border-right:10px solid #1e40af; }
+
+    /* ===== HANDS-ON PRACTICE ===== */
+    .hs-h { font-size:.92rem; font-weight:800; color:var(--dk); margin:0 0 10px; display:flex; align-items:center; gap:6px; }
+    .hands-steps { list-style:none; padding:0; margin:0; counter-reset:hsstep; display:flex; flex-direction:column; gap:6px; }
+    .hands-steps li { position:relative; padding:7px 12px 7px 42px; background:#f8fafc; border-left:3px solid #10b981; border-radius:6px; font-size:.83rem; color:#374151; counter-increment:hsstep; opacity:0; transform:translateX(-12px); transition:all .35s ease; }
+    .hands-steps li.vis { opacity:1; transform:translateX(0); }
+    .hands-steps li::before { content:counter(hsstep); position:absolute; left:9px; top:50%; transform:translateY(-50%); width:24px; height:24px; background:#10b981; color:#fff; border-radius:50%; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.74rem; }
+    .hands-steps code { background:rgba(16,185,129,.12); padding:1px 5px; border-radius:3px; font-size:.74rem; color:#065f46; font-family:'JetBrains Mono',monospace; }
+    .hands-steps kbd { background:#e2e8f0; padding:1px 5px; border-radius:3px; font-size:.7rem; font-family:'JetBrains Mono',monospace; color:#374151; border:1px solid #94a3b8; }
+  </style>
+</head>
+<body>
+<div class="slide-container">
+
+  <!-- ====== SLIDE 1: COVER ====== -->
+  <div class="slide cover-bg">
+    <div class="sc">
+      <div class="cv-badge">Módulo 2 · Ciclo Comum · IN02 · Aula 2 de 11</div>
+      <div class="cv-title">Banco de Dados I</div>
+      <div class="cv-sub">Conceitos, Modelagem e SQL</div>
+      <div class="cv-tags">
+        <div class="cv-tag" id="ct0">📦 Modelo Conceitual</div>
+        <div class="cv-tag" id="ct1">🗂️ Modelo Lógico</div>
+        <div class="cv-tag" id="ct2">⚙️ Modelo Físico</div>
+        <div class="cv-tag" id="ct3">🐘 PostgreSQL</div>
+        <div class="cv-tag" id="ct4">📝 SQL DDL</div>
+        <div class="cv-tag" id="ct5">🔑 Constraints</div>      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 2: DAILY ====== -->
+  <div class="slide cover-bg" style="background:linear-gradient(135deg,#1f2937 0%,#4b5563 50%,#b2b6bf 100%)!important;">
+    <div class="sc" style="text-align:center;">
+      <div style="background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:28px 32px;">
+        <div style="font-size:2rem;font-weight:800;color:white;margin-bottom:6px;">⏱️ Daily — 15 Minutos</div>
+        <div style="font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:18px;">O que você fez? O que vai fazer? Algum impedimento?</div>
+        <div class="daily-timer" id="daily-timer">15:00</div>
+        <div style="margin-bottom:18px;">
+          <button id="daily-start-btn" onclick="startDaily()" style="background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">▶ Iniciar</button>
+          <button onclick="resetDaily()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">↺ Reset</button>
+        </div>
+        <div>
+          <span class="daily-tag" id="dt0">✅ O que fiz</span>
+          <span class="daily-tag" id="dt1">🎯 O que vou fazer</span>
+          <span class="daily-tag" id="dt2">🚧 Impedimentos</span>
+          <span class="daily-tag" id="dt3">📦 Progresso do projeto</span>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 3: AGENDA ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">📋 Agenda da Aula 2</div><div class="ss">Estrutura e objetivos da aula de hoje</div></div>
+      <div class="g2" style="gap:12px;">
+        <div id="ag0" class="box" style="opacity:0;">
+          <h3>🕐 Bloco 1 — Fundamentos de Banco de Dados (20 min)</h3>
+          <p>Conceitos de BD, SGBD, modelos conceitual, lógico e físico.</p>
+        </div>
+        <div id="ag1" class="box" style="opacity:0;">
+          <h3>🕑 Bloco 2 — Modelagem e SQL DDL (30 min)</h3>
+          <p>Entidades, relacionamentos, tipos de dados, CREATE TABLE e constraints.</p>
+        </div>
+        <div id="ag2" class="box" style="opacity:0;">
+          <h3>🕒 Bloco 3 — Prática com PostgreSQL (30 min)</h3>
+          <p>Criação de schema real, definição de PK/FK, NOT NULL e UNIQUE.</p>
+        </div>
+        <div id="ag3" class="box acc" style="opacity:0;">
+          <h3>🎯 Objetivo da Aula</h3>
+          <p>Ao final, o aluno deve criar um banco de dados com tabelas, tipos e constraints usando SQL DDL.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+    </div>
+  </div>
+
+
+  <!-- ====== SLIDE 3: O QUE É UM BANCO DE DADOS? ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">O que é um Banco de Dados?</div><div class="ss">Por que não basta uma planilha?</div></div>
+      <div class="g2" style="gap:14px;align-items:stretch;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="box acc" style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <h3>📁 O que é?</h3>
+            <p style="margin-bottom:0;">Coleção organizada de dados persistentes, estruturados de forma que possam ser acessados, gerenciados e atualizados com eficiência.</p>
+          </div>
+          <div class="box" style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <h3>🤔 Por que precisamos?</h3>
+            <ul style="margin-bottom:0;">
+              <li>Múltiplos usuários simultâneos</li>
+              <li>Integridade e consistência dos dados</li>
+              <li>Consultas complexas e rápidas</li>
+              <li>Persistência, backup e recuperação</li>
+            </ul>
+          </div>
+          <div class="box grn" style="flex:1;display:flex;flex-direction:column;justify-content:center;">
+            <h3>📱 Exemplos do dia a dia</h3>
+            <p style="margin-bottom:0;">Instagram (posts/likes), Spotify (playlists), iFood (pedidos), sistemas bancários, cadastros de alunos no Inteli.</p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;">
+          <div class="box" style="padding:14px 18px;flex:1;display:flex;flex-direction:column;">
+            <h3 style="margin-bottom:12px;flex-shrink:0;">📈 Evolução do armazenamento</h3>
+            <div id="evo-pipe" style="flex:1;display:flex;flex-direction:column;justify-content:space-between;">
+              <div class="ps an" id="ep0" style="flex-direction:row;align-items:center;width:100%;justify-content:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9;display:flex;position:relative;">
+                <div class="pn" style="background:linear-gradient(135deg,#64748b,#94a3b8);width:40px;height:40px;font-size:1rem;">📄</div>
+                <div style="text-align:left;"><div class="pl" style="font-size:.82rem;margin-top:0;">Arquivo .txt</div><div class="ps2" style="margin-top:2px;">Simples, sem estrutura</div></div>
+                <div class="pc" style="display:none;"></div>
+              </div>
+              <div class="ps an" id="ep1" style="flex-direction:row;align-items:center;width:100%;justify-content:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9;display:flex;position:relative;">
+                <div class="pn" style="background:linear-gradient(135deg,#16a34a,#22c55e);width:40px;height:40px;font-size:1rem;">📊</div>
+                <div style="text-align:left;"><div class="pl" style="font-size:.82rem;margin-top:0;">Planilha Excel</div><div class="ps2" style="margin-top:2px;">Organizado, mas limitado</div></div>
+                <div class="pc" style="display:none;"></div>
+              </div>
+              <div class="ps an" id="ep2" style="flex-direction:row;align-items:center;width:100%;justify-content:flex-start;gap:12px;padding:10px 0;border-bottom:1px solid #f1f5f9;display:flex;position:relative;">
+                <div class="pn" style="background:linear-gradient(135deg,#336791,#4a90d9);width:40px;height:40px;font-size:1rem;">🐘</div>
+                <div style="text-align:left;"><div class="pl" style="font-size:.82rem;margin-top:0;">Banco de Dados Relacional</div><div class="ps2" style="margin-top:2px;">SQL, transações, integridade</div></div>
+                <div class="pc" style="display:none;"></div>
+              </div>
+              <div class="ps an" id="ep3" style="flex-direction:row;align-items:center;width:100%;justify-content:flex-start;gap:12px;padding:10px 0;display:flex;position:relative;">
+                <div class="pn" style="background:linear-gradient(135deg,#d97706,#f59e0b);width:40px;height:40px;font-size:1rem;">☁️</div>
+                <div style="text-align:left;"><div class="pl" style="font-size:.82rem;margin-top:0;">Cloud Database</div><div class="ps2" style="margin-top:2px;">Escala global, replicação</div></div>
+                <div class="pc" style="display:none;"></div>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 4: SGBD ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">SGBD — Sistema Gerenciador de Banco de Dados</div><div class="ss">O software que fica entre a aplicação e os dados</div></div>
+      <div id="pipe-sgbd" class="pipe" style="margin:16px 0;">
+        <div class="ps an">
+          <div class="pn" style="background:linear-gradient(135deg,#374151,#b2b6bf);">🖥️</div>
+          <div class="pl">Aplicação</div><div class="ps2">Node.js / Python</div>
+          <div class="pc"><div class="pcb" style="--fc:#4b5563;--tc:#7c3aed;"><div class="pcl">SQL Query</div></div></div>
+        </div>
+        <div class="ps an">
+          <div class="pn" style="background:linear-gradient(135deg,#7c3aed,#336791);">🐘</div>
+          <div class="pl">SGBD</div><div class="ps2">PostgreSQL</div>
+          <div class="pc"><div class="pcb" style="--fc:#7c3aed;--tc:#0d9488;"><div class="pcl">Processa</div></div></div>
+        </div>
+        <div class="ps an">
+          <div class="pn" style="background:linear-gradient(135deg,#0d9488,#10b981);">⚙️</div>
+          <div class="pl">Motor SQL</div><div class="ps2">Planner / Executor</div>
+          <div class="pc"><div class="pcb" style="--fc:#0d9488;--tc:#d97706;"><div class="pcl">Lê/Escreve</div></div></div>
+        </div>
+        <div class="ps an">
+          <div class="pn" style="background:linear-gradient(135deg,#d97706,#f59e0b);">💾</div>
+          <div class="pl">Arquivos em disco</div><div class="ps2">Páginas de dados</div>
+        </div>
+      </div>
+      <div class="g2" style="gap:12px;margin-top:8px;">
+        <div class="box acc">
+          <h3>🔐 Gerencia acesso</h3>
+          <p>Controla quem pode ler, escrever ou administrar cada objeto. Autenticação e autorização por usuário e role.</p>
+        </div>
+        <div class="box grn">
+          <h3>✅ Garante integridade</h3>
+          <p>Constraints (PK, FK, NOT NULL, UNIQUE) impedem que dados inválidos entrem no banco.</p>
+        </div>
+        <div class="box">
+          <h3>🔄 Controla transações</h3>
+          <p>ACID: Atomicidade, Consistência, Isolamento, Durabilidade. Ou tudo funciona, ou nada é salvo.</p>
+        </div>
+        <div class="box" style="border-left-color:var(--am);">
+          <h3>📦 Faz backups</h3>
+          <p>Recuperação em caso de falha com WAL (Write-Ahead Log) e snapshots periódicos.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 5: MODELAGEM ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">Modelagem — O Processo em 3 Etapas</div><div class="ss">Do conceito ao banco real</div></div>
+      <div class="lstack">
+        <div class="alayer" id="l0" style="background:linear-gradient(135deg,#374151,#b2b6bf);">
+          <div class="li">📦</div>
+          <div>
+            <div class="ln">Modelo Conceitual — O QUE</div>
+            <div class="lt">Diagrama ER · Entidades e Relacionamentos</div>
+            <div class="ld">Independente de tecnologia. Foco nos dados do domínio: o que existe e como se relaciona.</div>
+          </div>
+        </div>
+        <div class="larr" id="la0">⬇️ Mapeamento para tabelas</div>
+        <div class="alayer" id="l1" style="background:linear-gradient(135deg,#0d9488,#10b981);">
+          <div class="li">🗂️</div>
+          <div>
+            <div class="ln">Modelo Lógico — COMO</div>
+            <div class="lt">Tabelas, Colunas, Chaves Primárias e Estrangeiras</div>
+            <div class="ld">Define a estrutura das tabelas e suas relações. Ainda independente do SGBD escolhido.</div>
+          </div>
+        </div>
+        <div class="larr" id="la1">⬇️ Implementação no SGBD</div>
+        <div class="alayer" id="l2" style="background:linear-gradient(135deg,#d97706,#f59e0b);">
+          <div class="li">⚙️</div>
+          <div>
+            <div class="ln">Modelo Físico — EM QUAL BANCO</div>
+            <div class="lt">SQL DDL · CREATE TABLE · Tipos de dados PostgreSQL</div>
+            <div class="ld">Código SQL específico para o SGBD. Inclui tipos, índices, partições e otimizações.</div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 6: ENTIDADES ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">Entidades, Atributos e Relacionamentos</div><div class="ss">Os blocos de construção do Diagrama ER</div></div>
+      <div class="er-wrap" id="er-diagram">
+        <div class="er-ent" id="er0">
+          <div class="er-head" style="background:linear-gradient(135deg,#374151,#b2b6bf);">USUARIO</div>
+          <div class="er-attr">id <span class="pk">PK</span></div>
+          <div class="er-attr">nome</div>
+          <div class="er-attr">email</div>
+          <div class="er-attr">senha</div>
+        </div>
+        <div class="er-conn" id="erc0">
+          <div class="er-line" style="background:linear-gradient(90deg,#4b5563,#0d9488);"></div>
+          <div style="font-size:.65rem;color:#64748b;">faz</div>
+          <div class="er-line" style="background:linear-gradient(90deg,#4b5563,#0d9488);"></div>
+        </div>
+        <div class="er-ent" id="er1">
+          <div class="er-head" style="background:linear-gradient(135deg,#0d9488,#10b981);">PEDIDO</div>
+          <div class="er-attr">id <span class="pk">PK</span></div>
+          <div class="er-attr">data</div>
+          <div class="er-attr">status</div>
+          <div class="er-attr">total</div>
+        </div>
+        <div class="er-conn" id="erc1">
+          <div class="er-line" style="background:linear-gradient(90deg,#0d9488,#d97706);"></div>
+          <div style="font-size:.65rem;color:#64748b;">contém</div>
+          <div class="er-line" style="background:linear-gradient(90deg,#0d9488,#d97706);"></div>
+        </div>
+        <div class="er-ent" id="er2">
+          <div class="er-head" style="background:linear-gradient(135deg,#d97706,#f59e0b);">PRODUTO</div>
+          <div class="er-attr">id <span class="pk">PK</span></div>
+          <div class="er-attr">nome</div>
+          <div class="er-attr">preco</div>
+          <div class="er-attr">estoque</div>
+        </div>
+      </div>
+      <div class="g2" style="gap:10px;margin-top:10px;">
+        <div class="box acc">
+          <h3>🟦 Entidade</h3>
+          <p>Substantivo — algo com existência própria no domínio do sistema. Ex.: <strong>USUARIO</strong>, <strong>PEDIDO</strong>, <strong>PRODUTO</strong></p>
+        </div>
+        <div class="box grn">
+          <h3>🔷 Atributo</h3>
+          <p>Característica de uma entidade. Ex.: nome, email, preço. O atributo <strong>id</strong> com PK identifica cada linha unicamente.</p>
+        </div>
+        <div class="box">
+          <h3>🔗 Relacionamento</h3>
+          <p>Verbo entre entidades. "USUARIO <strong>faz</strong> PEDIDO" · "PEDIDO <strong>contém</strong> PRODUTO". Implementado com Foreign Keys.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 7: MODELO LÓGICO ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">Modelo Lógico — Tabelas e Colunas</div><div class="ss">Estrutura da tabela <code style="color:rgba(255,255,255,.9);background:rgba(255,255,255,.15);font-size:.85em;">usuarios</code></div></div>
+      <table class="stbl" id="logictbl">
+        <thead>
+          <tr>
+            <th>Coluna</th>
+            <th>Tipo</th>
+            <th>Constraint</th>
+            <th>Descrição</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><span class="scc" data-s="0">id</span></td>
+            <td><span class="scc" data-s="1">SERIAL</span></td>
+            <td><span class="scc" data-s="2">PRIMARY KEY</span></td>
+            <td><span class="scc" data-s="3">Identificador único</span></td>
+          </tr>
+          <tr>
+            <td><span class="scc" data-s="4">nome</span></td>
+            <td><span class="scc" data-s="5">VARCHAR(100)</span></td>
+            <td><span class="scc" data-s="6">NOT NULL</span></td>
+            <td><span class="scc" data-s="7">Nome completo</span></td>
+          </tr>
+          <tr>
+            <td><span class="scc" data-s="8">email</span></td>
+            <td><span class="scc" data-s="9">VARCHAR(200)</span></td>
+            <td><span class="scc" data-s="10">UNIQUE NOT NULL</span></td>
+            <td><span class="scc" data-s="11">Email de login</span></td>
+          </tr>
+          <tr>
+            <td><span class="scc" data-s="12">senha</span></td>
+            <td><span class="scc" data-s="13">VARCHAR(255)</span></td>
+            <td><span class="scc" data-s="14">NOT NULL</span></td>
+            <td><span class="scc" data-s="15">Hash da senha</span></td>
+          </tr>
+          <tr>
+            <td><span class="scc" data-s="16">criado_em</span></td>
+            <td><span class="scc" data-s="17">TIMESTAMP</span></td>
+            <td><span class="scc" data-s="18">DEFAULT NOW()</span></td>
+            <td><span class="scc" data-s="19">Data de criação</span></td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 8.5: DIAGRAMA ER — NOTAÇÃO DE CHEN ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">Diagrama ER — Notação de Chen</div><div class="ss">Quadrado, losango e oval — e a regra do N:N</div></div>
+      <div class="chen-canvas">
+        <svg viewBox="0 0 1200 360" preserveAspectRatio="xMidYMid meet">
+          <!-- USUARIO + atributos -->
+          <g class="cs" id="cs-u">
+            <ellipse cx="90" cy="90" rx="42" ry="20" fill="#fff" stroke="#4b5563" stroke-width="1.5"/>
+            <text x="90" y="95" text-anchor="middle" font-size="14" font-weight="700" fill="#374151">id</text>
+            <line x1="118" y1="103" x2="155" y2="170" stroke="#4b5563" stroke-width="1.5"/>
+            <ellipse cx="50" cy="200" rx="42" ry="20" fill="#fff" stroke="#4b5563" stroke-width="1.5"/>
+            <text x="50" y="205" text-anchor="middle" font-size="14" font-weight="700" fill="#374151">nome</text>
+            <line x1="92" y1="200" x2="125" y2="200" stroke="#4b5563" stroke-width="1.5"/>
+            <rect x="125" y="170" width="160" height="60" fill="#374151" stroke="#1f2937" stroke-width="2" rx="6"/>
+            <text x="205" y="208" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">USUARIO</text>
+          </g>
+          <!-- USUARIO -- 1 -- faz -- N -->
+          <g class="cs" id="cs-faz">
+            <line x1="285" y1="200" x2="350" y2="200" stroke="#374151" stroke-width="2"/>
+            <text x="315" y="190" text-anchor="middle" font-size="16" font-weight="800" fill="#0d9488">1</text>
+            <polygon points="350,200 410,160 470,200 410,240" fill="#fef3c7" stroke="#d97706" stroke-width="2"/>
+            <text x="410" y="205" text-anchor="middle" font-size="15" font-weight="800" fill="#92400e">faz</text>
+            <line x1="470" y1="200" x2="535" y2="200" stroke="#374151" stroke-width="2"/>
+            <text x="503" y="190" text-anchor="middle" font-size="16" font-weight="800" fill="#0d9488">N</text>
+          </g>
+          <!-- PEDIDO + atributos -->
+          <g class="cs" id="cs-p">
+            <ellipse cx="575" cy="100" rx="38" ry="18" fill="#fff" stroke="#0d9488" stroke-width="1.5"/>
+            <text x="575" y="105" text-anchor="middle" font-size="13" font-weight="700" fill="#374151">id</text>
+            <line x1="585" y1="118" x2="600" y2="170" stroke="#0d9488" stroke-width="1.5"/>
+            <ellipse cx="660" cy="100" rx="38" ry="18" fill="#fff" stroke="#0d9488" stroke-width="1.5"/>
+            <text x="660" y="105" text-anchor="middle" font-size="13" font-weight="700" fill="#374151">data</text>
+            <line x1="650" y1="118" x2="640" y2="170" stroke="#0d9488" stroke-width="1.5"/>
+            <rect x="535" y="170" width="160" height="60" fill="#0d9488" stroke="#0f766e" stroke-width="2" rx="6"/>
+            <text x="615" y="208" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">PEDIDO</text>
+          </g>
+          <!-- PEDIDO -- N -- contém (N:N marker) -- M -->
+          <g class="cs" id="cs-cnt">
+            <line x1="695" y1="200" x2="755" y2="200" stroke="#374151" stroke-width="2"/>
+            <text x="725" y="190" text-anchor="middle" font-size="16" font-weight="800" fill="#0d9488">N</text>
+            <rect x="755" y="155" width="200" height="90" fill="rgba(254,226,226,.4)" stroke="#dc2626" stroke-width="2.5" stroke-dasharray="6 4" rx="6"/>
+            <polygon points="770,200 855,160 940,200 855,240" fill="#fee2e2" stroke="#dc2626" stroke-width="2"/>
+            <text x="855" y="205" text-anchor="middle" font-size="15" font-weight="800" fill="#991b1b">contém</text>
+            <line x1="955" y1="200" x2="1015" y2="200" stroke="#374151" stroke-width="2"/>
+            <text x="985" y="190" text-anchor="middle" font-size="16" font-weight="800" fill="#0d9488">M</text>
+          </g>
+          <!-- atributo do relacionamento N:N -->
+          <g class="cs" id="cs-qty">
+            <line x1="855" y1="245" x2="855" y2="295" stroke="#dc2626" stroke-width="1.5"/>
+            <ellipse cx="855" cy="320" rx="62" ry="22" fill="#fff" stroke="#dc2626" stroke-width="1.5"/>
+            <text x="855" y="325" text-anchor="middle" font-size="13" font-weight="800" fill="#991b1b">quantidade</text>
+          </g>
+          <!-- PRODUTO + atributos -->
+          <g class="cs" id="cs-pr">
+            <ellipse cx="1075" cy="100" rx="38" ry="18" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
+            <text x="1075" y="105" text-anchor="middle" font-size="13" font-weight="700" fill="#374151">nome</text>
+            <line x1="1075" y1="118" x2="1075" y2="170" stroke="#d97706" stroke-width="1.5"/>
+            <ellipse cx="1155" cy="100" rx="38" ry="18" fill="#fff" stroke="#d97706" stroke-width="1.5"/>
+            <text x="1155" y="105" text-anchor="middle" font-size="13" font-weight="700" fill="#374151">preco</text>
+            <line x1="1155" y1="118" x2="1135" y2="170" stroke="#d97706" stroke-width="1.5"/>
+            <rect x="1015" y="170" width="160" height="60" fill="#d97706" stroke="#b45309" stroke-width="2" rx="6"/>
+            <text x="1095" y="208" text-anchor="middle" font-size="20" font-weight="800" fill="#fff">PRODUTO</text>
+          </g>
+        </svg>
+      </div>
+      <div class="g2" style="gap:12px;margin-top:10px;flex-shrink:0;">
+        <div class="box acc">
+          <h3>🔣 Símbolos da notação</h3>
+          <p><strong>Quadrado</strong> = entidade (substantivo) · <strong>Losango</strong> = relacionamento (verbo) · <strong>Oval</strong> = atributo. Linhas conectam com cardinalidade <strong>1, N, M</strong>.</p>
+        </div>
+        <div class="box grn">
+          <h3>🔁 Regra do N:N — quadrado em volta do losango</h3>
+          <p>Quando o relacionamento é <strong>muitos-para-muitos</strong>, ele vira uma <em>tabela associativa</em> com PK própria — e pode carregar atributos como <code>quantidade</code>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 9.5: MODELO LÓGICO — DA ER ÀS TABELAS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">Modelo Lógico — Da ER às Tabelas</div><div class="ss">Cada entidade vira tabela · 1:N gera FK · N:N vira tabela associativa</div></div>
+      <div class="lt-star">
+        <div class="lt-card lt-tl" id="lt0">
+          <div class="lt-head" style="background:#374151;">usuarios</div>
+          <div class="lt-row"><span class="lt-col">id</span><span class="lt-typ">SERIAL</span><span class="lt-tag pk">PK</span></div>
+          <div class="lt-row"><span class="lt-col">nome</span><span class="lt-typ">VARCHAR(100)</span></div>
+          <div class="lt-row"><span class="lt-col">email</span><span class="lt-typ">VARCHAR(200)</span><span class="lt-tag un">UQ</span></div>
+        </div>
+        <div class="lt-card lt-tr" id="lt2">
+          <div class="lt-head" style="background:#d97706;">produtos</div>
+          <div class="lt-row"><span class="lt-col">id</span><span class="lt-typ">SERIAL</span><span class="lt-tag pk">PK</span></div>
+          <div class="lt-row"><span class="lt-col">nome</span><span class="lt-typ">VARCHAR(100)</span></div>
+          <div class="lt-row"><span class="lt-col">preco</span><span class="lt-typ">DECIMAL(10,2)</span></div>
+        </div>
+        <div class="lt-conn lt-conn-v lt-vl" id="ltvl"><span class="lbl">FK <code>usuario_id → id</code></span></div>
+        <div class="lt-conn lt-conn-v lt-vr" id="ltvr"><span class="lbl">FK <code>produto_id → id</code></span></div>
+        <div class="lt-card lt-bl" id="lt1">
+          <div class="lt-head" style="background:#0d9488;">pedidos</div>
+          <div class="lt-row"><span class="lt-col">id</span><span class="lt-typ">SERIAL</span><span class="lt-tag pk">PK</span></div>
+          <div class="lt-row"><span class="lt-col">data</span><span class="lt-typ">TIMESTAMP</span></div>
+          <div class="lt-row"><span class="lt-col">usuario_id</span><span class="lt-typ">INTEGER</span><span class="lt-tag fk">FK</span></div>
+        </div>
+        <div class="lt-conn lt-conn-h lt-hb" id="lthb"><span class="lbl">FK <code>pedido_id → id</code></span></div>
+        <div class="lt-card assoc lt-br" id="lt3">
+          <div class="lt-head" style="background:#dc2626;">pedido_produto</div>
+          <div class="lt-row"><span class="lt-col">pedido_id</span><span class="lt-typ">INTEGER</span><span class="lt-tag pk">PK</span><span class="lt-tag fk">FK</span></div>
+          <div class="lt-row"><span class="lt-col">produto_id</span><span class="lt-typ">INTEGER</span><span class="lt-tag pk">PK</span><span class="lt-tag fk">FK</span></div>
+          <div class="lt-row"><span class="lt-col">quantidade</span><span class="lt-typ">INTEGER</span></div>
+        </div>
+      </div>
+      <div class="g2" style="gap:12px;margin-top:10px;">
+        <div class="box acc">
+          <h3>📐 Regras de tradução</h3>
+          <p><strong>Entidade</strong> → tabela · <strong>Atributo</strong> → coluna · <strong>1:N</strong> → FK no lado <em>muitos</em> (<code>pedidos.usuario_id → usuarios.id</code>) · <strong>N:N</strong> → tabela associativa com PK composta.</p>
+        </div>
+        <div class="box" style="border-left-color:#dc2626;">
+          <h3 style="color:#991b1b;">🔁 Tabela associativa <code>pedido_produto</code></h3>
+          <p>Nasce do losango <em>contém</em> com quadrado em volta. Tem <strong>PK composta</strong> (<code>pedido_id + produto_id</code>) — ambas FKs — e absorve o atributo <code>quantidade</code> do relacionamento.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 9.6: SQL — CRIANDO AS 4 TABELAS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">SQL — Criando as Tabelas</div><div class="ss"><code>CREATE TABLE</code> para cada tabela do modelo lógico</div></div>
+      <div class="g2" style="gap:14px;height:360px;">
+        <div class="term">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">parents.sql — tabelas-pai</div></div>
+          <div class="term-body">
+            <div class="tl" id="tb0"></div>
+            <div class="tl" id="tb1"></div>
+            <div class="tl" id="tb2"></div>
+            <div class="tl" id="tb3"></div>
+            <div class="tl" id="tb4"></div>
+            <div class="tl" id="tb5"></div>
+            <hr class="tdiv">
+            <div class="tl" id="tb6"></div>
+            <div class="tl" id="tb7"></div>
+            <div class="tl" id="tb8"></div>
+            <div class="tl" id="tb9"></div>
+            <div class="tl" id="tb10"></div>
+            <div class="tl" id="tb11"></div>
+          </div>
+        </div>
+        <div class="term">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">children.sql — FK e N:N</div></div>
+          <div class="term-body">
+            <div class="tl" id="tb12"></div>
+            <div class="tl" id="tb13"></div>
+            <div class="tl" id="tb14"></div>
+            <div class="tl" id="tb15"></div>
+            <div class="tl" id="tb16"></div>
+            <div class="tl" id="tb17"></div>
+            <hr class="tdiv">
+            <div class="tl" id="tb18"></div>
+            <div class="tl" id="tb19"></div>
+            <div class="tl" id="tb20"></div>
+            <div class="tl" id="tb21"></div>
+            <div class="tl" id="tb22"></div>
+            <div class="tl" id="tb23"></div>
+            <div class="tl" id="tb24"></div>
+          </div>
+        </div>
+      </div>
+      <div class="box acc" style="margin-top:10px;">
+        <p><strong>REFERENCES</strong> cria a FK que liga <code>pedidos.usuario_id → usuarios.id</code>. Em <code>pedido_produto</code>, a <strong>PK composta</strong> <code>(pedido_id, produto_id)</code> impede duplicar o mesmo produto no mesmo pedido — e ambas as colunas também são FKs apontando para os pais.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 9: SQL — AS 5 SUBLINGUAGENS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">SQL — As 5 Sublinguagens</div><div class="ss">Cada grupo de comandos tem um propósito bem definido</div></div>
+      <div class="g5" style="gap:10px;margin-bottom:12px;">
+        <div class="mc" id="sub0" style="--mc:#4b5563;"><div class="mb" style="background:#4b5563;">DDL</div><div class="mt">Data Definition</div><div class="md">Define a estrutura do banco</div><div class="mex">CREATE TABLE<br>ALTER TABLE<br>DROP TABLE</div></div>
+        <div class="mc" id="sub1" style="--mc:#0d9488;"><div class="mb" style="background:#0d9488;">DML</div><div class="mt">Data Manipulation</div><div class="md">Manipula registros nas tabelas</div><div class="mex">INSERT INTO<br>UPDATE SET<br>DELETE FROM</div></div>
+        <div class="mc" id="sub2" style="--mc:#6b7280;"><div class="mb" style="background:#6b7280;">DQL</div><div class="mt">Data Query</div><div class="md">Consulta e lê os dados</div><div class="mex">SELECT ... FROM<br>WHERE / ORDER BY<br>GROUP BY / HAVING</div></div>
+        <div class="mc" id="sub3" style="--mc:#d97706;"><div class="mb" style="background:#d97706;">DCL</div><div class="mt">Data Control</div><div class="md">Controla permissões de acesso</div><div class="mex">GRANT SELECT ON<br>REVOKE INSERT ON<br>TO / FROM user</div></div>
+        <div class="mc" id="sub4" style="--mc:#dc2626;"><div class="mb" style="background:#dc2626;">TCL</div><div class="mt">Transaction Control</div><div class="md">Gerencia transações ACID</div><div class="mex">BEGIN<br>COMMIT<br>ROLLBACK</div></div>
+      </div>
+      <div class="box acc"><p><strong>Esta aula cobre DDL + DML + DQL + DCL + TCL.</strong> Cada sublinguagem resolve um problema diferente — juntas formam o SQL completo.</p></div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 9: SQL DDL ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">SQL DDL — CREATE TABLE</div><div class="ss">Transformando o modelo lógico em código SQL real</div></div>
+      <div class="term" style="height:370px;">
+        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">schema.sql — PostgreSQL</div></div>
+        <div class="term-body">
+          <div class="tl" id="sl0"></div>
+          <div class="tl" id="sl1"></div>
+          <div class="tl" id="sl2"></div>
+          <div class="tl" id="sl3"></div>
+          <div class="tl" id="sl4"></div>
+          <div class="tl" id="sl5"></div>
+          <div class="tl" id="sl6"></div>
+          <div class="tl" id="sl7"></div>
+          <hr class="tdiv">
+          <div class="tl" id="sl8"></div>
+          <div class="tl" id="sl9"></div>
+          <div class="tl" id="sl10"></div>
+          <div class="tl" id="sl11"></div>
+          <div class="tl" id="sl12"></div>
+          <div class="tl" id="sl13"></div>
+          <div class="tl" id="sl14"></div>
+          <div class="tl" id="sl15"></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 9: TIPOS DE DADOS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">Tipos de Dados SQL</div><div class="ss">Escolha o tipo certo para cada coluna</div></div>
+      <div class="g3" style="gap:10px;">
+        <div class="mc" id="tp0" style="--mc:#4b5563;"><div class="mb">INTEGER / SERIAL</div><div class="mt">Números inteiros</div><div class="md">SERIAL é auto-increment — ideal para chaves primárias.</div><div class="mex">id SERIAL PRIMARY KEY</div></div>
+        <div class="mc" id="tp1" style="--mc:#0d9488;"><div class="mb">VARCHAR(n) / TEXT</div><div class="mt">Textos</div><div class="md">VARCHAR limita o tamanho. TEXT não tem limite definido.</div><div class="mex">nome VARCHAR(100)</div></div>
+        <div class="mc" id="tp2" style="--mc:#d97706;"><div class="mb">DECIMAL(p,s)</div><div class="mt">Decimais precisos</div><div class="md">p = total de dígitos, s = casas decimais. Use para dinheiro.</div><div class="mex">preco DECIMAL(10,2)</div></div>
+        <div class="mc" id="tp3" style="--mc:#7c3aed;"><div class="mb">BOOLEAN</div><div class="mt">Verdadeiro / Falso</div><div class="md">Aceita true/false ou 1/0. Útil para flags de estado.</div><div class="mex">ativo BOOLEAN DEFAULT true</div></div>
+        <div class="mc" id="tp4" style="--mc:#dc2626;"><div class="mb">TIMESTAMP / DATE</div><div class="mt">Data e hora</div><div class="md">TIMESTAMP inclui hora. DATE é apenas data. NOW() retorna o instante atual.</div><div class="mex">criado_em TIMESTAMP</div></div>
+        <div class="mc" id="tp5" style="--mc:#64748b;"><div class="mb">JSON / JSONB</div><div class="mt">Dados semi-estruturados</div><div class="md">JSONB é indexável e mais rápido. Útil para metadados flexíveis.</div><div class="mex">config JSONB</div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 10: CONSTRAINTS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">Constraints — Regras de Integridade</div><div class="ss">O banco garante que só dados válidos entram</div></div>
+      <div id="cbars" style="margin-bottom:12px;">
+        <div class="sbr" id="cb0">
+          <div class="scg" style="width:120px;text-align:left;font-size:.74rem;">PRIMARY KEY</div>
+          <div class="str"><div class="sf" style="background:linear-gradient(90deg,#4b5563,#6b7280);width:0;" data-w="95%"><div class="sfl">Identifica unicamente cada linha</div></div></div>
+        </div>
+        <div class="sbr" id="cb1">
+          <div class="scg" style="width:120px;text-align:left;font-size:.74rem;">NOT NULL</div>
+          <div class="str"><div class="sf" style="background:linear-gradient(90deg,#0d9488,#10b981);width:0;" data-w="85%"><div class="sfl">Campo obrigatório</div></div></div>
+        </div>
+        <div class="sbr" id="cb2">
+          <div class="scg" style="width:120px;text-align:left;font-size:.74rem;">UNIQUE</div>
+          <div class="str"><div class="sf" style="background:linear-gradient(90deg,#d97706,#f59e0b);width:0;" data-w="75%"><div class="sfl">Valor não pode repetir</div></div></div>
+        </div>
+        <div class="sbr" id="cb3">
+          <div class="scg" style="width:120px;text-align:left;font-size:.74rem;">FOREIGN KEY</div>
+          <div class="str"><div class="sf" style="background:linear-gradient(90deg,#7c3aed,#a855f7);width:0;" data-w="88%"><div class="sfl">Liga tabelas, garante integridade referencial</div></div></div>
+        </div>
+        <div class="sbr" id="cb4">
+          <div class="scg" style="width:120px;text-align:left;font-size:.74rem;">DEFAULT</div>
+          <div class="str"><div class="sf" style="background:linear-gradient(90deg,#64748b,#94a3b8);width:0;" data-w="60%"><div class="sfl">Valor padrão quando não informado</div></div></div>
+        </div>
+      </div>
+      <div class="box acc">
+        <h3>💡 Por que constraints importam?</h3>
+        <p>Elas garantem que a aplicação não precise validar tudo manualmente. O banco rejeita automaticamente dados inválidos, protegendo a integridade mesmo com bugs no código.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 11: DQL — SELECT ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">DQL — SELECT</div><div class="ss">Data Query Language · Consultando e filtrando dados no banco</div></div>
+      <div class="g2" style="gap:14px;height:340px;">
+        <div class="term">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">queries.sql</div></div>
+          <div class="term-body">
+            <div class="tl" id="ql0"></div>
+            <div class="tl" id="ql1"></div>
+            <div class="tl" id="ql2"></div>
+            <div class="tl" id="ql3"></div>
+            <div class="tl" id="ql4"></div>
+            <div class="tl" id="ql5"></div>
+            <div class="tl" id="ql6"></div>
+            <div class="tl" id="ql7"></div>
+            <div class="tl" id="ql8"></div>
+            <div class="tl" id="ql9"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="box acc" style="flex-shrink:0;">
+            <h3>📋 Resultado</h3>
+          </div>
+          <div style="overflow:hidden;border-radius:10px;border:1px solid #dfe5ec;flex:1;">
+            <table class="rtable" id="rtbl">
+              <thead><tr class="vis"><th>id</th><th>nome</th><th>email</th></tr></thead>
+              <tbody>
+                <tr id="rr0"><td>1</td><td>Ana Lima</td><td>ana@inteli.edu.br</td></tr>
+                <tr id="rr1"><td>2</td><td>Bruno Costa</td><td>bruno@inteli.edu.br</td></tr>
+                <tr id="rr2"><td>3</td><td>Carla Souza</td><td>carla@inteli.edu.br</td></tr>
+                <tr id="rr3"><td>4</td><td>Diego Alves</td><td>diego@inteli.edu.br</td></tr>
+                <tr id="rr4"><td>5</td><td>Elena Martins</td><td>elena@inteli.edu.br</td></tr>
+              </tbody>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+
+  <!-- ====== SLIDE 13: DML — INSERT ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">DML — INSERT INTO</div><div class="ss">Data Manipulation Language · Inserindo registros na tabela</div></div>
+      <div class="g2" style="gap:14px;height:350px;">
+        <div class="term">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">dml_insert.sql — PostgreSQL</div></div>
+          <div class="term-body">
+            <div class="tl" id="di0"></div>
+            <div class="tl" id="di1"></div>
+            <div class="tl" id="di2"></div>
+            <div class="tl" id="di3"></div>
+            <div class="tl" id="di4"></div>
+            <div class="hr" style="border-top:1px solid #313244;margin:6px 0;"></div>
+            <div class="tl" id="di5"></div>
+            <div class="tl" id="di6"></div>
+            <div class="tl" id="di7"></div>
+            <div class="tl" id="di8"></div>
+            <div class="tl" id="di9"></div>
+            <div class="tl" id="di10"></div>
+            <div class="tl" id="di11"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="mc vis" style="--mc:#0d9488;"><div class="mb" style="background:#0d9488;">INSERT básico</div><div class="mt">Linha única</div><div class="md">Especifica colunas explicitamente. Colunas com DEFAULT e SERIAL podem ser omitidas.</div></div>
+          <div class="mc vis" style="--mc:#4b5563;"><div class="mb" style="background:#4b5563;">INSERT múltiplo</div><div class="mt">Várias linhas de uma vez</div><div class="md">Muito mais eficiente que múltiplos INSERTs individuais. Um único round-trip ao banco.</div></div>
+          <div class="mc vis" style="--mc:#6b7280;"><div class="mb" style="background:#6b7280;">INSERT … RETURNING</div><div class="mt">Retorna o ID gerado</div><div class="md">Elimina a necessidade de um SELECT após o INSERT para buscar o id autogerado.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 14: DML — UPDATE e DELETE ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">DML — UPDATE e DELETE</div><div class="ss">Data Manipulation Language · Alterando e removendo registros</div></div>
+      <div class="g2" style="gap:14px;height:350px;">
+        <div class="term">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">dml_update_delete.sql</div></div>
+          <div class="term-body">
+            <div class="tl" id="ud0"></div>
+            <div class="tl" id="ud1"></div>
+            <div class="tl" id="ud2"></div>
+            <div class="tl" id="ud3"></div>
+            <div class="tl" id="ud4"></div>
+            <div class="hr" style="border-top:1px solid #313244;margin:6px 0;"></div>
+            <div class="tl" id="ud5"></div>
+            <div class="tl" id="ud6"></div>
+            <div class="tl" id="ud7"></div>
+            <div class="tl" id="ud8"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="mc vis" style="--mc:#d97706;border-top-color:#d97706;"><div class="mb" style="background:#d97706;">⚠️ UPDATE sem WHERE</div><div class="mt">Atualiza TODOS os registros</div><div class="md"><code style="background:#fef3c7;color:#92400e;">UPDATE usuarios SET ativo = false</code><br>Sem WHERE → todas as linhas são alteradas. <strong>Sempre use WHERE.</strong></div></div>
+          <div class="mc vis" style="--mc:#dc2626;border-top-color:#dc2626;"><div class="mb" style="background:#dc2626;">🚨 DELETE sem WHERE</div><div class="mt">Apaga TODOS os registros</div><div class="md">A tabela fica vazia mas continua existindo. Use <code>TRUNCATE</code> para isso intencionalmente. <strong>Sempre use WHERE no DELETE.</strong></div></div>
+          <div class="mc vis" style="--mc:#0d9488;"><div class="mb" style="background:#0d9488;">✅ Padrão seguro</div><div class="mt">Filtre sempre pelo ID</div><div class="md">Use <code>WHERE id = $1</code> em aplicações. Nunca confie em input direto do usuário — use prepared statements.</div></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 15: DCL + TCL ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">DCL + TCL — Controle e Transações</div><div class="ss">Permissões de acesso e operações ACID</div></div>
+      <div class="g2" style="gap:14px;height:350px;">
+        <div class="term">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">dcl_tcl.sql — PostgreSQL</div></div>
+          <div class="term-body">
+            <div class="tl" id="dt0"></div>
+            <div class="tl" id="dt1"></div>
+            <div class="tl" id="dt2"></div>
+            <div class="tl" id="dt3"></div>
+            <div class="tl" id="dt4"></div>
+            <div class="hr" style="border-top:1px solid #313244;margin:6px 0;"></div>
+            <div class="tl" id="dt5"></div>
+            <div class="tl" id="dt6"></div>
+            <div class="tl" id="dt7"></div>
+            <div class="tl" id="dt8"></div>
+            <div class="tl" id="dt9"></div>
+            <div class="tl" id="dt10"></div>
+            <div class="tl" id="dt11"></div>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="box" style="border-left-color:var(--am);">
+            <h3>🔐 DCL — Data Control Language</h3>
+            <p><strong>GRANT:</strong> concede permissões a um usuário ou role<br>
+            <strong>REVOKE:</strong> remove permissões<br>
+            Permissões granulares: <code>SELECT</code>, <code>INSERT</code>, <code>UPDATE</code>, <code>DELETE</code>, <code>ALL</code></p>
+          </div>
+          <div class="box acc">
+            <h3>🔄 TCL — Transaction Control Language</h3>
+            <p><strong>BEGIN:</strong> inicia uma transação<br>
+            <strong>COMMIT:</strong> confirma permanentemente todas as operações<br>
+            <strong>ROLLBACK:</strong> desfaz tudo desde o BEGIN<br>
+            <em>Garante as propriedades <strong>ACID</strong></em></p>
+          </div>
+          <div class="box grn">
+            <h3>⚡ ACID</h3>
+            <p style="font-size:.8rem;"><strong>A</strong>tomicity · <strong>C</strong>onsistency · <strong>I</strong>solation · <strong>D</strong>urability</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 19.1: SGBD — PostgreSQL ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue" style="background:linear-gradient(135deg,#1f4f7a,#336791);"><div class="st">🐘 PostgreSQL</div><div class="ss">Open-source · padrão SQL avançado · 1996</div></div>
+      <div class="term" style="height:340px;">
+        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">postgres.sql — PostgreSQL 16</div></div>
+        <div class="term-body">
+          <div class="tl" id="pgs0"></div>
+          <div class="tl" id="pgs1"></div>
+          <div class="tl" id="pgs2"></div>
+          <div class="tl" id="pgs3"></div>
+          <div class="tl" id="pgs4"></div>
+          <div class="tl" id="pgs5"></div>
+          <div class="tl" id="pgs6"></div>
+          <div class="tl" id="pgs7"></div>
+          <div class="tl" id="pgs8"></div>
+        </div>
+      </div>
+      <div class="g3" style="gap:10px;margin-top:12px;">
+        <div class="box acc"><h3>🔢 Auto-increment</h3><p><code>SERIAL</code> cria uma sequence automática. Em versões novas, <code>GENERATED AS IDENTITY</code> é o padrão SQL.</p></div>
+        <div class="box"><h3>📦 Tipos avançados</h3><p><code>JSONB</code> indexável, <code>ARRAY</code>, <code>UUID</code>, <code>INET</code>, tipos geográficos com PostGIS.</p></div>
+        <div class="box grn"><h3>🎯 Quando usar</h3><p>SaaS modernos, dados complexos, máxima conformidade com SQL padrão.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 19.2: SGBD — MySQL ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark" style="background:linear-gradient(135deg,#00546B,#F29111);"><div class="st">🐬 MySQL / MariaDB</div><div class="ss">O mais popular da web · LAMP, WordPress · 1995</div></div>
+      <div class="term" style="height:340px;">
+        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">mysql.sql — MySQL 8</div></div>
+        <div class="term-body">
+          <div class="tl" id="mys0"></div>
+          <div class="tl" id="mys1"></div>
+          <div class="tl" id="mys2"></div>
+          <div class="tl" id="mys3"></div>
+          <div class="tl" id="mys4"></div>
+          <div class="tl" id="mys5"></div>
+          <div class="tl" id="mys6"></div>
+          <div class="tl" id="mys7"></div>
+          <div class="tl" id="mys8"></div>
+        </div>
+      </div>
+      <div class="g3" style="gap:10px;margin-top:12px;">
+        <div class="box acc"><h3>🔢 Auto-increment</h3><p><code>AUTO_INCREMENT</code> direto na coluna. Não precisa de sequence separada.</p></div>
+        <div class="box"><h3>⚙️ Storage Engine</h3><p><code>ENGINE=InnoDB</code> suporta FK e transações. <code>MyISAM</code> não suporta — escolha sempre InnoDB.</p></div>
+        <div class="box grn"><h3>🎯 Quando usar</h3><p>Web apps clássicos, hospedagem compartilhada, ecossistema PHP/WordPress.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 19.3: SGBD — SQLite ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green" style="background:linear-gradient(135deg,#003B57,#0F80C1);"><div class="st">💾 SQLite</div><div class="ss">Embedded · zero-config · um único arquivo · 2000</div></div>
+      <div class="term" style="height:340px;">
+        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">app.db — SQLite 3</div></div>
+        <div class="term-body">
+          <div class="tl" id="lit0"></div>
+          <div class="tl" id="lit1"></div>
+          <div class="tl" id="lit2"></div>
+          <div class="tl" id="lit3"></div>
+          <div class="tl" id="lit4"></div>
+          <div class="tl" id="lit5"></div>
+          <div class="tl" id="lit6"></div>
+          <div class="tl" id="lit7"></div>
+          <div class="tl" id="lit8"></div>
+        </div>
+      </div>
+      <div class="g3" style="gap:10px;margin-top:12px;">
+        <div class="box acc"><h3>🔢 Auto-increment</h3><p><code>INTEGER PRIMARY KEY</code> já é alias do <code>rowid</code>. <code>AUTOINCREMENT</code> só evita reuso de IDs.</p></div>
+        <div class="box"><h3>🌀 Tipagem dinâmica</h3><p>Apenas 5 storage classes: <code>NULL</code>, <code>INTEGER</code>, <code>REAL</code>, <code>TEXT</code>, <code>BLOB</code>. <code>VARCHAR(100)</code> é ignorado.</p></div>
+        <div class="box grn"><h3>🎯 Quando usar</h3><p>Apps mobile, protótipos, testes, banco embarcado em cada instalação.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 19.4: SGBD — SQL Server ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark" style="background:linear-gradient(135deg,#7A0E13,#A91D22);"><div class="st">🟥 SQL Server (T-SQL)</div><div class="ss">Microsoft · stack .NET · enterprise · 1989</div></div>
+      <div class="term" style="height:340px;">
+        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">tsql.sql — SQL Server 2022</div></div>
+        <div class="term-body">
+          <div class="tl" id="mss0"></div>
+          <div class="tl" id="mss1"></div>
+          <div class="tl" id="mss2"></div>
+          <div class="tl" id="mss3"></div>
+          <div class="tl" id="mss4"></div>
+          <div class="tl" id="mss5"></div>
+          <div class="tl" id="mss6"></div>
+          <div class="tl" id="mss7"></div>
+          <div class="tl" id="mss8"></div>
+        </div>
+      </div>
+      <div class="g3" style="gap:10px;margin-top:12px;">
+        <div class="box acc"><h3>🔢 Auto-increment</h3><p><code>IDENTITY(seed, increment)</code> — <code>IDENTITY(1,1)</code> começa em 1 e soma 1 a cada linha.</p></div>
+        <div class="box"><h3>🔤 NVARCHAR vs VARCHAR</h3><p><code>NVARCHAR</code> guarda Unicode (acentos, emojis); <code>VARCHAR</code> só ASCII estendido. Use NVARCHAR sempre.</p></div>
+        <div class="box grn"><h3>🎯 Quando usar</h3><p>Empresas Microsoft, integrações com Power BI / Azure, BI corporativo.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 19.5: SGBD — Oracle ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark" style="background:linear-gradient(135deg,#8B2818,#C74634);"><div class="st">🔴 Oracle Database</div><div class="ss">Enterprise · grandes corporações · bancos / telecom · 1979</div></div>
+      <div class="term" style="height:340px;">
+        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">oracle.sql — Oracle 23ai</div></div>
+        <div class="term-body">
+          <div class="tl" id="ora0"></div>
+          <div class="tl" id="ora1"></div>
+          <div class="tl" id="ora2"></div>
+          <div class="tl" id="ora3"></div>
+          <div class="tl" id="ora4"></div>
+          <div class="tl" id="ora5"></div>
+          <div class="tl" id="ora6"></div>
+          <div class="tl" id="ora7"></div>
+          <div class="tl" id="ora8"></div>
+        </div>
+      </div>
+      <div class="g3" style="gap:10px;margin-top:12px;">
+        <div class="box acc"><h3>🔢 Auto-increment</h3><p><code>GENERATED ALWAYS AS IDENTITY</code> (12c+). Antes era <code>SEQUENCE + TRIGGER</code>.</p></div>
+        <div class="box"><h3>🔤 Tipos próprios</h3><p><code>VARCHAR2</code> em vez de <code>VARCHAR</code>, <code>NUMBER(p,s)</code> universal, <strong>não tem BOOLEAN</strong> — usa <code>NUMBER(1)</code>.</p></div>
+        <div class="box grn"><h3>🎯 Quando usar</h3><p>Sistemas legados, bancos, telecom, casos onde performance e suporte enterprise são críticos.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 16: RM-ODP — AS 5 VISÕES ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">RM-ODP — As 5 Visões do Sistema</div><div class="ss">ISO/IEC 10746 · Como diferentes stakeholders enxergam o sistema</div></div>
+      <div class="pipe" style="flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0;">
+        <div class="alayer" id="odp0" style="background:linear-gradient(135deg,#2e2640,#4b5563);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>🏢 Enterprise</strong><br><small>Propósito, regras de negócio</small></div>
+        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="oa0">→</div>
+        <div class="alayer" id="odp1" style="background:linear-gradient(135deg,#0d9488,#10b981);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>📋 Information</strong><br><small>Dados, entidades, relações</small></div>
+        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="oa1">→</div>
+        <div class="alayer" id="odp2" style="background:linear-gradient(135deg,#4b5563,#6b7280);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>⚙️ Computational</strong><br><small>Componentes, interfaces</small></div>
+        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="oa2">→</div>
+        <div class="alayer" id="odp3" style="background:linear-gradient(135deg,#d97706,#f59e0b);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>🔧 Engineering</strong><br><small>Distribuição, canais, nós</small></div>
+        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="oa3">→</div>
+        <div class="alayer" id="odp4" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>💻 Technology</strong><br><small>Plataformas, padrões</small></div>
+      </div>
+      <div class="box acc" style="margin-top:8px;"><p><strong>Esta aula:</strong> Visão <strong>Information</strong> — modelamos entidades, atributos e relações do minimundo. O banco de dados torna os dados do domínio persistentes e consultáveis.</p></div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 17: ESTA AULA NO RM-ODP ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">Esta Aula no RM-ODP</div><div class="ss">RF, RNF e Artefato desta aula</div></div>
+      <div class="g2" style="gap:12px;align-items:stretch;">
+        <div style="display:flex;flex-direction:column;gap:10px;">
+          <div class="box grn" style="flex:1;display:flex;flex-direction:column;justify-content:center;"><h3>📌 Requisito Funcional</h3><p style="margin-bottom:0;">Mapear quais funcionalidades dependem de persistência de dados — definir entidades e atributos do domínio.</p></div>
+          <div class="box" style="border-left-color:var(--am);flex:1;display:flex;flex-direction:column;justify-content:center;"><h3>📦 Artefato</h3><ul style="margin-bottom:0;">
+            <li id="art0" style="opacity:0;transition:all .4s ease;">🗺️ <strong>Minimundo</strong> do projeto descrito em texto</li>
+            <li id="art1" style="opacity:0;transition:all .4s ease;">📐 <strong>ER/DER inicial</strong> com entidades e relacionamentos</li>
+            <li id="art2" style="opacity:0;transition:all .4s ease;">💾 <strong>Primeiros comandos SQL</strong> (CREATE TABLE + SELECT)</li>
+          </ul></div>
+        </div>
+        <div style="display:flex;flex-direction:column;">
+          <div class="box acc" style="flex:1;display:flex;flex-direction:column;"><h3 style="flex-shrink:0;">⚖️ RNF — 8 Eixos ISO/IEC 25010</h3>
+            <table class="stbl" id="rnf-tbl" style="border-spacing:0 6px;width:100%;flex:1;">
+              <tr><td class="scc" data-s="0" style="opacity:0;transition:all .35s;padding:6px 10px;border-radius:5px;background:#f1f5f9;color:#374151;font-size:.82rem;"><strong>CONF</strong> Confiabilidade</td><td class="scc" data-s="1" style="opacity:0;transition:all .35s;padding:6px 10px;border-radius:5px;background:#dcfce7;color:#374151;font-size:.82rem;">✅ PK + FK + NOT NULL</td></tr>
+              <tr><td class="scc" data-s="2" style="opacity:0;transition:all .35s;padding:6px 10px;border-radius:5px;background:#f1f5f9;color:#374151;font-size:.82rem;"><strong>SEG</strong> Segurança</td><td class="scc" data-s="3" style="opacity:0;transition:all .35s;padding:6px 10px;border-radius:5px;background:#dcfce7;color:#374151;font-size:.82rem;">✅ Acesso controlado ao DB</td></tr>
+              <tr><td class="scc" data-s="4" style="opacity:0;transition:all .35s;padding:6px 10px;border-radius:5px;background:#f1f5f9;color:#374151;font-size:.82rem;"><strong>DES</strong> Desempenho</td><td class="scc" data-s="5" style="opacity:0;transition:all .35s;padding:6px 10px;border-radius:5px;background:#f9f9f9;color:#374151;font-size:.82rem;">→ Índices nas PKs</td></tr>
+              <tr><td class="scc" data-s="6" style="opacity:0;transition:all .35s;padding:6px 10px;border-radius:5px;background:#f1f5f9;color:#374151;font-size:.82rem;"><strong>SUP</strong> Suportabilidade</td><td class="scc" data-s="7" style="opacity:0;transition:all .35s;padding:6px 10px;border-radius:5px;background:#f9f9f9;color:#374151;font-size:.82rem;">→ Esquema documentado</td></tr>
+              <tr><td class="scc" data-s="8" style="opacity:0;transition:all .35s;padding:6px 10px;border-radius:5px;background:#f1f5f9;color:#374151;font-size:.82rem;"><strong>CAP</strong> Capacidade</td><td class="scc" data-s="9" style="opacity:0;transition:all .35s;padding:6px 10px;border-radius:5px;background:#f9f9f9;color:#374151;font-size:.82rem;">→ Volume de dados estimado</td></tr>
+            </table>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 18: CHECKLIST ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">Checklist da Aula</div><div class="ss">O que aprendemos hoje</div></div>
+      <div id="checklist">
+        <div class="ri" id="ck0"><div class="rn">✅</div><div><div class="rtl">O que é um banco de dados relacional</div><div class="rds">Coleção organizada com integridade, persistência e consultas eficientes</div></div></div>
+        <div class="ri" id="ck1"><div class="rn">✅</div><div><div class="rtl">Como funciona um SGBD</div><div class="rds">PostgreSQL: gerencia acesso, integridade, transações e backups</div></div></div>
+        <div class="ri" id="ck2"><div class="rn">✅</div><div><div class="rtl">Modelo Conceitual, Lógico e Físico</div><div class="rds">As 3 etapas da modelagem: ER → Tabelas → SQL DDL</div></div></div>
+        <div class="ri" id="ck3"><div class="rn">✅</div><div><div class="rtl">Entidades, Atributos e Relacionamentos</div><div class="rds">Substantivos, características e verbos do domínio do sistema</div></div></div>
+        <div class="ri" id="ck4"><div class="rn">✅</div><div><div class="rtl">CREATE TABLE e tipos de dados</div><div class="rds">SERIAL, VARCHAR, DECIMAL, BOOLEAN, TIMESTAMP, JSONB</div></div></div>
+        <div class="ri" id="ck5"><div class="rn">✅</div><div><div class="rtl">Constraints (PK, FK, NOT NULL, UNIQUE)</div><div class="rds">O banco rejeita dados inválidos automaticamente</div></div></div>
+        <div class="ri" id="ck6"><div class="rn">✅</div><div><div class="rtl">SELECT básico</div><div class="rds">SELECT, FROM, WHERE, ORDER BY, LIMIT</div></div></div>
+        <div class="ri cur" id="ck7"><div class="rn" style="background:linear-gradient(135deg,#d97706,#f59e0b);">➡️</div><div><div class="rtl">Próxima aula: CRUD completo</div><div class="rds">INSERT, UPDATE, DELETE e JOINs entre tabelas</div></div></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 18.5: PRÁTICA — SUPABASE ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green" style="background:linear-gradient(135deg,#0d9488,#10b981);"><div class="st">🚀 Mão na Massa — Crie sua Tabela no Supabase</div><div class="ss">Modele 1 tabela do problema do seu parceiro · ~10 min · pequena para caber na aula</div></div>
+      <div class="g2" style="gap:18px;">
+        <div>
+          <div class="hs-h">📋 Passo a passo</div>
+          <ol class="hands-steps">
+            <li><strong>Acesse</strong> seu projeto em <code>supabase.com</code></li>
+            <li>Abra <strong>SQL Editor</strong> no menu lateral</li>
+            <li><strong>Identifique</strong> 1 entidade pequena do parceiro <em>(ex.: cliente, agendamento, tarefa)</em></li>
+            <li><strong>Modele</strong>: 3–5 colunas + PK + 1 constraint útil</li>
+            <li><strong>Escreva</strong> o <code>CREATE TABLE</code> em PostgreSQL</li>
+            <li><strong>Execute</strong> com <kbd>Ctrl</kbd>+<kbd>Enter</kbd> (ou botão Run)</li>
+            <li><strong>Verifique</strong> em <em>Table Editor</em> que a tabela apareceu</li>
+          </ol>
+        </div>
+        <div>
+          <div class="hs-h">💡 Exemplo de referência</div>
+          <div class="term" style="height:280px;">
+            <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">Supabase SQL Editor — PostgreSQL</div></div>
+            <div class="term-body">
+              <div class="tl" id="hp0"></div>
+              <div class="tl" id="hp1"></div>
+              <div class="tl" id="hp2"></div>
+              <div class="tl" id="hp3"></div>
+              <div class="tl" id="hp4"></div>
+              <div class="tl" id="hp5"></div>
+              <div class="tl" id="hp6"></div>
+            </div>
+          </div>
+        </div>
+      </div>
+      <div class="g3" style="gap:10px;margin-top:12px;">
+        <div class="box acc">
+          <h3>⏱️ Escopo</h3>
+          <p>1 tabela só. 3–5 colunas. Não precisa modelar o domínio inteiro — escolha algo que caiba em 10 minutos.</p>
+        </div>
+        <div class="box">
+          <h3>🔗 Use o que aprendemos</h3>
+          <p><code>SERIAL PRIMARY KEY</code> · <code>VARCHAR(N) NOT NULL</code> · <code>TIMESTAMP DEFAULT NOW()</code> · <code>UNIQUE</code>.</p>
+        </div>
+        <div class="box grn">
+          <h3>✅ Critério</h3>
+          <p>Tabela criada com sucesso e visível no <em>Table Editor</em>. Bonus: insira 1 linha com <code>INSERT INTO</code>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 19: ENCERRAMENTO ====== -->
+  <div class="slide cover-bg" style="background:linear-gradient(135deg,#12082c 0%,#0d9488 55%,#10b981 100%)!important;">
+    <div class="sc" style="text-align:center;">
+      <div style="font-size:2.8rem;margin-bottom:12px;">🗄️</div>
+      <div style="font-size:2.2rem;font-weight:800;color:white;margin-bottom:10px;">Banco de Dados: o alicerce de tudo!</div>
+      <div style="font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:28px;max-width:580px;margin-left:auto;margin-right:auto;">
+        Com o modelo conceitual, lógico e o SQL DDL em mãos, você já consegue estruturar qualquer sistema. Na próxima aula: <strong>CRUD completo e JOINs</strong>.
+      </div>
+      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px;">
+        <div class="cv-tag" id="rt0">✅ Banco de Dados Relacional</div>
+        <div class="cv-tag" id="rt1">✅ SGBD PostgreSQL</div>
+        <div class="cv-tag" id="rt2">✅ Modelo Conceitual</div>
+        <div class="cv-tag" id="rt3">✅ Modelo Lógico</div>
+        <div class="cv-tag" id="rt4">✅ Modelo Físico</div>
+        <div class="cv-tag" id="rt5">✅ CREATE TABLE</div>
+        <div class="cv-tag" id="rt6">✅ Constraints</div>
+        <div class="cv-tag" id="rt7">✅ SELECT Básico</div>
+      </div>
+      <div style="font-size:.84rem;color:rgba(255,255,255,.6);">Módulo 2 · Ciclo Comum · Aula 2 de 11</div>
+    </div>
+  </div>
+
+</div><!-- /slide-container -->
+
+<!-- ====== FOOTER ====== -->
+<div class="slide-footer">
+  <div class="footer-links">
+    <a href="../../index.html" class="back-home">🏠 Home</a>
+    <a href="../materials/lesson-2-material.html" class="back-home material">📖 Material</a>
+  </div>
+  <div class="nav-wrapper">
+    <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">13</span></div>
+    <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
+  </div>
+  <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>
+</div>
+
+<script src="../js/human-type.js"></script>
+<script>
+// ── DAILY TIMER ───────────────────────────────────────────────────────────
+var dailyInterval = null;
+var dailySeconds = 900;
+var dailyRunning = false;
+function updateDailyDisplay() {
+  var m = Math.floor(dailySeconds / 60);
+  var s = dailySeconds % 60;
+  var el = document.getElementById('daily-timer');
+  if (el) el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+function startDaily() {
+  if (dailyRunning) { clearInterval(dailyInterval); dailyRunning = false; document.getElementById('daily-start-btn').textContent = '▶ Continuar'; return; }
+  dailyRunning = true;
+  document.getElementById('daily-start-btn').textContent = '⏸ Pausar';
+  dailyInterval = setInterval(function() {
+    if (dailySeconds <= 0) { clearInterval(dailyInterval); dailyRunning = false; document.getElementById('daily-start-btn').textContent = '✅ Fim!'; return; }
+    dailySeconds--;
+    updateDailyDisplay();
+  }, 1000);
+}
+function resetDaily() {
+  clearInterval(dailyInterval);
+  dailyRunning = false;
+  dailySeconds = 900;
+  updateDailyDisplay();
+  document.getElementById('daily-start-btn').textContent = '▶ Iniciar';
+}
+
+// ── NAVIGATION ──────────────────────────────────────────────────────────────
+var currentSlide = 0;
+var slides = document.querySelectorAll('.slide');
+var totalSlides = slides.length;
+document.getElementById('total-slides').textContent = totalSlides;
+
+function showSlide(i) {
+  document.querySelectorAll('.slide.active').forEach(function(s){ s.classList.remove('active'); });
+  slides[i].classList.add('active');
+  currentSlide = i;
+  document.getElementById('current-slide').textContent = i + 1;
+  document.getElementById('prev-btn').disabled = i === 0;
+  document.getElementById('next-btn').disabled = i === totalSlides - 1;
+  runAnim(i);
+}
+function nextSlide()     { if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1); }
+function previousSlide() { if (currentSlide > 0) showSlide(currentSlide - 1); }
+function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
+document.addEventListener('keydown', function(e) {
+  if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+  else if (e.key === 'ArrowLeft') previousSlide();
+  else if (e.key.toLowerCase() === 'f') toggleFullScreen();
+});
+
+// ── TIMER SYSTEM ──────────────────────────────────────────────────────────
+var _ts = [], _run = false;
+function clearT() { _run = false; _ts.forEach(clearTimeout); _ts = []; }
+function T(fn, d)  { _ts.push(setTimeout(fn, d)); }
+function escH(s)   { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
+function mkHtml(tokens) { return tokens.map(function(t){ return '<span class="'+t.c+'">'+escH(t.v)+'</span>'; }).join(''); }
+
+function showLine(id, tokens, delay) {
+  T(function() {
+    if (!_run) return;
+    var el = document.getElementById(id);
+    if (!el) return;
+    el.innerHTML = mkHtml(tokens);
+    el.classList.add('vis');
+  }, delay);
+}
+function resetLines(ids) {
+  ids.forEach(function(id) { var el=document.getElementById(id); if(el){ el.innerHTML=''; el.classList.remove('vis'); } });
+}
+
+// ── SLIDE 1: Cover ────────────────────────────────────────────────────────
+function animAgenda() {
+  ['ag0','ag1','ag2','ag3'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.style.opacity='0'; el.style.transform='translateY(18px)'; } });
+  ['ag0','ag1','ag2','ag3'].forEach(function(id,i){
+    T(function(){ var el=document.getElementById(id); if(el){ el.style.opacity='1'; el.style.transform='translateY(0)'; } }, i*160);
+  });
+}
+
+function animCover() {
+  ['ct0','ct1','ct2','ct3','ct4','ct5'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
+  ['ct0','ct1','ct2','ct3','ct4','ct5'].forEach(function(id,i){
+    T(function(){ var el=document.getElementById(id); if(el&&_run) el.classList.add('vis'); }, 200+i*160);
+  });
+}
+
+// ── SLIDE 2: Daily ───────────────────────────────────────────────────────
+function animDaily() {
+  ['di0','di1','di2'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.style.opacity='0'; el.style.transform='translateX(-14px)'; el.style.transition='all .4s ease'; } });
+  ['di0','di1','di2'].forEach(function(id,i){
+    T(function(lid){ var el=document.getElementById(lid); if(el&&_run){ el.style.opacity='1'; el.style.transform='translateX(0)'; } }.bind(null,id), 200+i*300);
+  });
+}
+
+// ── SLIDE 3: Evolution pipeline ───────────────────────────────────────────
+function animEvo() {
+  var steps = document.querySelectorAll('#evo-pipe .ps.an');
+  steps.forEach(function(s){ s.classList.remove('sv'); });
+  steps.forEach(function(s,i){ T(function(el){ if(_run) el.classList.add('sv'); }.bind(null,s), 150+i*320); });
+}
+
+// ── SLIDE 4: SGBD Pipeline ───────────────────────────────────────────────
+function animSGBD() {
+  var steps = document.querySelectorAll('#pipe-sgbd .ps.an');
+  steps.forEach(function(s){ s.classList.remove('sv'); });
+  steps.forEach(function(s,i){ T(function(el){ if(_run) el.classList.add('sv'); }.bind(null,s), 150+i*300); });
+}
+
+// ── SLIDE 5: Modeling Layers ──────────────────────────────────────────────
+function animLayers() {
+  ['l0','la0','l1','la1','l2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
+  ['l0','la0','l1','la1','l2'].forEach(function(id,i){
+    T(function(lid){ var el=document.getElementById(lid); if(el&&_run) el.classList.add('vis'); }.bind(null,id), 150+i*360);
+  });
+}
+
+// ── SLIDE 6: ER Diagram ───────────────────────────────────────────────────
+function animER() {
+  ['er0','erc0','er1','erc1','er2'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.classList.remove('vis'); } });
+  T(function(){ var el=document.getElementById('er0'); if(el&&_run) el.classList.add('vis'); }, 150);
+  T(function(){ var el=document.getElementById('erc0'); if(el&&_run) el.classList.add('vis'); }, 450);
+  T(function(){ var el=document.getElementById('er1'); if(el&&_run) el.classList.add('vis'); }, 700);
+  T(function(){ var el=document.getElementById('erc1'); if(el&&_run) el.classList.add('vis'); }, 1000);
+  T(function(){ var el=document.getElementById('er2'); if(el&&_run) el.classList.add('vis'); }, 1250);
+}
+
+// ── SLIDE 7: Logic Table ──────────────────────────────────────────────────
+function animLogicTbl() {
+  var cells = document.querySelectorAll('#logictbl .scc');
+  cells.forEach(function(el){ el.classList.remove('vis','pop'); });
+  cells.forEach(function(el){
+    var step = parseInt(el.getAttribute('data-s'),10);
+    T(function(c){ if(_run){ c.classList.add('vis','pop'); } }.bind(null,el), 80+step*120);
+  });
+}
+
+// ── SLIDE 8.5: Chen ER Diagram ────────────────────────────────────────────
+function animChen() {
+  var ids=['cs-u','cs-faz','cs-p','cs-cnt','cs-qty','cs-pr'];
+  ids.forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
+  ids.forEach(function(id,i){
+    T(function(lid){ var el=document.getElementById(lid); if(el&&_run) el.classList.add('vis'); }.bind(null,id), 150+i*350);
+  });
+}
+
+// ── SLIDE 9.6: Criando as 4 tabelas (CREATE TABLE) ────────────────────────
+function animCreateAll() {
+  var ids=[];
+  for (var k=0; k<25; k++) ids.push('tb'+k);
+  resetLines(ids);
+  var G=35;
+  // LEFT terminal — usuarios + produtos (parents)
+  var dL=0;
+  dL = typeLine('tb0', [{c:'cmt',v:'-- Tabela usuarios (PK)'}], dL)+G;
+  dL = typeLine('tb1', [{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'usuarios'},{c:'txt',v:' ('}], dL)+G;
+  dL = typeLine('tb2', [{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:'    '},{c:'kw',v:'SERIAL'},{c:'txt',v:'        '},{c:'kw',v:'PRIMARY KEY'},{c:'txt',v:','}], dL)+G;
+  dL = typeLine('tb3', [{c:'txt',v:'  '},{c:'jk',v:'nome'},{c:'txt',v:'  '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'100'},{c:'txt',v:')  '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}], dL)+G;
+  dL = typeLine('tb4', [{c:'txt',v:'  '},{c:'jk',v:'email'},{c:'txt',v:' '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'200'},{c:'txt',v:')  '},{c:'kw',v:'UNIQUE NOT NULL'}], dL)+G;
+  dL = typeLine('tb5', [{c:'txt',v:');'}], dL)+150;
+  dL = typeLine('tb6', [{c:'cmt',v:'-- Tabela produtos (PK)'}], dL)+G;
+  dL = typeLine('tb7', [{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'produtos'},{c:'txt',v:' ('}], dL)+G;
+  dL = typeLine('tb8', [{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:'    '},{c:'kw',v:'SERIAL'},{c:'txt',v:'         '},{c:'kw',v:'PRIMARY KEY'},{c:'txt',v:','}], dL)+G;
+  dL = typeLine('tb9', [{c:'txt',v:'  '},{c:'jk',v:'nome'},{c:'txt',v:'  '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'100'},{c:'txt',v:')   '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}], dL)+G;
+  dL = typeLine('tb10',[{c:'txt',v:'  '},{c:'jk',v:'preco'},{c:'txt',v:' '},{c:'kw',v:'DECIMAL'},{c:'txt',v:'('},{c:'jn',v:'10'},{c:'txt',v:','},{c:'jn',v:'2'},{c:'txt',v:') '},{c:'kw',v:'NOT NULL'}], dL)+G;
+  dL = typeLine('tb11',[{c:'txt',v:');'}], dL);
+  // RIGHT terminal — pedidos + pedido_produto (children, FK + N:N) — paralelo
+  var dR=0;
+  dR = typeLine('tb12',[{c:'cmt',v:'-- Tabela pedidos (FK → usuarios)'}], dR)+G;
+  dR = typeLine('tb13',[{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'pedidos'},{c:'txt',v:' ('}], dR)+G;
+  dR = typeLine('tb14',[{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:'         '},{c:'kw',v:'SERIAL'},{c:'txt',v:'    '},{c:'kw',v:'PRIMARY KEY'},{c:'txt',v:','}], dR)+G;
+  dR = typeLine('tb15',[{c:'txt',v:'  '},{c:'jk',v:'data'},{c:'txt',v:'       '},{c:'kw',v:'TIMESTAMP'},{c:'txt',v:' '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'pth',v:'NOW()'},{c:'txt',v:','}], dR)+G;
+  dR = typeLine('tb16',[{c:'txt',v:'  '},{c:'jk',v:'usuario_id'},{c:'txt',v:' '},{c:'kw',v:'INTEGER'},{c:'txt',v:'   '},{c:'kw',v:'REFERENCES'},{c:'txt',v:' '},{c:'pth',v:'usuarios'},{c:'txt',v:'('},{c:'jk',v:'id'},{c:'txt',v:')'}], dR)+G;
+  dR = typeLine('tb17',[{c:'txt',v:');'}], dR)+150;
+  dR = typeLine('tb18',[{c:'cmt',v:'-- Associativa N:N (PK composta + FKs)'}], dR)+G;
+  dR = typeLine('tb19',[{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'pedido_produto'},{c:'txt',v:' ('}], dR)+G;
+  dR = typeLine('tb20',[{c:'txt',v:'  '},{c:'jk',v:'pedido_id'},{c:'txt',v:'  '},{c:'kw',v:'INTEGER'},{c:'txt',v:' '},{c:'kw',v:'REFERENCES'},{c:'txt',v:' '},{c:'pth',v:'pedidos'},{c:'txt',v:'('},{c:'jk',v:'id'},{c:'txt',v:'),'}], dR)+G;
+  dR = typeLine('tb21',[{c:'txt',v:'  '},{c:'jk',v:'produto_id'},{c:'txt',v:' '},{c:'kw',v:'INTEGER'},{c:'txt',v:' '},{c:'kw',v:'REFERENCES'},{c:'txt',v:' '},{c:'pth',v:'produtos'},{c:'txt',v:'('},{c:'jk',v:'id'},{c:'txt',v:'),'}], dR)+G;
+  dR = typeLine('tb22',[{c:'txt',v:'  '},{c:'jk',v:'quantidade'},{c:'txt',v:' '},{c:'kw',v:'INTEGER'},{c:'txt',v:' '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}], dR)+G;
+  dR = typeLine('tb23',[{c:'txt',v:'  '},{c:'kw',v:'PRIMARY KEY'},{c:'txt',v:' ('},{c:'jk',v:'pedido_id'},{c:'txt',v:', '},{c:'jk',v:'produto_id'},{c:'txt',v:')'}], dR)+G;
+  dR = typeLine('tb24',[{c:'txt',v:');'}], dR);
+}
+
+// ── SLIDE 9.5: Logical Model derivation ───────────────────────────────────
+function animLogModel() {
+  var ids=['lt0','lt2','lt1','lt3'];
+  var conns=['ltvl','lthb','ltvr'];
+  ids.forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
+  conns.forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
+  ids.forEach(function(id,i){
+    T(function(lid){ var el=document.getElementById(lid); if(el&&_run) el.classList.add('vis'); }.bind(null,id), 150+i*240);
+  });
+  conns.forEach(function(id,i){
+    T(function(lid){ var el=document.getElementById(lid); if(el&&_run) el.classList.add('vis'); }.bind(null,id), 150+ids.length*240+i*220);
+  });
+}
+
+// ── SLIDE 8: SQL DDL Terminal ─────────────────────────────────────────────
+function animDDL() {
+  var allIds = ['sl0','sl1','sl2','sl3','sl4','sl5','sl6','sl7','sl8','sl9','sl10','sl11','sl12','sl13','sl14','sl15'];
+  resetLines(allIds);
+  var d=0, G=40;
+  d = typeLine('sl0',[{c:'cmt',v:'-- Criando a tabela de usuarios'}],d)+G;
+  d = typeLine('sl1',[{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'usuarios'},{c:'txt',v:' ('}],d)+G;
+  d = typeLine('sl2',[{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:'        '},{c:'kw',v:'SERIAL'},{c:'txt',v:'          '},{c:'kw',v:'PRIMARY KEY'},{c:'txt',v:','}],d)+G;
+  d = typeLine('sl3',[{c:'txt',v:'  '},{c:'jk',v:'nome'},{c:'txt',v:'      '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'100'},{c:'txt',v:')   '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}],d)+G;
+  d = typeLine('sl4',[{c:'txt',v:'  '},{c:'jk',v:'email'},{c:'txt',v:'     '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'200'},{c:'txt',v:')   '},{c:'kw',v:'UNIQUE NOT NULL'},{c:'txt',v:','}],d)+G;
+  d = typeLine('sl5',[{c:'txt',v:'  '},{c:'jk',v:'senha'},{c:'txt',v:'     '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'255'},{c:'txt',v:')   '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}],d)+G;
+  d = typeLine('sl6',[{c:'txt',v:'  '},{c:'jk',v:'criado_em'},{c:'txt',v:' '},{c:'kw',v:'TIMESTAMP'},{c:'txt',v:'      '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'pth',v:'NOW()'}],d)+G;
+  d = typeLine('sl7',[{c:'txt',v:');'}],d)+120;
+  d = typeLine('sl8',[{c:'cmt',v:'-- Criando a tabela de pedidos'}],d)+G;
+  d = typeLine('sl9',[{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'pedidos'},{c:'txt',v:' ('}],d)+G;
+  d = typeLine('sl10',[{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:'          '},{c:'kw',v:'SERIAL'},{c:'txt',v:'              '},{c:'kw',v:'PRIMARY KEY'},{c:'txt',v:','}],d)+G;
+  d = typeLine('sl11',[{c:'txt',v:'  '},{c:'jk',v:'usuario_id'},{c:'txt',v:'  '},{c:'kw',v:'INTEGER'},{c:'txt',v:'  '},{c:'kw',v:'REFERENCES'},{c:'txt',v:' '},{c:'pth',v:'usuarios'},{c:'txt',v:'('},{c:'jk',v:'id'},{c:'txt',v:'),'}],d)+G;
+  d = typeLine('sl12',[{c:'txt',v:'  '},{c:'jk',v:'total'},{c:'txt',v:'       '},{c:'kw',v:'DECIMAL'},{c:'txt',v:'('},{c:'jn',v:'10'},{c:'txt',v:','},{c:'jn',v:'2'},{c:'txt',v:')  '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}],d)+G;
+  d = typeLine('sl13',[{c:'txt',v:'  '},{c:'jk',v:'status'},{c:'txt',v:'      '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'20'},{c:'txt',v:') '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'js',v:"'pendente'"},{c:'txt',v:','}],d)+G;
+  d = typeLine('sl14',[{c:'txt',v:'  '},{c:'jk',v:'criado_em'},{c:'txt',v:'   '},{c:'kw',v:'TIMESTAMP'},{c:'txt',v:'       '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'pth',v:'NOW()'}],d)+G;
+  d = typeLine('sl15',[{c:'txt',v:');'}],d);
+}
+
+// ── SLIDE 9: Data Types ───────────────────────────────────────────────────
+function animTypes() {
+  for(var i=0;i<6;i++){var el=document.getElementById('tp'+i);if(el)el.classList.remove('vis');}
+  for(var j=0;j<6;j++){
+    (function(idx){ T(function(){ var el=document.getElementById('tp'+idx); if(el&&_run) el.classList.add('vis'); }, 100+idx*200); })(j);
+  }
+}
+
+// ── SLIDE 10: Constraints bars ────────────────────────────────────────────
+function animConstraints() {
+  for(var i=0;i<5;i++){
+    var row=document.getElementById('cb'+i);
+    if(row){ row.classList.remove('vis'); var f=row.querySelector('.sf'); if(f) f.style.width='0'; }
+  }
+  for(var j=0;j<5;j++){
+    (function(idx){
+      T(function(){
+        if(!_run) return;
+        var row=document.getElementById('cb'+idx); if(!row) return;
+        row.classList.add('vis');
+        T(function(){ var f=row.querySelector('.sf'); if(f) f.style.width=f.getAttribute('data-w'); }, 120);
+      }, 120+idx*260);
+    })(j);
+  }
+}
+
+// ── SLIDE 11: SELECT terminal + result rows ───────────────────────────────
+function animSelect() {
+  var qIds=['ql0','ql1','ql2','ql3','ql4','ql5','ql6','ql7','ql8','ql9'];
+  resetLines(qIds);
+  for(var i=0;i<5;i++){var r=document.getElementById('rr'+i);if(r)r.classList.remove('vis');}
+  var d=0, G=40;
+  d = typeLine('ql0',[{c:'cmt',v:'-- Buscar todos os usuarios'}],d)+G;
+  d = typeLine('ql1',[{c:'kw',v:'SELECT'},{c:'txt',v:' * '},{c:'kw',v:'FROM'},{c:'txt',v:' '},{c:'pth',v:'usuarios'},{c:'txt',v:';'}],d)+120;
+  d = typeLine('ql2',[{c:'cmt',v:'-- Buscar campos especificos'}],d)+G;
+  d = typeLine('ql3',[{c:'kw',v:'SELECT'},{c:'txt',v:' '},{c:'jk',v:'id'},{c:'txt',v:', '},{c:'jk',v:'nome'},{c:'txt',v:', '},{c:'jk',v:'email'}],d)+G;
+  d = typeLine('ql4',[{c:'kw',v:'FROM'},{c:'txt',v:'   '},{c:'pth',v:'usuarios'}],d)+G;
+  d = typeLine('ql5',[{c:'kw',v:'WHERE'},{c:'txt',v:'  '},{c:'jk',v:'ativo'},{c:'txt',v:' = '},{c:'jb',v:'true'}],d)+G;
+  d = typeLine('ql6',[{c:'kw',v:'ORDER BY'},{c:'txt',v:' '},{c:'jk',v:'nome'},{c:'txt',v:' '},{c:'kw',v:'ASC'}],d)+G;
+  d = typeLine('ql7',[{c:'kw',v:'LIMIT'},{c:'txt',v:'  '},{c:'jn',v:'10'},{c:'txt',v:';'}],d)+250;
+  for(var j=0;j<5;j++){
+    (function(idx){ T(function(){ var r=document.getElementById('rr'+idx); if(r&&_run) r.classList.add('vis'); }, d+idx*180); })(j);
+  }
+}
+
+// ── SLIDE 12: SQL Sublinguagens ───────────────────────────────────────────
+function animSublangs() {
+  for(var i=0;i<5;i++){var el=document.getElementById('sub'+i);if(el)el.classList.remove('vis');}
+  for(var j=0;j<5;j++){
+    (function(idx){ T(function(){ var el=document.getElementById('sub'+idx); if(el&&_run) el.classList.add('vis'); }, 80+idx*260); })(j);
+  }
+}
+
+// ── SLIDE 13: DML INSERT ──────────────────────────────────────────────────
+function animInsert() {
+  var ids=['di0','di1','di2','di3','di4','di5','di6','di7','di8','di9','di10','di11'];
+  resetLines(ids);
+  var d=0, G=40;
+  d = typeLine('di0',[{c:'cmt',v:'-- INSERT básico: uma linha'}],d)+G;
+  d = typeLine('di1',[{c:'kw',v:'INSERT INTO '},{c:'pth',v:'usuarios'},{c:'txt',v:' ('},{c:'jk',v:'nome'},{c:'txt',v:', '},{c:'jk',v:'email'},{c:'txt',v:', '},{c:'jk',v:'senha'},{c:'txt',v:')'}],d)+G;
+  d = typeLine('di2',[{c:'kw',v:'VALUES'},{c:'txt',v:' ('},{c:'js',v:"'Ana Lima'"},{c:'txt',v:', '},{c:'js',v:"'ana@inteli.edu.br'"},{c:'txt',v:', '},{c:'js',v:"'hash_bcrypt'"},{c:'txt',v:');'}],d)+140;
+  d = typeLine('di3',[{c:'cmt',v:'-- INSERT múltiplo: várias linhas de uma vez'}],d)+G;
+  d = typeLine('di4',[{c:'kw',v:'INSERT INTO '},{c:'pth',v:'usuarios'},{c:'txt',v:' ('},{c:'jk',v:'nome'},{c:'txt',v:', '},{c:'jk',v:'email'},{c:'txt',v:', '},{c:'jk',v:'senha'},{c:'txt',v:')'}],d)+G;
+  d = typeLine('di5',[{c:'kw',v:'VALUES'}],d)+G;
+  d = typeLine('di6',[{c:'txt',v:'  ('},{c:'js',v:"'Bruno Costa'"},{c:'txt',v:', '},{c:'js',v:"'bruno@inteli.edu.br'"},{c:'txt',v:', '},{c:'js',v:"'hash1'"},{c:'txt',v:'),'}],d)+G;
+  d = typeLine('di7',[{c:'txt',v:'  ('},{c:'js',v:"'Carla Souza'"},{c:'txt',v:', '},{c:'js',v:"'carla@inteli.edu.br'"},{c:'txt',v:', '},{c:'js',v:"'hash2'"},{c:'txt',v:');'}],d)+140;
+  d = typeLine('di8',[{c:'cmt',v:'-- INSERT RETURNING: retorna o id gerado'}],d)+G;
+  d = typeLine('di9',[{c:'kw',v:'INSERT INTO '},{c:'pth',v:'pedidos'},{c:'txt',v:' ('},{c:'jk',v:'usuario_id'},{c:'txt',v:', '},{c:'jk',v:'total'},{c:'txt',v:')'}],d)+G;
+  d = typeLine('di10',[{c:'kw',v:'VALUES'},{c:'txt',v:' ('},{c:'jn',v:'1'},{c:'txt',v:', '},{c:'jn',v:'149.90'},{c:'txt',v:')'}],d)+G;
+  d = typeLine('di11',[{c:'kw',v:'RETURNING'},{c:'txt',v:' '},{c:'jk',v:'id'},{c:'txt',v:';  '},{c:'cmt',v:'-- retorna: id = 42'}],d);
+}
+
+// ── SLIDE 14: DML UPDATE + DELETE ─────────────────────────────────────────
+function animUpdateDelete() {
+  var ids=['ud0','ud1','ud2','ud3','ud4','ud5','ud6','ud7','ud8'];
+  resetLines(ids);
+  var d=0, G=40;
+  d = typeLine('ud0',[{c:'cmt',v:'-- UPDATE: sempre use WHERE!'}],d)+G;
+  d = typeLine('ud1',[{c:'kw',v:'UPDATE '},{c:'pth',v:'usuarios'}],d)+G;
+  d = typeLine('ud2',[{c:'kw',v:'SET'},{c:'txt',v:'    '},{c:'jk',v:'nome'},{c:'txt',v:'  = '},{c:'js',v:"'Ana Lima Silva'"},{c:'txt',v:','}],d)+G;
+  d = typeLine('ud3',[{c:'txt',v:'       '},{c:'jk',v:'email'},{c:'txt',v:' = '},{c:'js',v:"'ana.silva@inteli.edu.br'"}],d)+G;
+  d = typeLine('ud4',[{c:'kw',v:'WHERE'},{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:' = '},{c:'jn',v:'1'},{c:'txt',v:';'}],d)+160;
+  d = typeLine('ud5',[{c:'cmt',v:'-- DELETE: sempre use WHERE!'}],d)+G;
+  d = typeLine('ud6',[{c:'kw',v:'DELETE FROM '},{c:'pth',v:'pedidos'}],d)+G;
+  d = typeLine('ud7',[{c:'kw',v:'WHERE'},{c:'txt',v:' '},{c:'jk',v:'status'},{c:'txt',v:' = '},{c:'js',v:"'cancelado'"}],d)+G;
+  d = typeLine('ud8',[{c:'kw',v:'  AND'},{c:'txt',v:' '},{c:'jk',v:'criado_em'},{c:'txt',v:' < '},{c:'pth',v:'NOW()'},{c:'txt',v:' - '},{c:'kw',v:'INTERVAL'},{c:'txt',v:' '},{c:'js',v:"'30 days'"},{c:'txt',v:';'}],d);
+}
+
+// ── SLIDE 15: DCL + TCL ───────────────────────────────────────────────────
+function animDclTcl() {
+  var ids=['dt0','dt1','dt2','dt3','dt4','dt5','dt6','dt7','dt8','dt9','dt10','dt11'];
+  resetLines(ids);
+  var d=0, G=40;
+  d = typeLine('dt0',[{c:'cmt',v:'-- DCL: conceder permissões (GRANT)'}],d)+G;
+  d = typeLine('dt1',[{c:'kw',v:'GRANT'},{c:'txt',v:' '},{c:'pth',v:'SELECT'},{c:'txt',v:', '},{c:'pth',v:'INSERT'},{c:'txt',v:' '},{c:'kw',v:'ON'},{c:'txt',v:' '},{c:'jk',v:'usuarios'},{c:'txt',v:' '},{c:'kw',v:'TO'},{c:'txt',v:' '},{c:'js',v:'app_user'},{c:'txt',v:';'}],d)+G;
+  d = typeLine('dt2',[{c:'kw',v:'GRANT'},{c:'txt',v:' '},{c:'pth',v:'ALL PRIVILEGES'},{c:'txt',v:' '},{c:'kw',v:'ON'},{c:'txt',v:' '},{c:'kw',v:'ALL TABLES IN SCHEMA'},{c:'txt',v:' '},{c:'js',v:'public'},{c:'txt',v:' '},{c:'kw',v:'TO'},{c:'txt',v:' '},{c:'js',v:'admin_user'},{c:'txt',v:';'}],d)+120;
+  d = typeLine('dt3',[{c:'cmt',v:'-- DCL: revogar permissões (REVOKE)'}],d)+G;
+  d = typeLine('dt4',[{c:'kw',v:'REVOKE'},{c:'txt',v:' '},{c:'pth',v:'DELETE'},{c:'txt',v:' '},{c:'kw',v:'ON'},{c:'txt',v:' '},{c:'jk',v:'usuarios'},{c:'txt',v:' '},{c:'kw',v:'FROM'},{c:'txt',v:' '},{c:'js',v:'app_user'},{c:'txt',v:';'}],d)+160;
+  d = typeLine('dt5',[{c:'cmt',v:'-- TCL: transação ACID completa'}],d)+G;
+  d = typeLine('dt6',[{c:'kw',v:'BEGIN'},{c:'txt',v:';'}],d)+G;
+  d = typeLine('dt7',[{c:'txt',v:'  '},{c:'kw',v:'UPDATE '},{c:'pth',v:'contas'},{c:'txt',v:' '},{c:'kw',v:'SET'},{c:'txt',v:' '},{c:'jk',v:'saldo'},{c:'txt',v:' = '},{c:'jk',v:'saldo'},{c:'txt',v:' - '},{c:'jn',v:'100'},{c:'txt',v:' '},{c:'kw',v:'WHERE'},{c:'txt',v:' '},{c:'jk',v:'id'},{c:'txt',v:' = '},{c:'jn',v:'1'},{c:'txt',v:';'}],d)+G;
+  d = typeLine('dt8',[{c:'txt',v:'  '},{c:'kw',v:'UPDATE '},{c:'pth',v:'contas'},{c:'txt',v:' '},{c:'kw',v:'SET'},{c:'txt',v:' '},{c:'jk',v:'saldo'},{c:'txt',v:' = '},{c:'jk',v:'saldo'},{c:'txt',v:' + '},{c:'jn',v:'100'},{c:'txt',v:' '},{c:'kw',v:'WHERE'},{c:'txt',v:' '},{c:'jk',v:'id'},{c:'txt',v:' = '},{c:'jn',v:'2'},{c:'txt',v:';'}],d)+G;
+  d = typeLine('dt9',[{c:'cmt',v:'  -- se algo falhar:'}],d)+G;
+  d = typeLine('dt10',[{c:'cmt',v:'  -- ROLLBACK; ← desfaz tudo'}],d)+G;
+  d = typeLine('dt11',[{c:'kw',v:'COMMIT'},{c:'txt',v:';  '},{c:'cmt',v:'-- confirma permanentemente'}],d);
+}
+
+// ── SGBD: PostgreSQL ──────────────────────────────────────────────────────
+function animPgCreate() {
+  var ids=['pgs0','pgs1','pgs2','pgs3','pgs4','pgs5','pgs6','pgs7','pgs8'];
+  resetLines(ids);
+  var d=0, G=35;
+  d = typeLine('pgs0',[{c:'cmt',v:'-- PostgreSQL 16'}], d)+G;
+  d = typeLine('pgs1',[{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'usuarios'},{c:'txt',v:' ('}], d)+G;
+  d = typeLine('pgs2',[{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:'         '},{c:'kw',v:'SERIAL'},{c:'txt',v:'        '},{c:'kw',v:'PRIMARY KEY'},{c:'txt',v:','}], d)+G;
+  d = typeLine('pgs3',[{c:'txt',v:'  '},{c:'jk',v:'nome'},{c:'txt',v:'       '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'100'},{c:'txt',v:')  '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}], d)+G;
+  d = typeLine('pgs4',[{c:'txt',v:'  '},{c:'jk',v:'email'},{c:'txt',v:'      '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'200'},{c:'txt',v:')  '},{c:'kw',v:'UNIQUE NOT NULL'},{c:'txt',v:','}], d)+G;
+  d = typeLine('pgs5',[{c:'txt',v:'  '},{c:'jk',v:'ativo'},{c:'txt',v:'      '},{c:'kw',v:'BOOLEAN'},{c:'txt',v:'       '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'jb',v:'true'},{c:'txt',v:','}], d)+G;
+  d = typeLine('pgs6',[{c:'txt',v:'  '},{c:'jk',v:'metadata'},{c:'txt',v:'   '},{c:'kw',v:'JSONB'},{c:'txt',v:','}], d)+G;
+  d = typeLine('pgs7',[{c:'txt',v:'  '},{c:'jk',v:'criado_em'},{c:'txt',v:'  '},{c:'kw',v:'TIMESTAMP'},{c:'txt',v:'     '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'pth',v:'NOW()'}], d)+G;
+  d = typeLine('pgs8',[{c:'txt',v:');'}], d);
+}
+
+// ── SGBD: MySQL ──────────────────────────────────────────────────────────
+function animMyCreate() {
+  var ids=['mys0','mys1','mys2','mys3','mys4','mys5','mys6','mys7','mys8'];
+  resetLines(ids);
+  var d=0, G=35;
+  d = typeLine('mys0',[{c:'cmt',v:'-- MySQL 8 / MariaDB'}], d)+G;
+  d = typeLine('mys1',[{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'usuarios'},{c:'txt',v:' ('}], d)+G;
+  d = typeLine('mys2',[{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:'         '},{c:'kw',v:'INT'},{c:'txt',v:'           '},{c:'kw',v:'AUTO_INCREMENT PRIMARY KEY'},{c:'txt',v:','}], d)+G;
+  d = typeLine('mys3',[{c:'txt',v:'  '},{c:'jk',v:'nome'},{c:'txt',v:'       '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'100'},{c:'txt',v:')  '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}], d)+G;
+  d = typeLine('mys4',[{c:'txt',v:'  '},{c:'jk',v:'email'},{c:'txt',v:'      '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'200'},{c:'txt',v:')  '},{c:'kw',v:'NOT NULL UNIQUE'},{c:'txt',v:','}], d)+G;
+  d = typeLine('mys5',[{c:'txt',v:'  '},{c:'jk',v:'ativo'},{c:'txt',v:'      '},{c:'kw',v:'TINYINT'},{c:'txt',v:'('},{c:'jn',v:'1'},{c:'txt',v:')    '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'jn',v:'1'},{c:'txt',v:','}], d)+G;
+  d = typeLine('mys6',[{c:'txt',v:'  '},{c:'jk',v:'metadata'},{c:'txt',v:'   '},{c:'kw',v:'JSON'},{c:'txt',v:','}], d)+G;
+  d = typeLine('mys7',[{c:'txt',v:'  '},{c:'jk',v:'criado_em'},{c:'txt',v:'  '},{c:'kw',v:'DATETIME'},{c:'txt',v:'      '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'pth',v:'CURRENT_TIMESTAMP'}], d)+G;
+  d = typeLine('mys8',[{c:'txt',v:') '},{c:'kw',v:'ENGINE'},{c:'txt',v:'='},{c:'pth',v:'InnoDB'},{c:'txt',v:' '},{c:'kw',v:'DEFAULT CHARSET'},{c:'txt',v:'='},{c:'pth',v:'utf8mb4'},{c:'txt',v:';'}], d);
+}
+
+// ── SGBD: SQLite ─────────────────────────────────────────────────────────
+function animLitCreate() {
+  var ids=['lit0','lit1','lit2','lit3','lit4','lit5','lit6','lit7','lit8'];
+  resetLines(ids);
+  var d=0, G=35;
+  d = typeLine('lit0',[{c:'cmt',v:'-- SQLite 3'}], d)+G;
+  d = typeLine('lit1',[{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'usuarios'},{c:'txt',v:' ('}], d)+G;
+  d = typeLine('lit2',[{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:'         '},{c:'kw',v:'INTEGER'},{c:'txt',v:'       '},{c:'kw',v:'PRIMARY KEY AUTOINCREMENT'},{c:'txt',v:','}], d)+G;
+  d = typeLine('lit3',[{c:'txt',v:'  '},{c:'jk',v:'nome'},{c:'txt',v:'       '},{c:'kw',v:'TEXT'},{c:'txt',v:'          '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}], d)+G;
+  d = typeLine('lit4',[{c:'txt',v:'  '},{c:'jk',v:'email'},{c:'txt',v:'      '},{c:'kw',v:'TEXT'},{c:'txt',v:'          '},{c:'kw',v:'NOT NULL UNIQUE'},{c:'txt',v:','}], d)+G;
+  d = typeLine('lit5',[{c:'txt',v:'  '},{c:'jk',v:'ativo'},{c:'txt',v:'      '},{c:'kw',v:'INTEGER'},{c:'txt',v:'       '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'jn',v:'1'},{c:'txt',v:','}], d)+G;
+  d = typeLine('lit6',[{c:'txt',v:'  '},{c:'jk',v:'metadata'},{c:'txt',v:'   '},{c:'kw',v:'TEXT'},{c:'txt',v:','},{c:'cmt',v:'  -- JSON via JSON1'}], d)+G;
+  d = typeLine('lit7',[{c:'txt',v:'  '},{c:'jk',v:'criado_em'},{c:'txt',v:'  '},{c:'kw',v:'TEXT'},{c:'txt',v:'          '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'pth',v:'CURRENT_TIMESTAMP'}], d)+G;
+  d = typeLine('lit8',[{c:'txt',v:');'}], d);
+}
+
+// ── SGBD: SQL Server ─────────────────────────────────────────────────────
+function animMssCreate() {
+  var ids=['mss0','mss1','mss2','mss3','mss4','mss5','mss6','mss7','mss8'];
+  resetLines(ids);
+  var d=0, G=35;
+  d = typeLine('mss0',[{c:'cmt',v:'-- SQL Server 2022 (T-SQL)'}], d)+G;
+  d = typeLine('mss1',[{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'usuarios'},{c:'txt',v:' ('}], d)+G;
+  d = typeLine('mss2',[{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:'         '},{c:'kw',v:'INT'},{c:'txt',v:'             '},{c:'kw',v:'IDENTITY'},{c:'txt',v:'('},{c:'jn',v:'1'},{c:'txt',v:','},{c:'jn',v:'1'},{c:'txt',v:') '},{c:'kw',v:'PRIMARY KEY'},{c:'txt',v:','}], d)+G;
+  d = typeLine('mss3',[{c:'txt',v:'  '},{c:'jk',v:'nome'},{c:'txt',v:'       '},{c:'kw',v:'NVARCHAR'},{c:'txt',v:'('},{c:'jn',v:'100'},{c:'txt',v:') '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}], d)+G;
+  d = typeLine('mss4',[{c:'txt',v:'  '},{c:'jk',v:'email'},{c:'txt',v:'      '},{c:'kw',v:'NVARCHAR'},{c:'txt',v:'('},{c:'jn',v:'200'},{c:'txt',v:') '},{c:'kw',v:'NOT NULL UNIQUE'},{c:'txt',v:','}], d)+G;
+  d = typeLine('mss5',[{c:'txt',v:'  '},{c:'jk',v:'ativo'},{c:'txt',v:'      '},{c:'kw',v:'BIT'},{c:'txt',v:'             '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'jn',v:'1'},{c:'txt',v:','}], d)+G;
+  d = typeLine('mss6',[{c:'txt',v:'  '},{c:'jk',v:'metadata'},{c:'txt',v:'   '},{c:'kw',v:'NVARCHAR'},{c:'txt',v:'('},{c:'kw',v:'MAX'},{c:'txt',v:'),'}], d)+G;
+  d = typeLine('mss7',[{c:'txt',v:'  '},{c:'jk',v:'criado_em'},{c:'txt',v:'  '},{c:'kw',v:'DATETIME2'},{c:'txt',v:'       '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'pth',v:'GETDATE()'}], d)+G;
+  d = typeLine('mss8',[{c:'txt',v:');'}], d);
+}
+
+// ── SGBD: Oracle ─────────────────────────────────────────────────────────
+function animOraCreate() {
+  var ids=['ora0','ora1','ora2','ora3','ora4','ora5','ora6','ora7','ora8'];
+  resetLines(ids);
+  var d=0, G=35;
+  d = typeLine('ora0',[{c:'cmt',v:'-- Oracle 23ai'}], d)+G;
+  d = typeLine('ora1',[{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'usuarios'},{c:'txt',v:' ('}], d)+G;
+  d = typeLine('ora2',[{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:'         '},{c:'kw',v:'NUMBER'},{c:'txt',v:'         '},{c:'kw',v:'GENERATED ALWAYS AS IDENTITY PRIMARY KEY'},{c:'txt',v:','}], d)+G;
+  d = typeLine('ora3',[{c:'txt',v:'  '},{c:'jk',v:'nome'},{c:'txt',v:'       '},{c:'kw',v:'VARCHAR2'},{c:'txt',v:'('},{c:'jn',v:'100'},{c:'txt',v:') '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}], d)+G;
+  d = typeLine('ora4',[{c:'txt',v:'  '},{c:'jk',v:'email'},{c:'txt',v:'      '},{c:'kw',v:'VARCHAR2'},{c:'txt',v:'('},{c:'jn',v:'200'},{c:'txt',v:') '},{c:'kw',v:'NOT NULL UNIQUE'},{c:'txt',v:','}], d)+G;
+  d = typeLine('ora5',[{c:'txt',v:'  '},{c:'jk',v:'ativo'},{c:'txt',v:'      '},{c:'kw',v:'NUMBER'},{c:'txt',v:'('},{c:'jn',v:'1'},{c:'txt',v:')      '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'jn',v:'1'},{c:'txt',v:','}], d)+G;
+  d = typeLine('ora6',[{c:'txt',v:'  '},{c:'jk',v:'metadata'},{c:'txt',v:'   '},{c:'kw',v:'CLOB'},{c:'txt',v:'           '},{c:'kw',v:'CHECK'},{c:'txt',v:' ('},{c:'jk',v:'metadata'},{c:'txt',v:' '},{c:'kw',v:'IS JSON'},{c:'txt',v:'),'}], d)+G;
+  d = typeLine('ora7',[{c:'txt',v:'  '},{c:'jk',v:'criado_em'},{c:'txt',v:'  '},{c:'kw',v:'TIMESTAMP'},{c:'txt',v:'      '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'pth',v:'SYSTIMESTAMP'}], d)+G;
+  d = typeLine('ora8',[{c:'txt',v:');'}], d);
+}
+
+// ── SLIDE 16: RM-ODP Viewpoints ──────────────────────────────────────────
+function animRmOdp() {
+  ['odp0','oa0','odp1','oa1','odp2','oa2','odp3','oa3','odp4'].forEach(function(id){
+    var el=document.getElementById(id); if(el){ el.style.opacity='0'; el.style.transform='translateY(16px)'; }
+  });
+  ['odp0','oa0','odp1','oa1','odp2','oa2','odp3','oa3','odp4'].forEach(function(id,i){
+    T(function(lid){ var el=document.getElementById(lid); if(el&&_run){ el.style.opacity='1'; el.style.transform='translateY(0)'; } }.bind(null,id), 120+i*320);
+  });
+}
+// ── SLIDE 13: RF + RNF + Artefato ─────────────────────────────────────────
+function animRfRnf() {
+  var cells=document.querySelectorAll('#rnf-tbl .scc');
+  cells.forEach(function(el){ el.style.opacity='0'; });
+  ['art0','art1','art2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.opacity='0'; });
+  cells.forEach(function(el){
+    var step=parseInt(el.getAttribute('data-s'),10);
+    T(function(c){ if(_run) c.style.opacity='1'; }.bind(null,el), 100+step*160);
+  });
+  ['art0','art1','art2'].forEach(function(id,i){
+    T(function(lid){ var el=document.getElementById(lid); if(el&&_run) el.style.opacity='1'; }.bind(null,id), 200+i*200);
+  });
+}
+// ── SLIDE 14: Checklist ───────────────────────────────────────────────────
+function animChecklist() {
+  for(var i=0;i<8;i++){var el=document.getElementById('ck'+i);if(el){el.style.opacity='0';el.style.transform='translateX(-14px)';el.style.transition='all .4s ease';}}
+  for(var j=0;j<8;j++){
+    (function(idx){ T(function(){ var el=document.getElementById('ck'+idx); if(el&&_run){el.style.opacity='1';el.style.transform='translateX(0)';} }, 100+idx*180); })(j);
+  }
+}
+
+// ── PRÁTICA: Supabase hands-on ────────────────────────────────────────────
+function animPractice() {
+  var steps = document.querySelectorAll('.hands-steps li');
+  steps.forEach(function(el){ el.classList.remove('vis'); });
+  steps.forEach(function(el,i){
+    T(function(le){ if(_run) le.classList.add('vis'); }.bind(null,el), 100+i*150);
+  });
+  var ids=['hp0','hp1','hp2','hp3','hp4','hp5','hp6'];
+  resetLines(ids);
+  var d=0, G=35;
+  d = typeLine('hp0',[{c:'cmt',v:'-- Exemplo: tabela de clientes'}], d)+G;
+  d = typeLine('hp1',[{c:'kw',v:'CREATE TABLE '},{c:'pth',v:'clientes'},{c:'txt',v:' ('}], d)+G;
+  d = typeLine('hp2',[{c:'txt',v:'  '},{c:'jk',v:'id'},{c:'txt',v:'         '},{c:'kw',v:'SERIAL'},{c:'txt',v:'        '},{c:'kw',v:'PRIMARY KEY'},{c:'txt',v:','}], d)+G;
+  d = typeLine('hp3',[{c:'txt',v:'  '},{c:'jk',v:'nome'},{c:'txt',v:'       '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'120'},{c:'txt',v:')  '},{c:'kw',v:'NOT NULL'},{c:'txt',v:','}], d)+G;
+  d = typeLine('hp4',[{c:'txt',v:'  '},{c:'jk',v:'email'},{c:'txt',v:'      '},{c:'kw',v:'VARCHAR'},{c:'txt',v:'('},{c:'jn',v:'200'},{c:'txt',v:')  '},{c:'kw',v:'UNIQUE NOT NULL'},{c:'txt',v:','}], d)+G;
+  d = typeLine('hp5',[{c:'txt',v:'  '},{c:'jk',v:'criado_em'},{c:'txt',v:'  '},{c:'kw',v:'TIMESTAMP'},{c:'txt',v:'     '},{c:'kw',v:'DEFAULT'},{c:'txt',v:' '},{c:'pth',v:'NOW()'}], d)+G;
+  d = typeLine('hp6',[{c:'txt',v:');'}], d);
+}
+
+// ── SLIDE 15: Recap ───────────────────────────────────────────────────────
+function animRecap() {
+  for(var i=0;i<8;i++){var el=document.getElementById('rt'+i);if(el)el.classList.remove('vis');}
+  for(var j=0;j<8;j++){
+    (function(idx){ T(function(){ var el=document.getElementById('rt'+idx); if(el&&_run) el.classList.add('vis'); }, 160+idx*140); })(j);
+  }
+}
+
+// ── DISPATCH ─────────────────────────────────────────────────────────────
+var animMap = [
+  animCover, animDaily, animAgenda, animEvo, animSGBD, animLayers,
+  animER, animLogicTbl, animChen, animLogModel, animCreateAll, animSublangs, animDDL, animTypes, animConstraints,
+  animSelect, animInsert, animUpdateDelete, animDclTcl,
+  animPgCreate, animMyCreate, animLitCreate, animMssCreate, animOraCreate,
+  animRmOdp, animRfRnf, animChecklist, animPractice, animRecap
+];
+
+function runAnim(idx) {
+  clearT();
+  _run = true;
+  var fn = animMap[idx];
+  if (fn) T(fn, 150);
+}
+
+showSlide(0);
+</script>
+</body>
+</html>

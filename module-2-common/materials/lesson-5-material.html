@@ -1,0 +1,1142 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 5 — Back-End I — TDD top-down — Inteli</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../css/inteli-styles.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ac:#3178c6; --hi:#5fa9e8; --dk:#0b1d3a; --gr:#0d9488; --re:#dc2626; --am:#d97706; --pr:#7c3aed;
+      --text:#1e293b; --muted:#64748b; --border:#e2e8f0; --bg:#f8fafc; --card:#ffffff;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family:'Manrope',sans-serif; color:var(--text); background:var(--bg); }
+
+    #progress-bar { position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--ac),var(--hi)); width:0%; z-index:9999; transition:width .1s; }
+
+    #float-nav { position:fixed; bottom:28px; right:28px; display:flex; flex-direction:column; gap:8px; z-index:9998; opacity:0; pointer-events:none; transform:translateY(12px); transition:opacity .3s,transform .3s; }
+    #float-nav.visible { opacity:1; pointer-events:auto; transform:translateY(0); }
+    .fn-btn { display:flex; align-items:center; gap:6px; padding:10px 16px; border-radius:999px; font-size:.82rem; font-weight:700; text-decoration:none; box-shadow:0 4px 18px rgba(0,0,0,.25); transition:transform .15s,box-shadow .15s; white-space:nowrap; }
+    .fn-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,.32); text-decoration:none; }
+    .fn-btn-slides { background:white; color:var(--ac); border:2px solid var(--ac); }
+    .fn-btn-back   { background:var(--dk); color:white; }
+
+    .mat-header { background:linear-gradient(135deg,#0b1d3a 0%,#3178c6 50%,#5fa9e8 100%); color:white; padding:40px 0 32px; }
+    .mat-header h1 { font-size:2.2rem; font-weight:800; margin:0 0 8px; }
+    .mat-header .subtitle { font-size:1rem; opacity:.85; margin:0 0 20px; }
+    .mat-badge { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); color:white; padding:4px 14px; border-radius:999px; font-size:.78rem; font-weight:700; display:inline-block; margin-bottom:12px; }
+
+    .mat-layout { display:grid; grid-template-columns:260px 1fr; gap:32px; max-width:1200px; margin:0 auto; padding:40px 24px; }
+    @media(max-width:900px){ .mat-layout { grid-template-columns:1fr; } .mat-sidebar { display:none; } }
+
+    .mat-sidebar { position:sticky; top:24px; max-height:calc(100vh - 48px); overflow-y:auto; }
+    .mat-toc { background:var(--card); border-radius:14px; padding:20px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,.05); }
+    .mat-toc h4 { font-size:.8rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 12px; }
+    .mat-toc a { display:block; color:var(--muted); text-decoration:none; font-size:.82rem; padding:4px 0 4px 12px; border-left:2px solid transparent; transition:all .2s; line-height:1.3; }
+    .mat-toc a:hover, .mat-toc a.active { color:var(--ac); border-left-color:var(--ac); }
+    .mat-toc .toc-h3 { padding-left:22px; font-size:.77rem; }
+
+    .mat-article { min-width:0; }
+    .mat-section { margin-bottom:56px; }
+    .mat-section h2 { font-size:1.75rem; font-weight:800; color:var(--dk); padding-bottom:12px; border-bottom:2px solid var(--border); margin:0 0 24px; scroll-margin-top:80px; }
+    .mat-section h3 { font-size:1.2rem; font-weight:700; color:var(--dk); margin:32px 0 12px; scroll-margin-top:80px; }
+    .mat-section h4 { font-size:1rem; font-weight:700; color:var(--dk); margin:24px 0 10px; }
+    .mat-section p { line-height:1.8; margin-bottom:16px; font-size:.97rem; color:#374151; }
+    .mat-section ul, .mat-section ol { padding-left:1.5rem; margin-bottom:16px; }
+    .mat-section li { line-height:1.75; font-size:.97rem; color:#374151; margin-bottom:4px; }
+    .mat-section strong { color:var(--dk); }
+
+    .callout { border-radius:12px; padding:16px 20px; margin:20px 0; border-left:4px solid; }
+    .callout-info  { background:#eff6ff; border-color:#3b82f6; }
+    .callout-warn  { background:#fffbeb; border-color:#f59e0b; }
+    .callout-danger{ background:#fef2f2; border-color:#ef4444; }
+    .callout-tip   { background:#f0fdf4; border-color:#22c55e; }
+    .callout-deep  { background:#f5f3ff; border-color:#8b5cf6; }
+    .callout-label { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; }
+    .callout-info  .callout-label { color:#3b82f6; }
+    .callout-warn  .callout-label { color:#f59e0b; }
+    .callout-danger .callout-label { color:#ef4444; }
+    .callout-tip   .callout-label { color:#22c55e; }
+    .callout-deep  .callout-label { color:#8b5cf6; }
+    .callout p { margin:0; font-size:.91rem; line-height:1.65; color:#374151; }
+
+    .code-wrap { position:relative; margin:20px 0; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.15); }
+    .code-label { background:#313244; color:#6c7086; font-size:.7rem; font-weight:700; padding:6px 14px; font-family:'JetBrains Mono',monospace; display:flex; justify-content:space-between; align-items:center; }
+    .code-copy { background:transparent; border:1px solid #6c7086; color:#cdd6f4; font-size:.65rem; padding:2px 8px; border-radius:5px; cursor:pointer; font-family:'JetBrains Mono',monospace; transition:all .2s; }
+    .code-copy:hover { background:#6c7086; color:white; }
+    pre.code-block { background:#1e1e2e; color:#cdd6f4; padding:18px 20px; margin:0; font-family:'JetBrains Mono',monospace; font-size:.82rem; line-height:1.75; overflow-x:auto; }
+    pre.code-block code { font-family:inherit; background:transparent; color:inherit; padding:0; }
+    .hl-kw  { color:#cba6f7; font-weight:600; }
+    .hl-str { color:#a6e3a1; }
+    .hl-num { color:#fab387; }
+    .hl-cmt { color:#6c7086; font-style:italic; }
+    .hl-typ { color:#89b4fa; }
+    .hl-fn  { color:#f9e2af; }
+    .hl-url { color:#94e2d5; text-decoration:underline; }
+
+    .mat-table { width:100%; border-collapse:collapse; margin:20px 0; border-radius:10px; overflow:hidden; border:1px solid var(--border); font-size:.88rem; }
+    .mat-table thead th { background:var(--dk); color:white; padding:12px 16px; text-align:left; font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+    .mat-table tbody td { padding:10px 16px; border-bottom:1px solid var(--border); line-height:1.5; }
+    .mat-table tbody tr:last-child td { border-bottom:none; }
+    .mat-table tbody tr:hover { background:#f8fafc; }
+    .tag { display:inline-block; padding:2px 8px; border-radius:5px; font-size:.72rem; font-weight:700; }
+    .tag-blue  { background:#dbeafe; color:#1d4ed8; }
+    .tag-green { background:#dcfce7; color:#15803d; }
+    .tag-red   { background:#fee2e2; color:#b91c1c; }
+    .tag-purple{ background:#ede9fe; color:#7c3aed; }
+    .tag-amber { background:#fef3c7; color:#92400e; }
+
+    /* TDD cycle visual */
+    .tdd-flow { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:14px; margin:20px 0; }
+    .tdd-card { padding:16px; border-radius:12px; color:white; text-align:center; }
+    .tdd-card.red   { background:linear-gradient(135deg,#dc2626,#f87171); }
+    .tdd-card.green { background:linear-gradient(135deg,#0d9488,#10b981); }
+    .tdd-card.refac { background:linear-gradient(135deg,#1863dc,#3b82f6); }
+    .tdd-card .icn { font-size:1.8rem; }
+    .tdd-card .nm  { font-size:1rem; font-weight:800; margin-top:4px; }
+    .tdd-card .ds  { font-size:.78rem; opacity:.92; margin-top:4px; line-height:1.5; }
+
+    /* Layer cards */
+    .layers { display:grid; grid-template-columns:repeat(auto-fit,minmax(180px,1fr)); gap:10px; margin:18px 0; }
+    .layer-card { background:var(--card); border:1px solid var(--border); border-top:4px solid; border-radius:12px; padding:14px 16px; }
+    .layer-card .lname { font-size:.92rem; font-weight:800; color:var(--dk); }
+    .layer-card .ldesc { font-size:.78rem; color:var(--muted); margin-top:4px; line-height:1.5; }
+
+    /* Stage badge */
+    .stage { display:inline-block; font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:800; padding:3px 10px; border-radius:6px; color:white; margin-right:8px; vertical-align:middle; }
+    .stage.red   { background:#dc2626; }
+    .stage.green { background:#0d9488; }
+    .stage.ref   { background:#1863dc; }
+
+    /* RM-ODP layers */
+    .odp-stack { display:flex; flex-direction:column; gap:8px; margin:20px 0; }
+    .odp-layer { border-radius:10px; padding:14px 18px; display:flex; align-items:center; gap:14px; opacity:0; transform:translateX(-20px); transition:all .5s cubic-bezier(.34,1.3,.64,1); }
+    .odp-layer.reveal { opacity:1; transform:translateX(0); }
+    .odp-icon { font-size:1.4rem; flex-shrink:0; }
+    .odp-name { font-size:.9rem; font-weight:700; color:var(--dk); }
+    .odp-desc { font-size:.8rem; color:#374151; margin-top:2px; line-height:1.5; }
+    .odp-focus { font-size:.73rem; font-weight:700; padding:2px 8px; border-radius:5px; margin-top:4px; display:inline-block; }
+
+    /* RNF eixos */
+    .eixo-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:20px 0; }
+    .eixo-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 16px; border-top:4px solid; opacity:0; transform:translateY(16px); transition:all .5s cubic-bezier(.34,1.3,.64,1); }
+    .eixo-card.reveal { opacity:1; transform:translateY(0); }
+    .eixo-tag { font-family:'JetBrains Mono',monospace; font-size:.72rem; font-weight:800; text-transform:uppercase; margin-bottom:6px; display:block; }
+    .eixo-title { font-size:.9rem; font-weight:700; color:var(--dk); margin-bottom:4px; }
+    .eixo-q { font-size:.78rem; color:var(--muted); line-height:1.5; }
+    .eixo-example { font-size:.75rem; color:#374151; margin-top:6px; background:#f8fafc; padding:5px 8px; border-radius:6px; font-style:italic; line-height:1.5; }
+
+    /* Deep-dive */
+    .deep-dive { margin:20px 0; border:1px solid #ede9fe; border-radius:12px; overflow:hidden; }
+    .deep-header { background:#f5f3ff; padding:14px 18px; cursor:pointer; display:flex; justify-content:space-between; align-items:center; user-select:none; }
+    .deep-header h4 { margin:0; font-size:.9rem; color:#6d28d9; font-weight:700; }
+    .deep-arrow { font-size:.8rem; color:#8b5cf6; transition:transform .3s; }
+    .deep-header.open .deep-arrow { transform:rotate(180deg); }
+    .deep-body { padding:0 18px; max-height:0; overflow:hidden; transition:max-height .4s ease, padding .3s; }
+    .deep-body.open { max-height:3000px; padding:16px 18px; }
+
+    .sr { opacity:0; transform:translateY(24px); transition:opacity .5s ease,transform .5s ease; }
+    .sr.vis { opacity:1; transform:translateY(0); }
+
+    .checklist { list-style:none; padding:0; margin:20px 0; }
+    .checklist li { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--border); font-size:.9rem; color:#374151; cursor:pointer; user-select:none; }
+    .checklist li:last-child { border-bottom:none; }
+    .ck-box { width:20px; height:20px; border:2px solid var(--border); border-radius:5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; margin-top:2px; }
+    .checklist li.done .ck-box { background:var(--gr); border-color:var(--gr); color:white; }
+    .checklist li.done .ck-text { text-decoration:line-through; color:var(--muted); }
+  </style>
+</head>
+<body>
+  <div id="progress-bar"></div>
+
+  <div id="float-nav">
+    <a href="../slides/slide-lesson-5.html" class="fn-btn fn-btn-slides">&#9654; Slides</a>
+    <a href="../../index.html" class="fn-btn fn-btn-back">&#8592; Módulo</a>
+  </div>
+
+  <header class="mat-header">
+    <div class="container">
+      <div class="mat-badge">Módulo 2 · Ciclo Comum · IN02</div>
+      <h1>Back-End I — TDD top-down</h1>
+      <p class="subtitle">Aula 5 — Material de Leitura Aprofundado</p>
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="../slides/slide-lesson-5.html" class="btn btn-light btn-sm">&#9654; Slides</a>
+        <a href="../../index.html" class="btn btn-outline-light btn-sm">&#8592; Voltar ao Módulo</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="mat-layout">
+
+    <aside class="mat-sidebar">
+      <div class="mat-toc">
+        <h4>Neste material</h4>
+        <a href="#sec-tdd">1. Por que TDD top-down?</a>
+        <a href="#sec-setup-ts">2. Setup TypeScript</a>
+        <a href="#sec-setup-jest">3. Setup Jest + supertest</a>
+        <a href="#sec-aaa">4. AAA + matchers</a>
+        <a href="#sec-spec-ctrl">5. Spec Controller (RED)</a>
+        <a href="#sec-spec-svc">6. Spec Service (RED)</a>
+        <a href="#sec-spec-repo">7. Spec Repository (RED)</a>
+        <a href="#sec-spec-helper">8. Spec Helper (RED)</a>
+        <a href="#sec-tree">9. Estrutura de pastas</a>
+        <a href="#sec-green-ctrl">10. GREEN Controller e Rotas</a>
+        <a href="#sec-green-svc">11. GREEN Service</a>
+        <a href="#sec-green-repo">12. GREEN Repository + Pool</a>
+        <a href="#sec-green-helper">13. GREEN Helpers + Errors</a>
+        <a href="#sec-refactor">14. REFACTOR</a>
+        <a href="#sec-coverage">15. Coverage</a>
+        <a href="#sec-rmodp">16. RM-ODP</a>
+        <a href="#sec-req">17. RF, RN, RNF</a>
+        <a href="#sec-checklist">18. Checklist</a>
+        <a href="#sec-refs">Referências</a>
+      </div>
+    </aside>
+
+    <article class="mat-article">
+
+      <!-- ════════ 1. POR QUE TDD TOP-DOWN ════════ -->
+      <section class="mat-section" id="sec-tdd">
+        <h2>1. Por que TDD top-down?</h2>
+
+        <p>Até a aula 4 você escreveu <strong>SQL puro</strong>: queries, JOINs, agregações executadas dentro do cliente do banco. Isso resolve <em>parte</em> de um sistema — mas não há aplicação ainda. A partir desta aula, esse SQL passa a ser invocado por <strong>código de aplicação</strong>: um servidor HTTP que recebe requisições, chama o banco, formata a resposta e retorna ao cliente. É o <strong>back-end</strong>.</p>
+
+        <p>Em vez de escrever todo o servidor de uma vez e depois tentar testar, vamos fazer o caminho inverso: <strong>escrever o teste primeiro</strong>, ver ele falhar, escrever o código mínimo que faz passar, repetir. Esse é o ciclo <strong>RED → GREEN → REFACTOR</strong> do TDD. E faremos isso <em>top-down</em>: começamos pelo controller (o ponto de entrada HTTP), descemos para o service, depois o repository, e finalmente o helper puro.</p>
+
+        <div class="tdd-flow">
+          <div class="tdd-card red">
+            <div class="icn">🔴</div>
+            <div class="nm">RED</div>
+            <div class="ds">Escreva o teste. Ele falha porque o código ainda não existe — <em>e está certo que falhe</em>.</div>
+          </div>
+          <div class="tdd-card green">
+            <div class="icn">🟢</div>
+            <div class="nm">GREEN</div>
+            <div class="ds">Escreva o <strong>mínimo</strong> de código que faz o teste passar. Sem inventar funcionalidade extra.</div>
+          </div>
+          <div class="tdd-card refac">
+            <div class="icn">♻️</div>
+            <div class="nm">REFACTOR</div>
+            <div class="ds">Com o teste verde, refatore com segurança: extraia funções, renomeie, reorganize.</div>
+          </div>
+        </div>
+
+        <h3>Por que TypeScript no back-end?</h3>
+        <p>Existem três grandes razões para o back-end deste curso ser em TypeScript em vez de JavaScript puro: <strong>tipagem estática</strong> que pega erros antes de rodar; <strong>contratos explícitos</strong> entre camadas — uma <code>interface User</code> é a verdade compartilhada por controller, service e repository, e o compilador reclama imediatamente se uma camada quebrar o contrato; e <strong>refactor seguro</strong> — renomear um campo de modelo quebra a compilação em todos os lugares onde ele é usado de forma inconsistente. No fim, TypeScript não é "JavaScript com chatice" — é JavaScript com um <em>par programador</em> que checa cada linha que você escreve.</p>
+
+        <div class="callout callout-info">
+          <div class="callout-label">Conceito fundamental</div>
+          <p>TDD top-down responde uma pergunta de cada vez. Spec do controller pergunta "como o sistema é usado?". Spec do service pergunta "qual é a regra de negócio?". Spec do repository pergunta "como persistimos?". Spec do helper pergunta "essa lógica isolada está certa?". Cada nível protege o seguinte.</p>
+        </div>
+
+        <h3>O alvo de hoje</h3>
+        <p>Ao fim do dia, sua aplicação responderá <code>GET /users/:id</code> retornando o usuário em JSON quando ele existir, e <strong>404</strong> quando não. Isso parece simples — é simples. Mas é o caminho completo: HTTP entra, controller delega ao service, service consulta o repository, repository pergunta ao Postgres via <code>pg.Pool</code>, e a resposta sobe de volta. Cada elo da corrente terá seu spec.</p>
+      </section>
+
+      <!-- ════════ 2. SETUP TS ════════ -->
+      <section class="mat-section" id="sec-setup-ts">
+        <h2>2. Setup do projeto TypeScript</h2>
+
+        <p>O setup é declarativo: três comandos no terminal, dois arquivos de configuração, e cinco scripts no <code>package.json</code>. Nada de mágica.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">terminal — bootstrap do projeto<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-cmt"># 1. Inicializa o package.json</span>
+npm init -y
+
+<span class="hl-cmt"># 2. Dependências de runtime</span>
+npm install express pg dotenv
+
+<span class="hl-cmt"># 3. Dependências de desenvolvimento</span>
+npm install -D typescript @types/node @types/express @types/pg \
+  tsx jest ts-jest @types/jest supertest @types/supertest
+
+<span class="hl-cmt"># 4. Inicializa o tsconfig.json</span>
+npx tsc --init</code></pre>
+        </div>
+
+        <p>Depois de rodar esses comandos você terá um <code>package.json</code>, um <code>tsconfig.json</code> com configuração padrão e um <code>node_modules/</code>. Edite o <code>tsconfig.json</code> para deixar a configuração estrita — isso evita uma classe inteira de bugs.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">tsconfig.json<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code>{
+  <span class="hl-str">"compilerOptions"</span>: {
+    <span class="hl-str">"target"</span>: <span class="hl-str">"ES2022"</span>,
+    <span class="hl-str">"module"</span>: <span class="hl-str">"commonjs"</span>,
+    <span class="hl-str">"moduleResolution"</span>: <span class="hl-str">"node"</span>,
+    <span class="hl-str">"strict"</span>: <span class="hl-kw">true</span>,
+    <span class="hl-str">"esModuleInterop"</span>: <span class="hl-kw">true</span>,
+    <span class="hl-str">"forceConsistentCasingInFileNames"</span>: <span class="hl-kw">true</span>,
+    <span class="hl-str">"skipLibCheck"</span>: <span class="hl-kw">true</span>,
+    <span class="hl-str">"rootDir"</span>: <span class="hl-str">"src"</span>,
+    <span class="hl-str">"outDir"</span>: <span class="hl-str">"dist"</span>,
+    <span class="hl-str">"resolveJsonModule"</span>: <span class="hl-kw">true</span>
+  },
+  <span class="hl-str">"include"</span>: [<span class="hl-str">"src/**/*.ts"</span>],
+  <span class="hl-str">"exclude"</span>: [<span class="hl-str">"node_modules"</span>, <span class="hl-str">"dist"</span>]
+}</code></pre>
+        </div>
+
+        <p>E os scripts do <code>package.json</code> que você usa todo dia:</p>
+
+        <div class="code-wrap">
+          <div class="code-label">package.json — campo "scripts"<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-str">"scripts"</span>: {
+  <span class="hl-str">"dev"</span>:        <span class="hl-str">"tsx watch src/server.ts"</span>,
+  <span class="hl-str">"build"</span>:      <span class="hl-str">"tsc"</span>,
+  <span class="hl-str">"start"</span>:      <span class="hl-str">"node dist/server.js"</span>,
+  <span class="hl-str">"test"</span>:       <span class="hl-str">"jest"</span>,
+  <span class="hl-str">"test:watch"</span>: <span class="hl-str">"jest --watch"</span>
+}</code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-label">tsx vs ts-node</div>
+          <p>Usamos <code>tsx</code> para o modo dev porque é mais rápido (usa esbuild) e tem watch nativo. <code>ts-node</code> ainda é popular, mas <code>tsx</code> é a escolha moderna para projetos Express simples.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 3. SETUP JEST ════════ -->
+      <section class="mat-section" id="sec-setup-jest">
+        <h2>3. Setup Jest + ts-jest + supertest</h2>
+
+        <p>O Jest é o framework de testes mais popular do ecossistema Node. Ele descobre arquivos com sufixo <code>.test.ts</code> ou <code>.spec.ts</code>, executa cada um isoladamente e relata pass/fail. Vamos adotar a convenção <code>.spec.ts</code> — "specification file" — e colocar cada spec <strong>ao lado do arquivo que ele testa</strong>. O <code>ts-jest</code> ensina o Jest a entender TypeScript em memória, sem build prévio.</p>
+
+        <p>O <code>supertest</code> é uma peça-chave para testar controllers: ele dispara requisições HTTP contra o objeto <code>app</code> do Express <em>sem subir uma porta de rede</em>. O servidor é instanciado em memória, a requisição vai e volta, e você inspeciona <code>res.status</code>, <code>res.body</code>. É rápido, isolado e perfeito para CI.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">jest.config.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import type</span> { <span class="hl-typ">Config</span> } <span class="hl-kw">from</span> <span class="hl-str">'jest'</span>;
+
+<span class="hl-kw">const</span> config: <span class="hl-typ">Config</span> = {
+  preset: <span class="hl-str">'ts-jest'</span>,
+  testEnvironment: <span class="hl-str">'node'</span>,
+  testMatch: [<span class="hl-str">'**/*.spec.ts'</span>],
+  collectCoverageFrom: [<span class="hl-str">'src/**/*.ts'</span>, <span class="hl-str">'!src/**/*.spec.ts'</span>],
+  clearMocks: <span class="hl-kw">true</span>
+};
+
+<span class="hl-kw">export default</span> config;</code></pre>
+        </div>
+
+        <p>Cada chave acima resolve um problema específico. <code>preset: 'ts-jest'</code> ativa a transformação TS-em-JS em memória. <code>testEnvironment: 'node'</code> evita carregar o JSDOM (que só faz sentido para testes de front-end). <code>testMatch</code> diz que todo arquivo terminado em <code>.spec.ts</code> é um teste — isso permite o padrão "spec ao lado do arquivo". <code>collectCoverageFrom</code> mira só na pasta <code>src/</code>, ignorando os próprios specs. E <code>clearMocks: true</code> limpa todos os mocks entre testes — sem ele, o estado de um teste vaza para o próximo.</p>
+
+        <div class="callout callout-warn">
+          <div class="callout-label">Atenção — banco real nos specs?</div>
+          <p>Nesta aula, todos os specs são <strong>unitários</strong> — eles mockam o pool ou o repository. Não tocamos no banco real. Em aulas futuras, faremos testes de integração com um <strong>banco efêmero</strong> (Postgres em container) que sobe e cai a cada suíte. Para hoje, mocks bastam.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 4. AAA ════════ -->
+      <section class="mat-section" id="sec-aaa">
+        <h2>4. AAA + matchers</h2>
+
+        <p>Todo teste bem escrito tem três blocos visualmente separados: <strong>Arrange</strong>, <strong>Act</strong>, <strong>Assert</strong>. Esse padrão é tão útil que ganhou nome — AAA. Ele transforma o spec em uma especificação legível: a primeira parte prepara o cenário, a segunda dispara a ação, a terceira verifica o resultado.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">AAA — exemplo genérico<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-fn">it</span>(<span class="hl-str">'soma dois números'</span>, () =&gt; {
+  <span class="hl-cmt">// ── Arrange ──────────────────────</span>
+  <span class="hl-kw">const</span> a = <span class="hl-num">2</span>;
+  <span class="hl-kw">const</span> b = <span class="hl-num">3</span>;
+
+  <span class="hl-cmt">// ── Act ──────────────────────────</span>
+  <span class="hl-kw">const</span> resultado = <span class="hl-fn">somar</span>(a, b);
+
+  <span class="hl-cmt">// ── Assert ───────────────────────</span>
+  <span class="hl-fn">expect</span>(resultado).<span class="hl-fn">toBe</span>(<span class="hl-num">5</span>);
+});</code></pre>
+        </div>
+
+        <p>Os <strong>matchers</strong> do Jest são as funções que você encadeia depois de <code>expect()</code> para fazer a verificação. Conhecer um pequeno conjunto cobre 90% dos casos:</p>
+
+        <table class="mat-table">
+          <thead><tr><th>Matcher</th><th>Verifica</th><th>Quando usar</th></tr></thead>
+          <tbody>
+            <tr><td><code>toBe</code></td><td>Igualdade estrita (<code>===</code>)</td><td>Primitivos: number, string, boolean</td></tr>
+            <tr><td><code>toEqual</code></td><td>Igualdade profunda</td><td>Objetos e arrays — compara conteúdo, não referência</td></tr>
+            <tr><td><code>toMatchObject</code></td><td>Subset de propriedades</td><td>Quando você só quer verificar algumas chaves de um objeto</td></tr>
+            <tr><td><code>toHaveBeenCalledWith</code></td><td>Mock chamado com X</td><td>Verificar argumentos passados a uma função mockada</td></tr>
+            <tr><td><code>rejects.toThrow</code></td><td>Promise rejeitada com erro</td><td>Casos de erro em código async</td></tr>
+            <tr><td><code>toBeInstanceOf</code></td><td>É instância de uma classe</td><td>Para erros customizados (NotFoundError etc.)</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-tip">
+          <div class="callout-label">Erro comum</div>
+          <p>Usar <code>toBe({ id: 1 })</code> em um objeto. Falha sempre — <code>toBe</code> compara referência. O correto para objetos é <code>toEqual</code> (profundo) ou <code>toMatchObject</code> (subset).</p>
+        </div>
+      </section>
+
+      <!-- ════════ 5. SPEC CONTROLLER (RED) ════════ -->
+      <section class="mat-section" id="sec-spec-ctrl">
+        <h2>5. <span class="stage red">RED</span>Spec do Controller via supertest</h2>
+
+        <p>Começamos pelo topo. O controller é a <em>casca</em> do back-end: o ponto onde uma requisição HTTP entra. Antes de existir uma linha do controller, vamos descrever em código como ele <em>deve se comportar</em>. O <code>supertest</code> torna isso natural: você importa o <code>app</code> do Express, dispara uma requisição e inspeciona a resposta.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/controllers/userController.spec.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> request <span class="hl-kw">from</span> <span class="hl-str">'supertest'</span>;
+<span class="hl-kw">import</span> { app } <span class="hl-kw">from</span> <span class="hl-str">'../app'</span>;
+<span class="hl-kw">import</span> * <span class="hl-kw">as</span> svc <span class="hl-kw">from</span> <span class="hl-str">'../services/userService'</span>;
+
+<span class="hl-fn">jest.mock</span>(<span class="hl-str">'../services/userService'</span>);
+
+<span class="hl-fn">describe</span>(<span class="hl-str">'GET /users/:id'</span>, () =&gt; {
+  <span class="hl-fn">it</span>(<span class="hl-str">'200 com user existente'</span>, <span class="hl-kw">async</span> () =&gt; {
+    <span class="hl-cmt">// Arrange</span>
+    (svc.getById <span class="hl-kw">as</span> <span class="hl-typ">jest.Mock</span>).<span class="hl-fn">mockResolvedValue</span>({
+      id: <span class="hl-num">1</span>, name: <span class="hl-str">'Ana'</span>, email: <span class="hl-str">'ana@inteli.edu'</span>
+    });
+
+    <span class="hl-cmt">// Act</span>
+    <span class="hl-kw">const</span> res = <span class="hl-kw">await</span> <span class="hl-fn">request</span>(app).<span class="hl-fn">get</span>(<span class="hl-str">'/users/1'</span>);
+
+    <span class="hl-cmt">// Assert</span>
+    <span class="hl-fn">expect</span>(res.status).<span class="hl-fn">toBe</span>(<span class="hl-num">200</span>);
+    <span class="hl-fn">expect</span>(res.body).<span class="hl-fn">toMatchObject</span>({ id: <span class="hl-num">1</span>, name: <span class="hl-str">'Ana'</span> });
+  });
+
+  <span class="hl-fn">it</span>(<span class="hl-str">'404 quando user não existe'</span>, <span class="hl-kw">async</span> () =&gt; {
+    (svc.getById <span class="hl-kw">as</span> <span class="hl-typ">jest.Mock</span>).<span class="hl-fn">mockRejectedValue</span>(
+      <span class="hl-kw">new</span> <span class="hl-fn">NotFoundError</span>(<span class="hl-str">'User 999 not found'</span>)
+    );
+
+    <span class="hl-kw">const</span> res = <span class="hl-kw">await</span> <span class="hl-fn">request</span>(app).<span class="hl-fn">get</span>(<span class="hl-str">'/users/999'</span>);
+
+    <span class="hl-fn">expect</span>(res.status).<span class="hl-fn">toBe</span>(<span class="hl-num">404</span>);
+  });
+});</code></pre>
+        </div>
+
+        <p>Note três decisões importantes. Primeiro, <code>jest.mock('../services/userService')</code> substitui o módulo inteiro por mocks automáticos — quando o controller importar <code>svc.getById</code>, ele receberá uma função fake, não a real. Segundo, controlamos o que essa função fake retorna com <code>mockResolvedValue</code> (resolve a Promise com valor) e <code>mockRejectedValue</code> (rejeita com erro). Terceiro, o teste <em>não toca no banco</em> — o service é fake, então nem o repository nem o pool são chamados.</p>
+
+        <div class="callout callout-danger">
+          <div class="callout-label">Resultado esperado: VERMELHO</div>
+          <p>Esse teste <strong>falha</strong> ao rodar. Não existe <code>app</code>, não existe rota, não existe controller. A falha é o ponto de partida — ela define exatamente o que precisamos construir.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 6. SPEC SERVICE (RED) ════════ -->
+      <section class="mat-section" id="sec-spec-svc">
+        <h2>6. <span class="stage red">RED</span>Spec do Service mockando o Repository</h2>
+
+        <p>O service guarda a regra de negócio. Aqui ela é simples: "se o repository devolveu <code>null</code>, lance <code>NotFoundError</code>; senão, devolva o user". Em sistemas reais, services contêm validações de domínio, orquestração de múltiplos repositories, regras de transação. Hoje, a regra é mínima — mas o spec descreve <em>exatamente</em> os dois caminhos.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/services/userService.spec.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> * <span class="hl-kw">as</span> repo <span class="hl-kw">from</span> <span class="hl-str">'../repositories/userRepository'</span>;
+<span class="hl-kw">import</span> { getById } <span class="hl-kw">from</span> <span class="hl-str">'./userService'</span>;
+<span class="hl-kw">import</span> { NotFoundError } <span class="hl-kw">from</span> <span class="hl-str">'../errors/AppError'</span>;
+
+<span class="hl-fn">jest.mock</span>(<span class="hl-str">'../repositories/userRepository'</span>);
+
+<span class="hl-fn">describe</span>(<span class="hl-str">'userService.getById'</span>, () =&gt; {
+  <span class="hl-fn">it</span>(<span class="hl-str">'retorna o user quando encontrado'</span>, <span class="hl-kw">async</span> () =&gt; {
+    (repo.findById <span class="hl-kw">as</span> <span class="hl-typ">jest.Mock</span>).<span class="hl-fn">mockResolvedValue</span>({
+      id: <span class="hl-num">1</span>, name: <span class="hl-str">'Ana'</span>, email: <span class="hl-str">'ana@inteli.edu'</span>
+    });
+
+    <span class="hl-kw">const</span> user = <span class="hl-kw">await</span> <span class="hl-fn">getById</span>(<span class="hl-num">1</span>);
+
+    <span class="hl-fn">expect</span>(user).<span class="hl-fn">toMatchObject</span>({ id: <span class="hl-num">1</span>, name: <span class="hl-str">'Ana'</span> });
+    <span class="hl-fn">expect</span>(repo.findById).<span class="hl-fn">toHaveBeenCalledWith</span>(<span class="hl-num">1</span>);
+  });
+
+  <span class="hl-fn">it</span>(<span class="hl-str">'lança NotFoundError quando o repository retorna null'</span>, <span class="hl-kw">async</span> () =&gt; {
+    (repo.findById <span class="hl-kw">as</span> <span class="hl-typ">jest.Mock</span>).<span class="hl-fn">mockResolvedValue</span>(<span class="hl-kw">null</span>);
+
+    <span class="hl-kw">await</span> <span class="hl-fn">expect</span>(<span class="hl-fn">getById</span>(<span class="hl-num">999</span>)).rejects.<span class="hl-fn">toThrow</span>(NotFoundError);
+  });
+});</code></pre>
+        </div>
+
+        <p>Os dois testes cobrem os dois caminhos do service. O primeiro é o <strong>caminho feliz</strong>: repo entrega user, service repassa. O segundo é o <strong>caminho infeliz</strong>: repo entrega <code>null</code>, service traduz para erro de domínio. Note como o repository <em>não existe</em> ainda — estamos descrevendo a interface esperada (<code>findById(id)</code> retorna <code>User | null</code>) através do mock.</p>
+
+        <div class="callout callout-info">
+          <div class="callout-label">Test doubles — vocabulário</div>
+          <p><strong>Stub</strong>: dummy que retorna valor fixo. <strong>Mock</strong>: stub que também grava como foi chamado (para você verificar argumentos). <strong>Spy</strong>: envolve a função real, observando sem trocar. O Jest oferece tudo via <code>jest.fn()</code>, <code>jest.mock()</code> e <code>jest.spyOn()</code>.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 7. SPEC REPOSITORY (RED) ════════ -->
+      <section class="mat-section" id="sec-spec-repo">
+        <h2>7. <span class="stage red">RED</span>Spec do Repository — SQL parametrizado</h2>
+
+        <p>O repository é a única camada que sabe falar SQL. O spec dele tem dois objetivos: provar que a query usa <strong>marcadores parametrizados</strong> (<code>$1</code>, não concatenação) e que o pool é chamado com o valor certo. Mockamos o módulo <code>db/pool</code> para não tocar em banco real.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/repositories/userRepository.spec.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> { pool } <span class="hl-kw">from</span> <span class="hl-str">'../db/pool'</span>;
+<span class="hl-kw">import</span> { findById } <span class="hl-kw">from</span> <span class="hl-str">'./userRepository'</span>;
+
+<span class="hl-fn">jest.mock</span>(<span class="hl-str">'../db/pool'</span>, () =&gt; ({
+  pool: { query: <span class="hl-fn">jest.fn</span>() }
+}));
+
+<span class="hl-fn">describe</span>(<span class="hl-str">'userRepository.findById'</span>, () =&gt; {
+  <span class="hl-fn">it</span>(<span class="hl-str">'usa SQL parametrizado com $1'</span>, <span class="hl-kw">async</span> () =&gt; {
+    (pool.query <span class="hl-kw">as</span> <span class="hl-typ">jest.Mock</span>).<span class="hl-fn">mockResolvedValue</span>({
+      rows: [{ id: <span class="hl-num">1</span>, name: <span class="hl-str">'Ana'</span> }]
+    });
+
+    <span class="hl-kw">await</span> <span class="hl-fn">findById</span>(<span class="hl-num">1</span>);
+
+    <span class="hl-fn">expect</span>(pool.query).<span class="hl-fn">toHaveBeenCalledWith</span>(
+      <span class="hl-str">'SELECT * FROM users WHERE id = $1'</span>,
+      [<span class="hl-num">1</span>]
+    );
+  });
+
+  <span class="hl-fn">it</span>(<span class="hl-str">'retorna null quando não há linhas'</span>, <span class="hl-kw">async</span> () =&gt; {
+    (pool.query <span class="hl-kw">as</span> <span class="hl-typ">jest.Mock</span>).<span class="hl-fn">mockResolvedValue</span>({ rows: [] });
+
+    <span class="hl-kw">const</span> r = <span class="hl-kw">await</span> <span class="hl-fn">findById</span>(<span class="hl-num">999</span>);
+
+    <span class="hl-fn">expect</span>(r).<span class="hl-fn">toBeNull</span>();
+  });
+});</code></pre>
+        </div>
+
+        <p>O matcher <code>toHaveBeenCalledWith</code> faz a verificação principal: ele afirma que <code>pool.query</code> foi chamado com exatamente esses dois argumentos — a string SQL com <code>$1</code> e o array <code>[1]</code>. Isso é mais forte do que só verificar que a query roda; é uma proteção contra <strong>SQL injection</strong>: se alguém amanhã trocar para <code>"WHERE id = " + id</code>, esse teste falha.</p>
+
+        <div class="callout callout-warn">
+          <div class="callout-label">Banco efêmero — quando precisa</div>
+          <p>Mockar o pool é suficiente para <em>provar a estrutura</em> da query. Mas para garantir que o SQL é <em>sintaticamente válido</em> e que o resultado é mapeado corretamente, em algum momento você precisará de um banco real. A solução padrão é o <strong>banco efêmero</strong>: um container Docker do Postgres que sobe a cada suíte de testes de integração e é descartado depois. Veremos isso em aulas futuras.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 8. SPEC HELPER (RED) ════════ -->
+      <section class="mat-section" id="sec-spec-helper">
+        <h2>8. <span class="stage red">RED</span>Spec do Helper puro — <code>isValidEmail</code></h2>
+
+        <p>Helpers são funções puras: dado o mesmo input, devolvem o mesmo output, sem efeitos colaterais. São o caso mais simples de testar — não precisa de mock, não precisa de async, não precisa de banco. Sirvem como aquecimento e como rede de segurança para validações que migram entre camadas.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/helpers/email.spec.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> { isValidEmail } <span class="hl-kw">from</span> <span class="hl-str">'./email'</span>;
+
+<span class="hl-fn">describe</span>(<span class="hl-str">'isValidEmail'</span>, () =&gt; {
+  <span class="hl-fn">it</span>(<span class="hl-str">'aceita email válido'</span>, () =&gt; {
+    <span class="hl-fn">expect</span>(<span class="hl-fn">isValidEmail</span>(<span class="hl-str">'ana@inteli.edu'</span>)).<span class="hl-fn">toBe</span>(<span class="hl-kw">true</span>);
+    <span class="hl-fn">expect</span>(<span class="hl-fn">isValidEmail</span>(<span class="hl-str">'bruno.costa+vip@empresa.com.br'</span>)).<span class="hl-fn">toBe</span>(<span class="hl-kw">true</span>);
+  });
+
+  <span class="hl-fn">it</span>(<span class="hl-str">'rejeita string sem @'</span>, () =&gt; {
+    <span class="hl-fn">expect</span>(<span class="hl-fn">isValidEmail</span>(<span class="hl-str">'foo'</span>)).<span class="hl-fn">toBe</span>(<span class="hl-kw">false</span>);
+  });
+
+  <span class="hl-fn">it</span>(<span class="hl-str">'rejeita string sem domínio'</span>, () =&gt; {
+    <span class="hl-fn">expect</span>(<span class="hl-fn">isValidEmail</span>(<span class="hl-str">'ana@'</span>)).<span class="hl-fn">toBe</span>(<span class="hl-kw">false</span>);
+  });
+
+  <span class="hl-fn">it</span>(<span class="hl-str">'rejeita string vazia'</span>, () =&gt; {
+    <span class="hl-fn">expect</span>(<span class="hl-fn">isValidEmail</span>(<span class="hl-str">''</span>)).<span class="hl-fn">toBe</span>(<span class="hl-kw">false</span>);
+  });
+});</code></pre>
+        </div>
+
+        <p>Cobrir os casos felizes e os infelizes em testes diferentes deixa a falha falando: se a regex aceita uma string sem domínio, sabemos exatamente qual <code>it</code> quebrou e qual ajuste é preciso. Esse é o ponto do TDD — o teste é a documentação e o detector de regressão ao mesmo tempo.</p>
+      </section>
+
+      <!-- ════════ 9. ESTRUTURA DE PASTAS ════════ -->
+      <section class="mat-section" id="sec-tree">
+        <h2>9. Estrutura de pastas — <code>.spec.ts</code> ao lado</h2>
+
+        <p>O MVC clássico tem três pastas. Em projetos Node modernos, você verá uma evolução para <strong>seis camadas</strong>, cada uma com responsabilidade clara. Essa é a organização que adotamos no curso a partir de agora.</p>
+
+        <div class="layers">
+          <div class="layer-card" style="border-top-color:#1e40af;">
+            <div class="lname">🛣️ routes</div>
+            <div class="ldesc">Mapeia URL para controller. Sem lógica.</div>
+          </div>
+          <div class="layer-card" style="border-top-color:#0284c7;">
+            <div class="lname">🎮 controllers</div>
+            <div class="ldesc">Recebe req, valida formato, delega ao service, devolve res. Sem regra de negócio.</div>
+          </div>
+          <div class="layer-card" style="border-top-color:#0d9488;">
+            <div class="lname">🧠 services</div>
+            <div class="ldesc">Regras de negócio. Orquestra repositories. Lança erros de domínio.</div>
+          </div>
+          <div class="layer-card" style="border-top-color:#d97706;">
+            <div class="lname">🗄️ repositories</div>
+            <div class="ldesc">SQL e pool. Única camada que conhece o banco.</div>
+          </div>
+          <div class="layer-card" style="border-top-color:#7c3aed;">
+            <div class="lname">📐 models</div>
+            <div class="ldesc">Interfaces TS — contratos compartilhados.</div>
+          </div>
+          <div class="layer-card" style="border-top-color:#475569;">
+            <div class="lname">🛠️ helpers</div>
+            <div class="ldesc">Funções puras reutilizáveis.</div>
+          </div>
+        </div>
+
+        <p>E os specs ficam <strong>ao lado</strong> do arquivo testado. Não em uma pasta <code>__tests__/</code> separada. Por quê? Porque quando você renomeia <code>userService.ts</code>, o <code>userService.spec.ts</code> aparece junto no diff. Quando você muda de pasta, ambos vão. Ficam <em>fisicamente acoplados</em> — o que é ótimo, porque conceitualmente eles são uma coisa só.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">árvore de arquivos<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code>src/
+├── controllers/
+│   ├── userController.ts
+│   └── userController.spec.ts        <span class="hl-cmt">// supertest</span>
+├── routes/
+│   └── userRoutes.ts
+├── services/
+│   ├── userService.ts
+│   └── userService.spec.ts           <span class="hl-cmt">// mock do repo</span>
+├── repositories/
+│   ├── userRepository.ts
+│   └── userRepository.spec.ts        <span class="hl-cmt">// mock do pool</span>
+├── models/
+│   └── user.ts                       <span class="hl-cmt">// interface User</span>
+├── helpers/
+│   ├── email.ts
+│   └── email.spec.ts                 <span class="hl-cmt">// puro</span>
+├── middlewares/
+│   └── errorHandler.ts
+├── errors/
+│   └── AppError.ts
+├── db/
+│   └── pool.ts
+├── app.ts
+└── server.ts</code></pre>
+        </div>
+      </section>
+
+      <!-- ════════ 10. GREEN CONTROLLER E ROTAS ════════ -->
+      <section class="mat-section" id="sec-green-ctrl">
+        <h2>10. <span class="stage green">GREEN</span>Controller e Rotas — primeiro</h2>
+
+        <p>Hora de pintar verde. Começamos pelo controller e pela rota — nessa ordem — porque o spec do controller é o que falha mais alto na pilha. Implementamos o <strong>mínimo</strong>: receber a requisição, chamar o service, devolver o JSON. Sem validações elaboradas, sem cache, sem nada que o teste não exija.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/controllers/userController.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import type</span> { <span class="hl-typ">Request</span>, <span class="hl-typ">Response</span>, <span class="hl-typ">NextFunction</span> } <span class="hl-kw">from</span> <span class="hl-str">'express'</span>;
+<span class="hl-kw">import</span> * <span class="hl-kw">as</span> svc <span class="hl-kw">from</span> <span class="hl-str">'../services/userService'</span>;
+
+<span class="hl-kw">export async function</span> <span class="hl-fn">show</span>(
+  req: <span class="hl-typ">Request</span>,
+  res: <span class="hl-typ">Response</span>,
+  next: <span class="hl-typ">NextFunction</span>
+) {
+  <span class="hl-kw">try</span> {
+    <span class="hl-kw">const</span> id = <span class="hl-typ">Number</span>(req.params.id);
+    <span class="hl-kw">const</span> user = <span class="hl-kw">await</span> svc.<span class="hl-fn">getById</span>(id);
+    res.<span class="hl-fn">json</span>(user);
+  } <span class="hl-kw">catch</span> (e) {
+    <span class="hl-fn">next</span>(e);
+  }
+}</code></pre>
+        </div>
+
+        <p>O controller chama <code>svc.getById</code>, captura qualquer erro e o repassa via <code>next(e)</code> — o middleware de erro (que veremos adiante) traduz <code>NotFoundError</code> para HTTP 404.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/routes/userRoutes.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> { <span class="hl-typ">Router</span> } <span class="hl-kw">from</span> <span class="hl-str">'express'</span>;
+<span class="hl-kw">import</span> { show } <span class="hl-kw">from</span> <span class="hl-str">'../controllers/userController'</span>;
+
+<span class="hl-kw">export const</span> userRoutes = <span class="hl-fn">Router</span>();
+
+userRoutes.<span class="hl-fn">get</span>(<span class="hl-str">'/:id'</span>, show);</code></pre>
+        </div>
+
+        <p>E o <code>app.ts</code> amarra tudo:</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/app.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> express <span class="hl-kw">from</span> <span class="hl-str">'express'</span>;
+<span class="hl-kw">import</span> { userRoutes } <span class="hl-kw">from</span> <span class="hl-str">'./routes/userRoutes'</span>;
+<span class="hl-kw">import</span> { errorHandler } <span class="hl-kw">from</span> <span class="hl-str">'./middlewares/errorHandler'</span>;
+
+<span class="hl-kw">export const</span> app = <span class="hl-fn">express</span>();
+
+app.<span class="hl-fn">use</span>(express.<span class="hl-fn">json</span>());
+app.<span class="hl-fn">use</span>(<span class="hl-str">'/users'</span>, userRoutes);
+app.<span class="hl-fn">use</span>(errorHandler);</code></pre>
+        </div>
+
+        <p>E o <code>server.ts</code>, finalmente, sobe a porta — mas <em>não importa para os testes</em>, porque o supertest usa o objeto <code>app</code> diretamente:</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/server.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> { app } <span class="hl-kw">from</span> <span class="hl-str">'./app'</span>;
+
+<span class="hl-kw">const</span> port = process.env.<span class="hl-typ">PORT</span> || <span class="hl-num">3000</span>;
+app.<span class="hl-fn">listen</span>(port, () =&gt; {
+  console.<span class="hl-fn">log</span>(<span class="hl-str">`API rodando em http://localhost:${port}`</span>);
+});</code></pre>
+        </div>
+
+        <div class="callout callout-tip">
+          <div class="callout-label">Por que separar app e server?</div>
+          <p>Mantemos <code>app.ts</code> sem <code>listen()</code>. Isso permite que o supertest importe o <code>app</code> e dispare requisições sem subir uma porta real. O <code>server.ts</code> é o único lugar que dá <code>listen</code> — e ele só roda em produção/dev, não em teste.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 11. GREEN SERVICE ════════ -->
+      <section class="mat-section" id="sec-green-svc">
+        <h2>11. <span class="stage green">GREEN</span>Service — a regra de negócio</h2>
+
+        <p>O service descobre se o user existe (perguntando ao repository) e decide o que fazer com a resposta. Hoje a regra é uma só: se não existe, lance <code>NotFoundError</code>. Em sistemas maiores, esse mesmo método poderia também checar permissão, calcular dados derivados, gravar log de auditoria — toda regra de domínio mora aqui.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/services/userService.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> { findById } <span class="hl-kw">from</span> <span class="hl-str">'../repositories/userRepository'</span>;
+<span class="hl-kw">import type</span> { <span class="hl-typ">User</span> } <span class="hl-kw">from</span> <span class="hl-str">'../models/user'</span>;
+<span class="hl-kw">import</span> { NotFoundError } <span class="hl-kw">from</span> <span class="hl-str">'../errors/AppError'</span>;
+
+<span class="hl-kw">export async function</span> <span class="hl-fn">getById</span>(id: <span class="hl-typ">number</span>): <span class="hl-typ">Promise&lt;User&gt;</span> {
+  <span class="hl-kw">const</span> user = <span class="hl-kw">await</span> <span class="hl-fn">findById</span>(id);
+  <span class="hl-kw">if</span> (!user) {
+    <span class="hl-kw">throw new</span> <span class="hl-fn">NotFoundError</span>(<span class="hl-str">`User ${id} not found`</span>);
+  }
+  <span class="hl-kw">return</span> user;
+}</code></pre>
+        </div>
+
+        <p>E o model — uma única interface compartilhada por todas as camadas:</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/models/user.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">export interface</span> <span class="hl-typ">User</span> {
+  id: <span class="hl-typ">number</span>;
+  name: <span class="hl-typ">string</span>;
+  email: <span class="hl-typ">string</span>;
+  created_at?: <span class="hl-typ">Date</span>;
+}</code></pre>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-label">Models como contratos</div>
+          <p>A <code>interface User</code> é importada por <em>todas</em> as camadas que tocam o conceito "usuário". Se amanhã você adicionar um campo <code>role</code> obrigatório, o TypeScript reclama em todos os lugares que ainda não enviam ou não consomem esse campo. É o contrato vivo entre as camadas.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 12. GREEN REPO + POOL ════════ -->
+      <section class="mat-section" id="sec-green-repo">
+        <h2>12. <span class="stage green">GREEN</span>Repository + Pool — SQL parametrizado</h2>
+
+        <p>O repository é a fronteira entre a aplicação e o banco. <strong>Toda</strong> consulta SQL deve viver aqui — nunca em controllers ou services. Isso facilita revisão de segurança (você sabe onde procurar), facilita troca de banco (se um dia migrar para outro driver, só essa camada muda) e facilita teste (você pode mockar a função inteira em vez de mockar o pool).</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/db/pool.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> { <span class="hl-typ">Pool</span> } <span class="hl-kw">from</span> <span class="hl-str">'pg'</span>;
+<span class="hl-kw">import</span> dotenv <span class="hl-kw">from</span> <span class="hl-str">'dotenv'</span>;
+
+dotenv.<span class="hl-fn">config</span>();
+
+<span class="hl-kw">export const</span> pool = <span class="hl-kw">new</span> <span class="hl-fn">Pool</span>({
+  connectionString: process.env.<span class="hl-typ">DATABASE_URL</span>
+});</code></pre>
+        </div>
+
+        <p>O <code>pg.Pool</code> mantém um conjunto de conexões reutilizáveis. Isso é crítico em produção: abrir uma conexão TCP por requisição é caríssimo. O pool reutiliza, balanceia e descarta automaticamente.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/repositories/userRepository.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> { pool } <span class="hl-kw">from</span> <span class="hl-str">'../db/pool'</span>;
+<span class="hl-kw">import type</span> { <span class="hl-typ">User</span> } <span class="hl-kw">from</span> <span class="hl-str">'../models/user'</span>;
+
+<span class="hl-kw">export async function</span> <span class="hl-fn">findById</span>(id: <span class="hl-typ">number</span>): <span class="hl-typ">Promise&lt;User | null&gt;</span> {
+  <span class="hl-kw">const</span> r = <span class="hl-kw">await</span> pool.<span class="hl-fn">query</span>&lt;<span class="hl-typ">User</span>&gt;(
+    <span class="hl-str">'SELECT * FROM users WHERE id = $1'</span>,
+    [id]
+  );
+  <span class="hl-kw">return</span> r.rows[<span class="hl-num">0</span>] ?? <span class="hl-kw">null</span>;
+}</code></pre>
+        </div>
+
+        <p>Repare em três detalhes que <em>parecem</em> pequenos mas são fundamentais. O <strong>marcador <code>$1</code></strong> com array <code>[id]</code> separa <em>código SQL</em> de <em>dado do usuário</em> — o driver do <code>pg</code> escapa o valor automaticamente, eliminando SQL injection. O <strong>tipo genérico <code>&lt;User&gt;</code></strong> diz ao TypeScript que <code>r.rows</code> é <code>User[]</code>, dando autocomplete e checagem do tipo de retorno. O <strong>operador <code>??</code></strong> (nullish coalescing) traduz "linha inexistente" em <code>null</code> explícito — evita devolver <code>undefined</code>, que é uma sutileza que pode confundir o service.</p>
+
+        <div class="callout callout-danger">
+          <div class="callout-label">SQL injection — não negociável</div>
+          <p>Nunca: <code>"SELECT * FROM users WHERE id = " + req.params.id</code>. O usuário pode mandar <code>1; DROP TABLE users;--</code> e isso é executado. Sempre use marcadores <code>$1, $2, ...</code> com o array de valores. O driver do <code>pg</code> faz o escape correto para você.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 13. GREEN HELPERS + ERRORS ════════ -->
+      <section class="mat-section" id="sec-green-helper">
+        <h2>13. <span class="stage green">GREEN</span>Helpers + Errors + Middleware</h2>
+
+        <p>Faltam três peças: o erro de domínio, o middleware que traduz para HTTP, e o helper puro. Os três juntos fecham o caminho do erro do banco de volta para o cliente.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/errors/AppError.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">export class</span> <span class="hl-typ">AppError</span> <span class="hl-kw">extends</span> <span class="hl-typ">Error</span> {
+  <span class="hl-fn">constructor</span>(
+    msg: <span class="hl-typ">string</span>,
+    <span class="hl-kw">public</span> status = <span class="hl-num">500</span>
+  ) {
+    <span class="hl-kw">super</span>(msg);
+  }
+}
+
+<span class="hl-kw">export class</span> <span class="hl-typ">NotFoundError</span> <span class="hl-kw">extends</span> <span class="hl-typ">AppError</span> {
+  <span class="hl-fn">constructor</span>(msg = <span class="hl-str">'Not Found'</span>) {
+    <span class="hl-kw">super</span>(msg, <span class="hl-num">404</span>);
+  }
+}</code></pre>
+        </div>
+
+        <p>Erros de domínio são <em>classes</em>, não strings. Isso permite que o middleware decida o que fazer baseado no <code>instanceof</code>, e dá ao service vocabulário para expressar a intenção: "esse user não foi encontrado" é diferente de "o banco caiu". Cada um vira uma classe.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/middlewares/errorHandler.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import type</span> { <span class="hl-typ">ErrorRequestHandler</span> } <span class="hl-kw">from</span> <span class="hl-str">'express'</span>;
+<span class="hl-kw">import</span> { AppError } <span class="hl-kw">from</span> <span class="hl-str">'../errors/AppError'</span>;
+
+<span class="hl-kw">export const</span> errorHandler: <span class="hl-typ">ErrorRequestHandler</span> = (err, _req, res, _next) =&gt; {
+  <span class="hl-kw">if</span> (err <span class="hl-kw">instanceof</span> <span class="hl-typ">AppError</span>) {
+    <span class="hl-kw">return</span> res.<span class="hl-fn">status</span>(err.status).<span class="hl-fn">json</span>({ error: err.message });
+  }
+  console.<span class="hl-fn">error</span>(err);
+  res.<span class="hl-fn">status</span>(<span class="hl-num">500</span>).<span class="hl-fn">json</span>({ error: <span class="hl-str">'Internal Server Error'</span> });
+};</code></pre>
+        </div>
+
+        <p>O middleware é um interceptador de erro: o Express chama-o quando algum middleware ou handler chama <code>next(err)</code>. Se for um <code>AppError</code> nosso, devolvemos o status correto (404, 400, 422, etc.) com mensagem amigável. Se for qualquer outro erro, devolvemos 500 com mensagem genérica — e logamos o erro real no servidor (nunca exponha stack trace ao cliente em produção).</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/helpers/email.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">const</span> RX = <span class="hl-str">/^[^\s@]+@[^\s@]+\.[^\s@]+$/</span>;
+
+<span class="hl-kw">export function</span> <span class="hl-fn">isValidEmail</span>(s: <span class="hl-typ">string</span>): <span class="hl-typ">boolean</span> {
+  <span class="hl-kw">return</span> RX.<span class="hl-fn">test</span>(s);
+}</code></pre>
+        </div>
+
+        <p>O helper é proposital simples — é um detector básico, não validador definitivo de RFC 5322 (que é absurdamente complexo). Para a maioria dos casos práticos, "tem caractere antes do @, depois do @ e tem ponto no domínio" é o suficiente. Se você precisa de mais rigor, use uma biblioteca como <code>validator</code>; mas comece simples.</p>
+
+        <div class="callout callout-tip">
+          <div class="callout-label">Tudo verde — agora podemos refatorar</div>
+          <p>Com os 4 specs passando, temos a rede de segurança completa. <code>npm test</code> vira o sinal verde para mexer no código com confiança.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 14. REFACTOR ════════ -->
+      <section class="mat-section" id="sec-refactor">
+        <h2>14. <span class="stage ref">REFACTOR</span>Refatorar com testes verdes</h2>
+
+        <p>Refatoração é mudar a forma do código <strong>sem mudar o comportamento</strong>. É exatamente onde TDD brilha: você sabe que o comportamento não mudou porque os testes continuam verdes. Sem testes, refatorar é apostar; com testes, é trabalho de oficina.</p>
+
+        <h3>Extrair <code>asyncHandler</code></h3>
+        <p>Toda função controller que usamos repete o padrão <code>try { ... } catch (e) { next(e); }</code>. Isso é ruído. Podemos extrair um wrapper que faz isso uma única vez:</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/helpers/asyncHandler.ts<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import type</span> { <span class="hl-typ">RequestHandler</span> } <span class="hl-kw">from</span> <span class="hl-str">'express'</span>;
+
+<span class="hl-kw">export const</span> asyncHandler =
+  (fn: <span class="hl-typ">RequestHandler</span>): <span class="hl-typ">RequestHandler</span> =&gt;
+  (req, res, next) =&gt; {
+    <span class="hl-typ">Promise</span>.<span class="hl-fn">resolve</span>(<span class="hl-fn">fn</span>(req, res, next)).<span class="hl-fn">catch</span>(next);
+  };</code></pre>
+        </div>
+
+        <p>Com isso, o controller fica:</p>
+
+        <div class="code-wrap">
+          <div class="code-label">src/controllers/userController.ts (refatorado)<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> { asyncHandler } <span class="hl-kw">from</span> <span class="hl-str">'../helpers/asyncHandler'</span>;
+<span class="hl-kw">import</span> * <span class="hl-kw">as</span> svc <span class="hl-kw">from</span> <span class="hl-str">'../services/userService'</span>;
+
+<span class="hl-kw">export const</span> show = <span class="hl-fn">asyncHandler</span>(<span class="hl-kw">async</span> (req, res) =&gt; {
+  <span class="hl-kw">const</span> user = <span class="hl-kw">await</span> svc.<span class="hl-fn">getById</span>(<span class="hl-typ">Number</span>(req.params.id));
+  res.<span class="hl-fn">json</span>(user);
+});</code></pre>
+        </div>
+
+        <p>Rode <code>npm test</code>. Tudo verde? Boa, a refatoração foi correta. Vermelho? Algo quebrou — desfaça e tente outra abordagem. Esse é o ritmo do TDD: <strong>passos pequenos, ciclos curtos</strong>.</p>
+
+        <h3>Outras refatorações comuns</h3>
+        <ul>
+          <li><strong>Extrair validação</strong> para <code>helpers/</code> — o que era um <code>if</code> no controller vira uma função pura testável.</li>
+          <li><strong>Tipar callbacks</strong> com <code>RequestHandler</code> em vez de <code>(req, res, next)</code> soltos — mais conciso e seguro.</li>
+          <li><strong>Promover constantes mágicas</strong> (status 404, mensagens) a constantes nomeadas — facilita mudança e leitura.</li>
+        </ul>
+
+        <div class="callout callout-deep">
+          <div class="callout-label">Aprofundamento</div>
+          <p>Existe uma diferença entre <strong>refactor</strong> e <strong>add feature</strong>. Refatorar não muda comportamento — adicionar feature muda. Misturar os dois numa única mudança é a fonte de muitos bugs. A regra de Kent Beck é: troque de chapéu. Quando estiver de "chapéu de refactor", os testes não mudam. Quando estiver de "chapéu de feature", você primeiro escreve um novo teste vermelho.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 15. COVERAGE ════════ -->
+      <section class="mat-section" id="sec-coverage">
+        <h2>15. Coverage — métrica, não meta</h2>
+
+        <p>Coverage (cobertura de código) é a porcentagem do código fonte que é executado durante os testes. O Jest mostra para você com <code>jest --coverage</code>:</p>
+
+        <div class="code-wrap">
+          <div class="code-label">terminal — saída de coverage<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-cmt">$ npm test -- --coverage</span>
+
+----------------------|---------|----------|---------|---------|
+File                  | % Stmts | % Branch | % Funcs | % Lines |
+----------------------|---------|----------|---------|---------|
+All files             |   89.47 |    66.67 |   85.71 |   89.47 |
+ controllers          |   <span class="hl-str">100.00</span> |   <span class="hl-str">100.00</span> |   <span class="hl-str">100.00</span> |   <span class="hl-str">100.00</span> |
+ services             |   <span class="hl-str">100.00</span> |   <span class="hl-str">100.00</span> |   <span class="hl-str">100.00</span> |   <span class="hl-str">100.00</span> |
+ repositories         |   <span class="hl-str">100.00</span> |    50.00 |   <span class="hl-str">100.00</span> |   <span class="hl-str">100.00</span> |
+ helpers              |   <span class="hl-str">100.00</span> |   <span class="hl-str">100.00</span> |   <span class="hl-str">100.00</span> |   <span class="hl-str">100.00</span> |
+----------------------|---------|----------|---------|---------|</code></pre>
+        </div>
+
+        <p>Coverage é útil para <strong>encontrar buracos</strong> — código que nunca é executado nos testes. Mas é péssimo como <em>meta</em>. Buscar 100% de cobertura por si só leva a testes vazios: testes sem asserção real, testes que apenas chamam funções para "marcar a linha como coberta", testes que validam mocks em vez de comportamento. Esses testes mentem para você — o relatório fica verde mas o código está sem rede.</p>
+
+        <div class="callout callout-warn">
+          <div class="callout-label">Heurística de qualidade</div>
+          <p>Se um teste pode ser deletado sem que você se sinta menos seguro, ele provavelmente está mentindo. Foque em <strong>cobrir comportamentos</strong>, não linhas. 80% de cobertura com testes de qualidade vale infinitamente mais do que 100% com testes vazios.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 16. RM-ODP ════════ -->
+      <section class="mat-section" id="sec-rmodp">
+        <h2>16. RM-ODP — onde mora o que escrevemos hoje</h2>
+
+        <p>O framework RM-ODP (ISO/IEC 10746) define cinco viewpoints para descrever um sistema distribuído. O back-end de hoje toca todas elas, mas o foco principal é a visão <strong>Computational</strong>: como o sistema se decompõe em componentes (controller, service, repository) com interfaces explícitas.</p>
+
+        <div class="odp-stack" id="odp-stack">
+          <div class="odp-layer" style="background:#dbeafe;">
+            <div class="odp-icon">&#127970;</div>
+            <div>
+              <div class="odp-name">Enterprise (Empresarial)</div>
+              <div class="odp-desc">"O sistema deve permitir consultar usuários cadastrados via API HTTP" — esse é o requisito de negócio que justifica a existência do endpoint <code>GET /users/:id</code>.</div>
+              <span class="odp-focus" style="background:#dbeafe;color:#1d4ed8;">RF — propósito do recurso</span>
+            </div>
+          </div>
+          <div class="odp-layer" style="background:#dcfce7;">
+            <div class="odp-icon">&#128203;</div>
+            <div>
+              <div class="odp-name">Information (Informação)</div>
+              <div class="odp-desc">A <code>interface User</code> é a definição da informação. Ela é compartilhada por todas as camadas e estabelece o contrato sobre o que é um usuário no sistema.</div>
+              <span class="odp-focus" style="background:#dcfce7;color:#15803d;">interface User = contrato compartilhado</span>
+            </div>
+          </div>
+          <div class="odp-layer" style="background:#dbeafe;">
+            <div class="odp-icon">&#9881;</div>
+            <div>
+              <div class="odp-name">Computational (Computacional) ◀ foco da aula</div>
+              <div class="odp-desc">A decomposição em controller, service, repository, helpers. Cada componente tem uma interface clara (assinatura tipada). Os specs descrevem o contrato de cada componente.</div>
+              <span class="odp-focus" style="background:#dbeafe;color:#1d4ed8;">controller / service / repository / helper</span>
+            </div>
+          </div>
+          <div class="odp-layer" style="background:#fef3c7;">
+            <div class="odp-icon">&#128295;</div>
+            <div>
+              <div class="odp-name">Engineering (Engenharia)</div>
+              <div class="odp-desc">O <code>pg.Pool</code> que gerencia conexões TCP, o middleware que intercepta erros, o servidor Express que serializa JSON. Mecanismos que sustentam o sistema computacional.</div>
+              <span class="odp-focus" style="background:#fef3c7;color:#92400e;">Pool, middleware, JSON serialization</span>
+            </div>
+          </div>
+          <div class="odp-layer" style="background:#fee2e2;">
+            <div class="odp-icon">&#128187;</div>
+            <div>
+              <div class="odp-name">Technology (Tecnologia)</div>
+              <div class="odp-desc">Node.js LTS, TypeScript ES2022, Express 4, driver <code>pg</code>, Jest 29, supertest. A escolha tecnológica concreta.</div>
+              <span class="odp-focus" style="background:#fee2e2;color:#b91c1c;">Node + TypeScript + Express + pg</span>
+            </div>
+          </div>
+        </div>
+
+        <p>A escolha de TDD top-down não é gratuita — ela espelha a hierarquia das visões: começamos pelo <em>uso</em> (Computational, perto do Enterprise) e descemos até o <em>mecanismo</em> (Engineering/Technology). Cada spec é um contrato em uma das visões.</p>
+      </section>
+
+      <!-- ════════ 17. RF, RN, RNF ════════ -->
+      <section class="mat-section" id="sec-req">
+        <h2>17. RF, RN e RNF aplicados ao back-end</h2>
+
+        <h3>Requisitos Funcionais (RF)</h3>
+        <p>Cada endpoint do back-end implementa um ou mais RFs. O endpoint da aula resolve um único RF, mas o método se replica para todos:</p>
+
+        <table class="mat-table">
+          <thead><tr><th>RF</th><th>Descrição</th><th>Camada principal</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><span class="tag tag-blue">RF-04</span></td>
+              <td>O sistema deve permitir consultar um usuário pelo seu ID via API HTTP</td>
+              <td><code>GET /users/:id</code> — controller, service, repository</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-green">RF-05</span></td>
+              <td>O sistema deve responder com 404 quando o usuário não existir</td>
+              <td>service lança <code>NotFoundError</code> + middleware</td>
+            </tr>
+            <tr>
+              <td><span class="tag tag-purple">RF-06</span></td>
+              <td>O sistema deve validar o formato de email no cadastro</td>
+              <td>helper <code>isValidEmail</code> + service</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Regras de Negócio (RN)</h3>
+        <p>RNs aparecem como condições e validações dentro do service. Por exemplo: "RN-02: Usuário inativo não pode ser retornado em consulta pública". Isso vira um filtro no service ou um campo extra no <code>WHERE</code> do repository — depende da decisão arquitetural.</p>
+
+        <h3>Requisitos Não Funcionais (RNF)</h3>
+
+        <div class="eixo-grid" id="eixo-grid">
+          <div class="eixo-card" style="border-top-color:#3178c6;">
+            <span class="eixo-tag" style="color:#3178c6;">RNF — Manutenibilidade</span>
+            <div class="eixo-title">Cobertura de testes acima de 70%</div>
+            <div class="eixo-q">Cada arquivo de produção tem um spec ao lado, executado pelo CI antes de merge?</div>
+            <div class="eixo-example">Evidência: arquivos <code>.spec.ts</code> ao lado de cada módulo; <code>jest --coverage</code> roda no CI</div>
+          </div>
+          <div class="eixo-card" style="border-top-color:#dc2626;">
+            <span class="eixo-tag" style="color:#dc2626;">RNF — Segurança</span>
+            <div class="eixo-title">Resistência a SQL injection</div>
+            <div class="eixo-q">Toda query usa marcadores parametrizados em vez de concatenação?</div>
+            <div class="eixo-example">Evidência: spec do repository força uso de <code>$1</code>; revisão pega qualquer concatenação direta</div>
+          </div>
+          <div class="eixo-card" style="border-top-color:#0d9488;">
+            <span class="eixo-tag" style="color:#0d9488;">RNF — Confiabilidade</span>
+            <div class="eixo-title">Erros tratados sem vazar stack ao cliente</div>
+            <div class="eixo-q">Erros não-AppError viram 500 genérico, com stack só no log do servidor?</div>
+            <div class="eixo-example">Evidência: middleware <code>errorHandler</code>; spec verifica formato da resposta de erro</div>
+          </div>
+          <div class="eixo-card" style="border-top-color:#7c3aed;">
+            <span class="eixo-tag" style="color:#7c3aed;">RNF — Observabilidade</span>
+            <div class="eixo-title">Logs estruturados de erro 500</div>
+            <div class="eixo-q">Cada erro inesperado é registrado com timestamp e contexto?</div>
+            <div class="eixo-example">Evidência: <code>console.error(err)</code> no middleware (evolui para Pino/Winston)</div>
+          </div>
+        </div>
+
+        <div class="callout callout-info">
+          <div class="callout-label">Como TDD ajuda RNFs</div>
+          <p>RNFs como manutenibilidade e segurança são <em>verificáveis por testes</em>. O spec do repository não só prova que a query funciona — ele <strong>impõe</strong> o uso de marcadores parametrizados. Mudou a query para concatenação? O teste falha. Esse é o poder do TDD: virar políticas em código executável.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 18. CHECKLIST ════════ -->
+      <section class="mat-section" id="sec-checklist">
+        <h2>18. Checklist de Estudo</h2>
+        <p>Clique nos itens à medida que dominar cada conceito:</p>
+        <ul class="checklist" id="checklist">
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei explicar por que TDD top-down começa pelo controller e não pelo helper.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Configurei <code>tsconfig.json</code> em modo strict e entendo cada flag.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Configurei <code>jest.config.ts</code> com <code>ts-jest</code> e <code>testMatch: ['**/*.spec.ts']</code>.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei usar <code>supertest</code> para disparar requisições HTTP contra o app sem subir porta.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Escrevi um spec de controller que mocka o service e cobre 200 e 404.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Escrevi um spec de service que mocka o repository e cobre caminho feliz e <code>NotFoundError</code>.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Escrevi um spec de repository que mocka o pool e prova uso de <code>$1</code>.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Escrevi um spec de helper puro com vários casos felizes e infelizes.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Implementei controller e rotas <strong>antes</strong> das outras camadas (top-down).</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei diferenciar <code>toBe</code>, <code>toEqual</code>, <code>toMatchObject</code> e quando usar cada um.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei explicar AAA (Arrange / Act / Assert) com um exemplo próprio.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Refatorei pelo menos uma duplicação com testes verdes (ex.: <code>asyncHandler</code>).</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei explicar por que coverage é métrica e não meta.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Localizo o trabalho desta aula na visão Computational do RM-ODP.</span></li>
+        </ul>
+      </section>
+
+      <!-- ════════ REFERÊNCIAS ════════ -->
+      <section class="mat-section" id="sec-refs">
+        <h2>Referências</h2>
+        <ul>
+          <li><a href="https://www.typescriptlang.org/docs/handbook/intro.html" target="_blank" rel="noopener noreferrer">TypeScript Handbook</a> — documentação oficial: tipos, generics, narrowing, strict mode</li>
+          <li><a href="https://expressjs.com/" target="_blank" rel="noopener noreferrer">Express.js — Documentation</a> — guia oficial: routing, middleware, error handling</li>
+          <li><a href="https://jestjs.io/docs/getting-started" target="_blank" rel="noopener noreferrer">Jest — Getting Started</a> — referência completa de matchers, mocks e configuração</li>
+          <li><a href="https://github.com/ladjs/supertest#readme" target="_blank" rel="noopener noreferrer">supertest — README</a> — exemplos de teste HTTP em Node</li>
+          <li><a href="https://kulshekhar.github.io/ts-jest/" target="_blank" rel="noopener noreferrer">ts-jest — Documentation</a> — integração TypeScript + Jest</li>
+          <li><a href="https://node-postgres.com/" target="_blank" rel="noopener noreferrer">node-postgres (pg) — Documentation</a> — driver oficial do Postgres para Node</li>
+          <li><a href="https://martinfowler.com/bliki/TestDrivenDevelopment.html" target="_blank" rel="noopener noreferrer">Martin Fowler — Test Driven Development</a> — visão geral pragmática do TDD</li>
+          <li><a href="https://www.iso.org/standard/20696.html" target="_blank" rel="noopener noreferrer">ISO/IEC 10746 — RM-ODP</a> — Reference Model for Open Distributed Processing</li>
+          <li>Kent Beck — <em>Test-Driven Development: By Example</em>. Livro fundamental do RED → GREEN → REFACTOR.</li>
+        </ul>
+      </section>
+
+    </article>
+  </div>
+
+  <div class="text-center py-4">
+    <img src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1769427095/9c2796bb-d4da-4f4e-846a-d38d547249ee_pwwh3l.png" alt="Inteli Logo" style="max-width:140px;">
+  </div>
+  <footer class="py-4 bg-light border-top">
+    <div class="container text-center">
+      <p class="mb-1">Material criado pelo professor <strong>Afonso Brandão</strong> para o <strong>Inteli</strong>.</p>
+      <small class="text-muted">Licença de leitura aberta</small>
+    </div>
+  </footer>
+
+  <script>
+    const floatNav = document.getElementById('float-nav');
+    const matHeader = document.querySelector('.mat-header');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+      document.getElementById('progress-bar').style.width = pct + '%';
+      const headerBottom = matHeader.getBoundingClientRect().bottom;
+      if (headerBottom < 0) { floatNav.classList.add('visible'); }
+      else { floatNav.classList.remove('visible'); }
+    });
+
+    const srObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('vis'); srObserver.unobserve(e.target); }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.sr').forEach(el => srObserver.observe(el));
+
+    const odpObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        document.querySelectorAll('.odp-layer').forEach((el, i) => {
+          setTimeout(() => el.classList.add('reveal'), i * 220);
+        });
+        odpObserver.disconnect();
+      }
+    }, { threshold: 0.1 });
+    const odpStack = document.getElementById('odp-stack');
+    if (odpStack) odpObserver.observe(odpStack);
+
+    const eixoObserver = new IntersectionObserver((entries) => {
+      if (entries[0].isIntersecting) {
+        document.querySelectorAll('.eixo-card').forEach((el, i) => {
+          setTimeout(() => el.classList.add('reveal'), i * 120);
+        });
+        eixoObserver.disconnect();
+      }
+    }, { threshold: 0.1 });
+    const eixoGrid = document.getElementById('eixo-grid');
+    if (eixoGrid) eixoObserver.observe(eixoGrid);
+
+    function toggleDeep(header) {
+      header.classList.toggle('open');
+      const body = header.nextElementSibling;
+      body.classList.toggle('open');
+    }
+
+    function toggleCk(li) {
+      li.classList.toggle('done');
+    }
+
+    function copyCode(btn) {
+      const pre = btn.closest('.code-wrap').querySelector('pre');
+      navigator.clipboard.writeText(pre.innerText).then(() => {
+        btn.textContent = 'copiado ok';
+        setTimeout(() => btn.textContent = 'copiar', 2000);
+      });
+    }
+
+    const sections = document.querySelectorAll('.mat-section[id]');
+    const tocLinks = document.querySelectorAll('.mat-toc a');
+    const tocObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const id = e.target.id;
+          tocLinks.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(s => tocObserver.observe(s));
+  </script>
+</body>
+</html>

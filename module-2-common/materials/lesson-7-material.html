@@ -1,0 +1,832 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Aula 7 — Front-End I — HTML, DOM e JS com SSR + EJS — Material — Inteli</title>
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="../../css/inteli-styles.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --ac:#4b5563; --hi:#b2b6bf; --dk:#2e2640; --gr:#0d9488; --re:#dc2626; --am:#d97706;
+      --text:#1e293b; --muted:#64748b; --border:#e2e8f0; --bg:#f8fafc; --card:#ffffff;
+    }
+    *, *::before, *::after { box-sizing: border-box; }
+    body { font-family:'Manrope',sans-serif; color:var(--text); background:var(--bg); }
+
+    #progress-bar { position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--ac),var(--hi)); width:0%; z-index:9999; transition:width .1s; }
+
+    #float-nav { position:fixed; bottom:28px; right:28px; display:flex; flex-direction:column; gap:8px; z-index:9998; opacity:0; pointer-events:none; transform:translateY(12px); transition:opacity .3s,transform .3s; }
+    #float-nav.visible { opacity:1; pointer-events:auto; transform:translateY(0); }
+    .fn-btn { display:flex; align-items:center; gap:6px; padding:10px 16px; border-radius:999px; font-size:.82rem; font-weight:700; text-decoration:none; box-shadow:0 4px 18px rgba(0,0,0,.25); transition:transform .15s,box-shadow .15s; white-space:nowrap; }
+    .fn-btn:hover { transform:translateY(-2px); box-shadow:0 6px 24px rgba(0,0,0,.32); text-decoration:none; }
+    .fn-btn-slides { background:white; color:var(--ac); border:2px solid var(--ac); }
+    .fn-btn-back   { background:var(--dk); color:white; }
+
+    .mat-header { background:linear-gradient(135deg,#1f2937 0%,#4b5563 50%,#b2b6bf 100%); color:white; padding:40px 0 32px; }
+    .mat-header h1 { font-size:2.2rem; font-weight:800; margin:0 0 8px; }
+    .mat-header .subtitle { font-size:1rem; opacity:.85; margin:0 0 20px; }
+    .mat-badge { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); color:white; padding:4px 14px; border-radius:999px; font-size:.78rem; font-weight:700; display:inline-block; margin-bottom:12px; }
+
+    .mat-layout { display:grid; grid-template-columns:260px 1fr; gap:32px; max-width:1200px; margin:0 auto; padding:40px 24px; }
+    @media(max-width:900px){ .mat-layout { grid-template-columns:1fr; } .mat-sidebar { display:none; } }
+
+    .mat-sidebar { position:sticky; top:24px; max-height:calc(100vh - 48px); overflow-y:auto; }
+    .mat-toc { background:var(--card); border-radius:14px; padding:20px; border:1px solid var(--border); box-shadow:0 2px 8px rgba(0,0,0,.05); }
+    .mat-toc h4 { font-size:.8rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; color:var(--muted); margin:0 0 12px; }
+    .mat-toc a { display:block; color:var(--muted); text-decoration:none; font-size:.82rem; padding:4px 0 4px 12px; border-left:2px solid transparent; transition:all .2s; line-height:1.3; }
+    .mat-toc a:hover, .mat-toc a.active { color:var(--ac); border-left-color:var(--ac); }
+    .mat-toc .toc-h3 { padding-left:22px; font-size:.77rem; }
+
+    .mat-article { min-width:0; }
+    .mat-section { margin-bottom:56px; }
+    .mat-section h2 { font-size:1.75rem; font-weight:800; color:var(--dk); padding-bottom:12px; border-bottom:2px solid var(--border); margin:0 0 24px; scroll-margin-top:80px; }
+    .mat-section h3 { font-size:1.2rem; font-weight:700; color:var(--dk); margin:32px 0 12px; scroll-margin-top:80px; }
+    .mat-section h4 { font-size:1rem; font-weight:700; color:var(--dk); margin:24px 0 10px; }
+    .mat-section p { line-height:1.8; margin-bottom:16px; font-size:.97rem; color:#374151; }
+    .mat-section ul, .mat-section ol { padding-left:1.5rem; margin-bottom:16px; }
+    .mat-section li { line-height:1.75; font-size:.97rem; color:#374151; margin-bottom:4px; }
+    .mat-section strong { color:var(--dk); }
+    .mat-section code { background:#eef2f7; color:#1f2937; padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:.84em; }
+
+    .callout { border-radius:12px; padding:16px 20px; margin:20px 0; border-left:4px solid; }
+    .callout-info  { background:#eff6ff; border-color:#3b82f6; }
+    .callout-warn  { background:#fffbeb; border-color:#f59e0b; }
+    .callout-danger{ background:#fef2f2; border-color:#ef4444; }
+    .callout-tip   { background:#f0fdf4; border-color:#22c55e; }
+    .callout-deep  { background:#f5f3ff; border-color:#8b5cf6; }
+    .callout-label { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; margin-bottom:6px; }
+    .callout-info  .callout-label { color:#3b82f6; }
+    .callout-warn  .callout-label { color:#f59e0b; }
+    .callout-danger .callout-label { color:#ef4444; }
+    .callout-tip   .callout-label { color:#22c55e; }
+    .callout-deep  .callout-label { color:#8b5cf6; }
+    .callout p { margin:0; font-size:.91rem; line-height:1.65; color:#374151; }
+
+    .code-wrap { position:relative; margin:20px 0; border-radius:12px; overflow:hidden; box-shadow:0 4px 16px rgba(0,0,0,.15); }
+    .code-label { background:#313244; color:#6c7086; font-size:.7rem; font-weight:700; padding:6px 14px; font-family:'JetBrains Mono',monospace; display:flex; justify-content:space-between; align-items:center; }
+    .code-copy { background:transparent; border:1px solid #6c7086; color:#cdd6f4; font-size:.65rem; padding:2px 8px; border-radius:5px; cursor:pointer; font-family:'JetBrains Mono',monospace; transition:all .2s; }
+    .code-copy:hover { background:#6c7086; color:white; }
+    pre.code-block { background:#1e1e2e; color:#cdd6f4; padding:18px 20px; margin:0; font-family:'JetBrains Mono',monospace; font-size:.82rem; line-height:1.75; overflow-x:auto; }
+    pre.code-block code { font-family:inherit; background:transparent; color:inherit; padding:0; }
+    .hl-kw  { color:#89b4fa; font-weight:600; }
+    .hl-str { color:#a6e3a1; }
+    .hl-num { color:#fab387; }
+    .hl-cmt { color:#6c7086; font-style:italic; }
+    .hl-typ { color:#cba6f7; }
+    .hl-fn  { color:#f9e2af; }
+    .hl-tag { color:#f38ba8; }
+    .hl-att { color:#fab387; }
+    .hl-val { color:#a6e3a1; }
+
+    .mat-table { width:100%; border-collapse:collapse; margin:20px 0; border-radius:10px; overflow:hidden; border:1px solid var(--border); font-size:.88rem; }
+    .mat-table thead th { background:var(--dk); color:white; padding:12px 16px; text-align:left; font-size:.8rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+    .mat-table tbody td { padding:10px 16px; border-bottom:1px solid var(--border); line-height:1.5; }
+    .mat-table tbody tr:last-child td { border-bottom:none; }
+    .mat-table tbody tr:hover { background:#f8fafc; }
+    .tag { display:inline-block; padding:2px 8px; border-radius:5px; font-size:.72rem; font-weight:700; }
+    .tag-blue  { background:#dbeafe; color:#1d4ed8; }
+    .tag-green { background:#dcfce7; color:#15803d; }
+    .tag-red   { background:#fee2e2; color:#b91c1c; }
+    .tag-purple{ background:#ede9fe; color:#7c3aed; }
+    .tag-amber { background:#fef3c7; color:#92400e; }
+
+    .vs-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:20px 0; }
+    @media(max-width:700px){ .vs-grid { grid-template-columns:1fr; } }
+    .vs-card { border-radius:12px; padding:16px 18px; border:2px solid; }
+    .vs-card.ssr { background:#ecfdf5; border-color:#0d9488; }
+    .vs-card.csr { background:#fff7ed; border-color:#d97706; }
+    .vs-card h3 { margin:0 0 6px; font-size:1.05rem; font-weight:800; color:var(--dk); }
+    .vs-card .vs-sub { font-size:.82rem; color:var(--muted); margin-bottom:8px; }
+    .vs-card ul { margin:0; padding-left:1.1rem; }
+    .vs-card li { font-size:.86rem; color:#374151; margin-bottom:4px; }
+
+    .ej-grid { display:grid; grid-template-columns:repeat(auto-fit,minmax(220px,1fr)); gap:12px; margin:20px 0; }
+    .ej-card { background:var(--card); border:1px solid var(--border); border-radius:12px; padding:14px 16px; border-top:4px solid; }
+    .ej-card.escape { border-top-color:#0d9488; }
+    .ej-card.raw    { border-top-color:#dc2626; }
+    .ej-card.logic  { border-top-color:#4b5563; }
+    .ej-card.include{ border-top-color:#8b5cf6; }
+    .ej-tag { font-family:'JetBrains Mono',monospace; font-size:.86rem; font-weight:800; background:#1e1e2e; color:#fab387; padding:4px 10px; border-radius:6px; display:inline-block; margin-bottom:8px; }
+    .ej-name { font-size:.9rem; font-weight:700; color:var(--dk); margin-bottom:4px; }
+    .ej-desc { font-size:.82rem; color:#374151; line-height:1.5; }
+
+    .checklist { list-style:none; padding:0; margin:20px 0; }
+    .checklist li { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--border); font-size:.9rem; color:#374151; cursor:pointer; user-select:none; }
+    .checklist li:last-child { border-bottom:none; }
+    .ck-box { width:20px; height:20px; border:2px solid var(--border); border-radius:5px; flex-shrink:0; display:flex; align-items:center; justify-content:center; transition:all .2s; margin-top:2px; }
+    .checklist li.done .ck-box { background:var(--gr); border-color:var(--gr); color:white; }
+    .checklist li.done .ck-text { text-decoration:line-through; color:var(--muted); }
+
+    .sr { opacity:0; transform:translateY(24px); transition:opacity .5s ease,transform .5s ease; }
+    .sr.vis { opacity:1; transform:translateY(0); }
+  </style>
+</head>
+<body>
+  <div id="progress-bar"></div>
+
+  <div id="float-nav">
+    <a href="../slides/slide-lesson-7.html" class="fn-btn fn-btn-slides">&#9654; Slides</a>
+    <a href="../../index.html" class="fn-btn fn-btn-back">&#8592; Módulo</a>
+  </div>
+
+  <header class="mat-header">
+    <div class="container">
+      <div class="mat-badge">Módulo 2 · Ciclo Comum · IN02</div>
+      <h1>Front-End I — HTML, DOM e JavaScript com SSR + EJS</h1>
+      <p class="subtitle">Aula 7 — Material de Leitura Aprofundado</p>
+      <div class="d-flex gap-2 flex-wrap">
+        <a href="../slides/slide-lesson-7.html" class="btn btn-light btn-sm">&#9654; Slides</a>
+        <a href="../../index.html" class="btn btn-outline-light btn-sm">&#8592; Voltar ao Módulo</a>
+      </div>
+    </div>
+  </header>
+
+  <div class="mat-layout">
+
+    <!-- ── Sidebar ── -->
+    <aside class="mat-sidebar">
+      <div class="mat-toc">
+        <h4>Neste material</h4>
+        <a href="#sec-ssr-csr">1. SSR vs CSR vs Hydration</a>
+        <a href="#sec-setup">2. Setup do EJS no Express</a>
+        <a href="#sec-views">3. Estrutura de views/ e partials</a>
+        <a href="#sec-syntax">4. Sintaxe EJS — as 4 tags</a>
+        <a href="#sec-render">5. Controller chamando res.render</a>
+        <a href="#sec-semantic">6. HTML semântico</a>
+        <a href="#sec-forms">7. Forms tradicionais</a>
+        <a href="#sec-static">8. Static files</a>
+        <a href="#sec-dom">9. DOM essencial</a>
+        <a href="#sec-events">10. Eventos no DOM</a>
+        <a href="#sec-server-script">11. Passando dados server → script</a>
+        <a href="#sec-validation">12. Validação dupla</a>
+        <a href="#sec-xss">13. Segurança · XSS</a>
+        <a href="#sec-helpers">14. Helpers EJS via app.locals</a>
+        <a href="#sec-checklist">15. Checklist</a>
+        <a href="#sec-refs">Referências</a>
+      </div>
+    </aside>
+
+    <!-- ── Article ── -->
+    <article class="mat-article">
+
+      <!-- ════════ 1. SSR vs CSR ════════ -->
+      <section class="mat-section" id="sec-ssr-csr">
+        <h2>1. SSR vs CSR vs Hydration — quem monta o HTML?</h2>
+
+        <p>Toda página web exibida no navegador é, no fim, uma string de HTML. A diferença entre as estratégias modernas de front-end está em <strong>quem</strong> produz essa string e <strong>quando</strong>. As três abordagens dominantes hoje são: Server-Side Rendering (SSR), Client-Side Rendering (CSR) e a abordagem híbrida com hydration. Entender as diferenças não é trivia acadêmica — a escolha define a complexidade da sua build, o tempo de primeiro paint, o comportamento em buscadores e a dificuldade de fazer SEO e acessibilidade.</p>
+
+        <p>No <strong>Server-Side Rendering</strong>, o servidor recebe a requisição, consulta o banco, chama os serviços, monta a string de HTML completa (com os dados já preenchidos) e devolve essa string para o navegador. O navegador exibe a página imediatamente — não há "tela branca" esperando JavaScript. Para uma aplicação simples ou um projeto educacional, SSR é a escolha mais direta: você só precisa de um servidor Node.js, um template engine como EJS, e está pronto. Não há build step, não há bundle gigante, não há <code>node_modules</code> de mil pacotes para fazer um <code>&lt;h1&gt;</code> aparecer.</p>
+
+        <p>No <strong>Client-Side Rendering</strong>, o servidor devolve um HTML quase vazio — geralmente apenas uma <code>&lt;div id="app"&gt;&lt;/div&gt;</code> e uma referência a um arquivo JavaScript grande. O navegador baixa esse JS, o executa, e só então o JS faz <code>fetch</code> nos dados, monta o DOM dinamicamente e renderiza a interface. Essa é a abordagem clássica de SPAs (Single Page Applications) com React, Vue ou Angular sem framework de SSR. O resultado é uma navegação interna muito rápida (não há reload do navegador) ao custo de um primeiro paint mais lento e SEO problemático.</p>
+
+        <div class="vs-grid sr">
+          <div class="vs-card ssr">
+            <h3>🖥️ SSR — server monta tudo</h3>
+            <div class="vs-sub">Express + EJS — esta aula</div>
+            <ul>
+              <li>Primeiro paint imediato (HTML pronto)</li>
+              <li>SEO nativo — buscadores leem o HTML</li>
+              <li>Sem build pesado, sem webpack</li>
+              <li>Cada navegação = nova página completa</li>
+              <li>Fácil de depurar (View Source mostra o real)</li>
+            </ul>
+          </div>
+          <div class="vs-card csr">
+            <h3>🌐 CSR — client monta tudo</h3>
+            <div class="vs-sub">React/Vue/Angular puros</div>
+            <ul>
+              <li>Primeiro paint depende do JS chegar</li>
+              <li>SEO precisa de pre-rendering</li>
+              <li>Build complexo (Vite/webpack)</li>
+              <li>Navegação interna rápida (sem reload)</li>
+              <li>View Source mostra HTML vazio</li>
+            </ul>
+          </div>
+        </div>
+
+        <p>O <strong>hydration</strong> é a abordagem híbrida adotada por frameworks como Next.js, Nuxt e Remix. O servidor renderiza o HTML completo (como SSR), mas envia também o JS da aplicação. Quando o JS chega, ele "hidrata" o DOM existente, anexando event listeners e tornando a página interativa como uma SPA. O usuário vê o conteúdo rapidamente <em>e</em> ainda assim tem navegação fluida. O preço é a complexidade: você lida com dois mundos (server e client), com problemas como mismatches de hydration e bundle splitting.</p>
+
+        <div class="callout callout-info sr">
+          <div class="callout-label">Por que SSR para este projeto</div>
+          <p>Para a aula 7 e para o projeto integrador do módulo, escolhemos SSR puro com EJS por três razões: (1) nenhum tooling de build é necessário, (2) o aluno enxerga claramente a separação entre server (TypeScript) e client (JS de browser), (3) o resultado é debugável apenas com o "View Source" do navegador. Frameworks com hydration são poderosos, mas escondem o pipeline básico que o aluno precisa entender primeiro.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 2. Setup ════════ -->
+      <section class="mat-section" id="sec-setup">
+        <h2>2. Setup do EJS no Express</h2>
+
+        <p>Configurar o EJS é uma operação de duas linhas. O Express tem suporte built-in para template engines via <code>app.set('view engine', ...)</code>; basta instalar o pacote correspondente e apontar para o diretório de views. A partir desse ponto, qualquer chamada a <code>res.render('caminho/template')</code> dentro de um controller fará o Express procurar <code>views/caminho/template.ejs</code>, executar o template com os dados fornecidos e enviar o HTML resultante como resposta.</p>
+
+        <p>O EJS é uma das engines mais simples do ecossistema Node.js. Diferente de Pug (que tem sintaxe própria) ou Handlebars (que limita a lógica permitida no template), o EJS permite JavaScript puro dentro do template. Isso reduz a curva de aprendizado: se você sabe JS, sabe EJS. A contrapartida é que é fácil colocar lógica demais no template — disciplina pessoal e revisão de código resolvem.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">TS — src/app.ts <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> express <span class="hl-kw">from</span> <span class="hl-str">'express'</span>;
+<span class="hl-kw">import</span> path <span class="hl-kw">from</span> <span class="hl-str">'path'</span>;
+
+<span class="hl-kw">const</span> app = <span class="hl-fn">express</span>();
+
+<span class="hl-cmt">// 1. Diz ao Express qual engine usar para qualquer res.render(...)</span>
+app.<span class="hl-fn">set</span>(<span class="hl-str">'view engine'</span>, <span class="hl-str">'ejs'</span>);
+
+<span class="hl-cmt">// 2. Diretório base dos templates (.ejs)</span>
+app.<span class="hl-fn">set</span>(<span class="hl-str">'views'</span>, path.<span class="hl-fn">join</span>(__dirname, <span class="hl-str">'views'</span>));
+
+<span class="hl-cmt">// 3. Body parser para forms tradicionais (application/x-www-form-urlencoded)</span>
+app.<span class="hl-fn">use</span>(express.<span class="hl-fn">urlencoded</span>({ extended: <span class="hl-kw">true</span> }));
+
+<span class="hl-cmt">// 4. Static files (CSS, JS, imagens em /public)</span>
+app.<span class="hl-fn">use</span>(express.<span class="hl-fn">static</span>(<span class="hl-str">'public'</span>));
+
+app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</code></pre>
+        </div>
+
+        <p>A instalação é trivial: <code>npm install ejs</code>. O TypeScript não precisa de tipagens adicionais para o setup, pois <code>res.render</code> já é tipado pelo próprio Express. Note que <code>path.join(__dirname, 'views')</code> é uma boa prática — em vez de passar uma string relativa como <code>'./views'</code>, usar o diretório absoluto evita problemas quando o processo é iniciado a partir de outro diretório (comum em produção, com PM2 ou Docker).</p>
+
+        <div class="callout callout-warn sr">
+          <div class="callout-label">__dirname com ESM</div>
+          <p>Se você usar TypeScript com módulos ES (ESM, com <code>"type": "module"</code> no package.json), <code>__dirname</code> não existe. Nesse caso, derive-o de <code>import.meta.url</code>: <code>const __dirname = path.dirname(fileURLToPath(import.meta.url));</code>. Para o módulo 2, mantemos CommonJS (sem ESM) e o <code>__dirname</code> funciona naturalmente.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 3. Estrutura de views ════════ -->
+      <section class="mat-section" id="sec-views">
+        <h2>3. Estrutura de <code>views/</code> e partials</h2>
+
+        <p>Templates EJS, assim como qualquer estrutura de código, beneficiam-se de uma organização clara. A convenção que usaremos no projeto integrador segue dois princípios: <strong>organização por recurso</strong> (cada entidade do domínio tem sua própria pasta) e <strong>composição via partials</strong> (header, footer, navegação são reusados em todas as páginas). Isso evita o problema clássico de copiar e colar o mesmo <code>&lt;header&gt;</code> em vinte arquivos e ter que atualizar todos quando o logo muda.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">Estrutura — src/views/ <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code>src/views/
+├── layouts/
+│   └── main.ejs          <span class="hl-cmt"># shell HTML &lt;html&gt;...&lt;/html&gt;</span>
+├── partials/
+│   ├── header.ejs        <span class="hl-cmt"># &lt;header&gt; + nav</span>
+│   ├── footer.ejs        <span class="hl-cmt"># &lt;footer&gt;</span>
+│   └── flash.ejs         <span class="hl-cmt"># mensagens de sucesso/erro</span>
+├── home.ejs              <span class="hl-cmt"># GET /</span>
+├── users/
+│   ├── index.ejs         <span class="hl-cmt"># GET /users</span>
+│   ├── show.ejs          <span class="hl-cmt"># GET /users/:id</span>
+│   ├── new.ejs           <span class="hl-cmt"># GET /users/new (form)</span>
+│   └── edit.ejs          <span class="hl-cmt"># GET /users/:id/edit (form)</span>
+└── errors/
+    ├── 404.ejs
+    └── 500.ejs</code></pre>
+        </div>
+
+        <p>Os <strong>partials</strong> são pedaços de HTML pequenos e reusáveis. Tipicamente: o cabeçalho com logo e menu, o rodapé com créditos, blocos de mensagens flash, a sidebar de filtros. Você os inclui em qualquer template com a tag <code>&lt;%- include('caminho/relativo') %&gt;</code>. O caminho é relativo ao próprio template que faz o include — não ao diretório <code>views/</code>.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">EJS — views/users/index.ejs <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-cmt">&lt;%- include('../partials/header') %&gt;</span>
+
+<span class="hl-tag">&lt;main&gt;</span>
+  <span class="hl-tag">&lt;h1&gt;</span>Usuários<span class="hl-tag">&lt;/h1&gt;</span>
+  <span class="hl-tag">&lt;ul&gt;</span>
+    <span class="hl-cmt">&lt;% users.forEach(u =&gt; { %&gt;</span>
+      <span class="hl-tag">&lt;li&gt;</span><span class="hl-cmt">&lt;%= u.nome %&gt;</span><span class="hl-tag">&lt;/li&gt;</span>
+    <span class="hl-cmt">&lt;% }) %&gt;</span>
+  <span class="hl-tag">&lt;/ul&gt;</span>
+<span class="hl-tag">&lt;/main&gt;</span>
+
+<span class="hl-cmt">&lt;%- include('../partials/footer') %&gt;</span></code></pre>
+        </div>
+
+        <p>O EJS puro não tem o conceito de "layout" como o Pug ou o Handlebars têm — você precisa replicar o <code>&lt;html&gt;...&lt;/html&gt;</code> em cada template ou usar partials para o cabeçalho e rodapé. Para projetos pequenos isso é aceitável; para projetos maiores, o pacote <code>express-ejs-layouts</code> resolve, permitindo declarar um layout único e cada view só fornecer o conteúdo do <code>&lt;main&gt;</code>.</p>
+      </section>
+
+      <!-- ════════ 4. Sintaxe ════════ -->
+      <section class="mat-section" id="sec-syntax">
+        <h2>4. Sintaxe EJS — as 4 tags principais</h2>
+
+        <p>A sintaxe do EJS é minimalista. São, na prática, quatro tags que cobrem 95% dos casos. Todas elas são delimitadas por <code>&lt;%</code> e <code>%&gt;</code> — qualquer coisa fora desses delimitadores é HTML cru, copiado para a saída sem modificação. Dentro deles, JavaScript puro.</p>
+
+        <div class="ej-grid sr">
+          <div class="ej-card escape">
+            <span class="ej-tag">&lt;%= var %&gt;</span>
+            <div class="ej-name">Interpolação escapada</div>
+            <div class="ej-desc">Imprime o valor escapando caracteres HTML (<code>&lt;</code>, <code>&gt;</code>, <code>&amp;</code>, <code>'</code>, <code>"</code>). Esta é a tag <strong>padrão</strong> para qualquer conteúdo de variável. Defesa primária contra XSS.</div>
+          </div>
+          <div class="ej-card raw">
+            <span class="ej-tag">&lt;%- var %&gt;</span>
+            <div class="ej-name">Interpolação raw (não escapada)</div>
+            <div class="ej-desc">Imprime o valor sem escapar — HTML é renderizado como markup. <strong>Use apenas com conteúdo confiável</strong>: includes de partials, HTML pré-processado pelo servidor. Nunca para input do usuário.</div>
+          </div>
+          <div class="ej-card logic">
+            <span class="ej-tag">&lt;% código %&gt;</span>
+            <div class="ej-name">Lógica (não imprime)</div>
+            <div class="ej-desc">Bloco JavaScript executado mas sem output. Usado para <code>if</code>, <code>for</code>, <code>forEach</code>, declarações de variáveis. A combinação com <code>&lt;% } %&gt;</code> fecha estruturas.</div>
+          </div>
+          <div class="ej-card include">
+            <span class="ej-tag">&lt;%- include(...) %&gt;</span>
+            <div class="ej-name">Composição via partials</div>
+            <div class="ej-desc">Inclui outro template no lugar atual. Aceita um segundo argumento opcional: <code>include('partials/card', { title: 'Hi' })</code> — variáveis adicionais visíveis dentro do partial.</div>
+          </div>
+        </div>
+
+        <h3>Exemplo combinando todas as tags</h3>
+
+        <div class="code-wrap">
+          <div class="code-label">EJS — exemplo completo <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-cmt">&lt;%- include('partials/header', { title: 'Usuários' }) %&gt;</span>
+
+<span class="hl-tag">&lt;main&gt;</span>
+  <span class="hl-tag">&lt;h1&gt;</span>Olá, <span class="hl-cmt">&lt;%= currentUser.nome %&gt;</span>!<span class="hl-tag">&lt;/h1&gt;</span>
+
+  <span class="hl-cmt">&lt;% if (users.length === 0) { %&gt;</span>
+    <span class="hl-tag">&lt;p&gt;</span>Nenhum usuário cadastrado.<span class="hl-tag">&lt;/p&gt;</span>
+  <span class="hl-cmt">&lt;% } else { %&gt;</span>
+    <span class="hl-tag">&lt;ul&gt;</span>
+      <span class="hl-cmt">&lt;% users.forEach(u =&gt; { %&gt;</span>
+        <span class="hl-tag">&lt;li&gt;</span>
+          <span class="hl-tag">&lt;a href=</span><span class="hl-val">"/users/<span class="hl-cmt">&lt;%= u.id %&gt;</span>"</span><span class="hl-tag">&gt;</span>
+            <span class="hl-cmt">&lt;%= u.nome %&gt;</span> &mdash; <span class="hl-cmt">&lt;%= u.email %&gt;</span>
+          <span class="hl-tag">&lt;/a&gt;</span>
+        <span class="hl-tag">&lt;/li&gt;</span>
+      <span class="hl-cmt">&lt;% }) %&gt;</span>
+    <span class="hl-tag">&lt;/ul&gt;</span>
+  <span class="hl-cmt">&lt;% } %&gt;</span>
+<span class="hl-tag">&lt;/main&gt;</span>
+
+<span class="hl-cmt">&lt;%- include('partials/footer') %&gt;</span></code></pre>
+        </div>
+
+        <p>Note como cada tag tem um papel distinto: o <code>include</code> traz partials, o <code>&lt;%= %&gt;</code> imprime variáveis com escape, o <code>&lt;% if/forEach %&gt;</code> faz o controle de fluxo. Esse é o padrão que se repete em todos os seus templates.</p>
+
+        <table class="mat-table sr">
+          <thead><tr><th>Tag</th><th>Imprime?</th><th>Escapa HTML?</th><th>Quando usar</th></tr></thead>
+          <tbody>
+            <tr><td><code>&lt;%= var %&gt;</code></td><td>Sim</td><td>Sim</td><td>Conteúdo do usuário, valores de banco</td></tr>
+            <tr><td><code>&lt;%- var %&gt;</code></td><td>Sim</td><td>Não</td><td>HTML pré-renderizado, includes</td></tr>
+            <tr><td><code>&lt;% código %&gt;</code></td><td>Não</td><td>—</td><td>if/forEach/variáveis</td></tr>
+            <tr><td><code>&lt;%- include(...) %&gt;</code></td><td>Sim</td><td>Não</td><td>Composição via partials</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ════════ 5. res.render ════════ -->
+      <section class="mat-section" id="sec-render">
+        <h2>5. Controller chamando <code>res.render</code></h2>
+
+        <p>O ponto onde a arquitetura MVC encontra o template engine é a chamada a <code>res.render</code> dentro do controller. O controller é responsável por orquestrar: receber a requisição HTTP, delegar a lógica de negócio ao service (que por sua vez chama o repository), receber os dados, e <em>escolher qual template renderizar com quais dados</em>. O template engine assume daí em diante e produz o HTML.</p>
+
+        <p>A assinatura básica é <code>res.render(templatePath, data)</code>. O <code>templatePath</code> é relativo ao diretório de views (configurado no setup) e sem extensão — <code>'users/index'</code> resolverá para <code>views/users/index.ejs</code>. O segundo argumento é um objeto cujas chaves se tornam variáveis disponíveis dentro do template.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">TS — src/controllers/users.controller.ts <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">import</span> { Request, Response } <span class="hl-kw">from</span> <span class="hl-str">'express'</span>;
+<span class="hl-kw">import</span> { UsersService } <span class="hl-kw">from</span> <span class="hl-str">'../services/users.service'</span>;
+
+<span class="hl-kw">export class</span> <span class="hl-typ">UsersController</span> {
+  <span class="hl-kw">constructor</span>(<span class="hl-kw">private</span> <span class="hl-kw">readonly</span> service: UsersService) {}
+
+  <span class="hl-cmt">// GET /users — lista todos</span>
+  <span class="hl-kw">async</span> <span class="hl-fn">index</span>(req: Request, res: Response) {
+    <span class="hl-kw">const</span> users = <span class="hl-kw">await</span> <span class="hl-kw">this</span>.service.<span class="hl-fn">list</span>();
+    <span class="hl-kw">const</span> currentUser = req.session?.user ?? <span class="hl-kw">null</span>;
+    res.<span class="hl-fn">render</span>(<span class="hl-str">'users/index'</span>, { users, currentUser });
+  }
+
+  <span class="hl-cmt">// GET /users/:id — detalhe</span>
+  <span class="hl-kw">async</span> <span class="hl-fn">show</span>(req: Request, res: Response) {
+    <span class="hl-kw">const</span> user = <span class="hl-kw">await</span> <span class="hl-kw">this</span>.service.<span class="hl-fn">findById</span>(req.params.id);
+    <span class="hl-kw">if</span> (!user) <span class="hl-kw">return</span> res.<span class="hl-fn">status</span>(<span class="hl-num">404</span>).<span class="hl-fn">render</span>(<span class="hl-str">'errors/404'</span>);
+    res.<span class="hl-fn">render</span>(<span class="hl-str">'users/show'</span>, { user });
+  }
+}</code></pre>
+        </div>
+
+        <p>Repare em três detalhes importantes do código acima. Primeiro, o controller é uma <strong>classe TypeScript</strong> com injeção de dependência no construtor — ele recebe o service em vez de criar um internamente. Esse padrão facilita testes unitários (você passa um mock do service). Segundo, o controller <strong>não conhece SQL</strong> — ele só conversa com o service, que por sua vez conversa com o repository. Terceiro, o controller decide o status HTTP e o template; o EJS apenas renderiza com os dados que recebe.</p>
+
+        <h3>Fluxo end-to-end de uma requisição GET /users</h3>
+
+        <ol>
+          <li>O navegador faz <code>GET /users</code>.</li>
+          <li>O Express casa a rota com <code>UsersController.index</code>.</li>
+          <li>O controller chama <code>service.list()</code>.</li>
+          <li>O service aplica regras de negócio e chama <code>repository.findAll()</code>.</li>
+          <li>O repository executa a query SQL via <code>pg</code> e retorna <code>User[]</code>.</li>
+          <li>O controller faz <code>res.render('users/index', { users })</code>.</li>
+          <li>O EJS abre <code>views/users/index.ejs</code>, executa o template com a variável <code>users</code>, gera a string HTML.</li>
+          <li>O Express envia o HTML como resposta com status 200.</li>
+          <li>O navegador parseia o HTML e exibe a página.</li>
+        </ol>
+
+        <div class="callout callout-tip sr">
+          <div class="callout-label">res.locals — variáveis automáticas</div>
+          <p>Se uma variável precisa estar disponível em <em>todos</em> os templates (ex.: o usuário logado, o ano corrente para o footer, configs do site), use <code>res.locals</code> em um middleware. Qualquer chave em <code>res.locals</code> fica acessível no EJS sem precisar passá-la em cada <code>render</code>.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 6. HTML semântico ════════ -->
+      <section class="mat-section" id="sec-semantic">
+        <h2>6. HTML semântico</h2>
+
+        <p>HTML semântico é o uso de tags que <strong>descrevem o significado</strong> do conteúdo, não a sua aparência. Em vez de envolver tudo em <code>&lt;div&gt;</code> com classes (a famosa "div soup"), você usa <code>&lt;header&gt;</code> para o cabeçalho, <code>&lt;nav&gt;</code> para a navegação, <code>&lt;main&gt;</code> para o conteúdo principal, <code>&lt;article&gt;</code> para uma unidade autônoma de conteúdo, <code>&lt;section&gt;</code> para agrupamentos temáticos, <code>&lt;aside&gt;</code> para conteúdo lateral e <code>&lt;footer&gt;</code> para o rodapé. Visualmente, um <code>&lt;header&gt;</code> é igual a uma <code>&lt;div&gt;</code> — a diferença está no <em>significado</em> que essa tag carrega.</p>
+
+        <p>Esse significado importa para três audiências distintas. <strong>Leitores de tela</strong> usados por pessoas com deficiência visual constroem uma "lista de marcos" da página com base nessas tags — o usuário pode pular direto para o <code>&lt;main&gt;</code> ou para o <code>&lt;nav&gt;</code> com um atalho. Sem semântica, esse atalho não funciona, e a pessoa precisa percorrer linearmente todo o conteúdo. <strong>Buscadores</strong> como Google extraem hierarquia de informação para o ranking — uma página com <code>&lt;article&gt;</code> bem estruturado tende a aparecer melhor em SERP. <strong>Outros desenvolvedores</strong> entendem mais rápido um código onde as tags se autoexplicam — <code>&lt;footer&gt;</code> é claramente o rodapé, sem precisar olhar a classe CSS.</p>
+
+        <table class="mat-table sr">
+          <thead><tr><th>Tag</th><th>Significado</th><th>Quando usar</th></tr></thead>
+          <tbody>
+            <tr><td><code>&lt;header&gt;</code></td><td>Cabeçalho da página ou de uma seção</td><td>Logo, título do site, breadcrumb</td></tr>
+            <tr><td><code>&lt;nav&gt;</code></td><td>Bloco de navegação principal</td><td>Menu superior, sidebar de links</td></tr>
+            <tr><td><code>&lt;main&gt;</code></td><td>Conteúdo principal único da página</td><td>Aparece UMA vez por página</td></tr>
+            <tr><td><code>&lt;section&gt;</code></td><td>Agrupamento temático com título</td><td>Capítulos, abas, blocos relacionados</td></tr>
+            <tr><td><code>&lt;article&gt;</code></td><td>Unidade autônoma de conteúdo</td><td>Post de blog, card de produto</td></tr>
+            <tr><td><code>&lt;aside&gt;</code></td><td>Conteúdo lateral, complementar</td><td>Sidebar, propaganda, "veja também"</td></tr>
+            <tr><td><code>&lt;footer&gt;</code></td><td>Rodapé da página ou de uma seção</td><td>Créditos, links secundários</td></tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-tip sr">
+          <div class="callout-label">Acessibilidade na prática</div>
+          <p>Imagens devem ter <code>alt</code> descritivo. Inputs devem ter <code>&lt;label for="id"&gt;</code>. Botões clicáveis devem ser <code>&lt;button&gt;</code> (não <code>&lt;div onclick&gt;</code>). Ícones decorativos devem ter <code>aria-hidden="true"</code>. Cores nunca devem ser o único meio de transmitir informação. Esses são os 5 itens que mais retornam em auditorias de acessibilidade.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 7. Forms ════════ -->
+      <section class="mat-section" id="sec-forms">
+        <h2>7. Forms tradicionais — POST direto para o servidor</h2>
+
+        <p>Antes de qualquer fetch ou AJAX, o jeito original e ainda perfeitamente válido de enviar dados para o servidor é o <strong>form HTML tradicional</strong>. O <code>&lt;form method="POST" action="/users"&gt;</code> faz o navegador enviar uma requisição POST para a URL indicada, com os campos do formulário codificados como <code>application/x-www-form-urlencoded</code>. Após a resposta, o navegador <em>recarrega a página</em> com o novo HTML. É simples, funciona sem JavaScript e cobre 80% dos casos de aplicações CRUD.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">EJS — views/users/new.ejs <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-tag">&lt;form action=</span><span class="hl-val">"/users"</span> <span class="hl-tag">method=</span><span class="hl-val">"POST"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;label for=</span><span class="hl-val">"nome"</span><span class="hl-tag">&gt;</span>Nome<span class="hl-tag">&lt;/label&gt;</span>
+  <span class="hl-tag">&lt;input id=</span><span class="hl-val">"nome"</span> <span class="hl-tag">name=</span><span class="hl-val">"nome"</span> <span class="hl-tag">type=</span><span class="hl-val">"text"</span> <span class="hl-tag">required maxlength=</span><span class="hl-val">"80"</span><span class="hl-tag">&gt;</span>
+
+  <span class="hl-tag">&lt;label for=</span><span class="hl-val">"email"</span><span class="hl-tag">&gt;</span>E-mail<span class="hl-tag">&lt;/label&gt;</span>
+  <span class="hl-tag">&lt;input id=</span><span class="hl-val">"email"</span> <span class="hl-tag">name=</span><span class="hl-val">"email"</span> <span class="hl-tag">type=</span><span class="hl-val">"email"</span> <span class="hl-tag">required&gt;</span>
+
+  <span class="hl-tag">&lt;button type=</span><span class="hl-val">"submit"</span><span class="hl-tag">&gt;</span>Cadastrar<span class="hl-tag">&lt;/button&gt;</span>
+<span class="hl-tag">&lt;/form&gt;</span></code></pre>
+        </div>
+
+        <p>No servidor, esse form chega no controller via <code>req.body</code> — desde que o middleware <code>express.urlencoded({ extended: true })</code> esteja ativo (vimos isso no setup). O controller valida, chama o service e responde geralmente com um <code>res.redirect('/users')</code> para o padrão "Post-Redirect-Get": o usuário é redirecionado após o POST para evitar reenvio do form ao recarregar a página.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">TS — controller recebendo o form <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-cmt">// POST /users</span>
+<span class="hl-kw">async</span> <span class="hl-fn">create</span>(req: Request, res: Response) {
+  <span class="hl-kw">const</span> { nome, email } = req.body; <span class="hl-cmt">// vem do form urlencoded</span>
+  <span class="hl-kw">await</span> <span class="hl-kw">this</span>.service.<span class="hl-fn">create</span>({ nome, email });
+  res.<span class="hl-fn">redirect</span>(<span class="hl-str">'/users'</span>); <span class="hl-cmt">// Post-Redirect-Get</span>
+}</code></pre>
+        </div>
+
+        <p>Forms tradicionais não substituem fetch (que veremos na aula 8). São complementares: forms são ótimos para create/update simples e quando JavaScript pode falhar; fetch é melhor para experiências sem reload, listas com filtros dinâmicos e UIs mais ricas.</p>
+      </section>
+
+      <!-- ════════ 8. Static files ════════ -->
+      <section class="mat-section" id="sec-static">
+        <h2>8. Static files — CSS, JS e imagens</h2>
+
+        <p>Templates EJS produzem o HTML. Mas o HTML referencia arquivos externos: folhas de estilo CSS, scripts JavaScript de cliente e imagens. Esses arquivos precisam ser servidos pelo Express, e o middleware <code>express.static</code> resolve isso em uma linha: <code>app.use(express.static('public'))</code>. A partir desse ponto, qualquer arquivo dentro de <code>public/</code> é acessível por uma URL relativa.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">Estrutura — public/ <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code>public/
+├── css/
+│   └── site.css       <span class="hl-cmt"># acessível em /css/site.css</span>
+├── js/
+│   └── app.js         <span class="hl-cmt"># acessível em /js/app.js</span>
+└── img/
+    └── logo.png       <span class="hl-cmt"># acessível em /img/logo.png</span></code></pre>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-label">EJS — referenciando assets <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-tag">&lt;head&gt;</span>
+  <span class="hl-tag">&lt;link rel=</span><span class="hl-val">"stylesheet"</span> <span class="hl-tag">href=</span><span class="hl-val">"/css/site.css"</span><span class="hl-tag">&gt;</span>
+<span class="hl-tag">&lt;/head&gt;</span>
+<span class="hl-tag">&lt;body&gt;</span>
+  <span class="hl-tag">&lt;img src=</span><span class="hl-val">"/img/logo.png"</span> <span class="hl-tag">alt=</span><span class="hl-val">"Logo"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-tag">&lt;script src=</span><span class="hl-val">"/js/app.js"</span><span class="hl-tag">&gt;&lt;/script&gt;</span>
+<span class="hl-tag">&lt;/body&gt;</span></code></pre>
+        </div>
+
+        <p>O nome do diretório (<code>public</code>) <strong>não aparece na URL</strong>. <code>public/css/site.css</code> é servido em <code>/css/site.css</code>, não em <code>/public/css/site.css</code>. Isso é uma das poucas pegadinhas comuns — alunos que não percebem isso ficam vendo 404 e ficam confusos.</p>
+
+        <div class="callout callout-warn sr">
+          <div class="callout-label">Não coloque arquivos sensíveis em public/</div>
+          <p>Tudo dentro de <code>public/</code> é exposto publicamente. Nunca coloque ali <code>.env</code>, configurações com credenciais, dumps de banco ou backups. O Express vai entregá-los para qualquer um que adivinhar o caminho.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 9. DOM essencial ════════ -->
+      <section class="mat-section" id="sec-dom">
+        <h2>9. DOM essencial — JavaScript no navegador</h2>
+
+        <p>O HTML que chega no navegador é parseado e transformado em uma árvore de objetos: o <strong>DOM</strong> (Document Object Model). Cada tag vira um nó dessa árvore, com propriedades, métodos e relações pai/filho. O JavaScript de cliente — aquele rodando no <code>&lt;script&gt;</code> da página — manipula essa árvore para mudar conteúdo, alterar estilos, adicionar elementos, escutar eventos do usuário.</p>
+
+        <p>O DOM moderno é poderoso e a maioria das tarefas comuns é resolvida com três APIs apenas: <code>document.querySelector</code> para selecionar elementos, <code>element.addEventListener</code> para escutar eventos, e <code>element.classList</code> para manipular classes CSS. Antes do navegador ter essas APIs (era do jQuery), todas essas operações eram verbosas e inconsistentes entre browsers. Hoje, JavaScript de cliente é tão expressivo quanto qualquer biblioteca.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">JS — public/js/app.js (toggle de menu) <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-cmt">// 1. Selecionar elementos com seletores CSS</span>
+<span class="hl-kw">const</span> btn = document.<span class="hl-fn">querySelector</span>(<span class="hl-str">'#menu-btn'</span>);
+<span class="hl-kw">const</span> menu = document.<span class="hl-fn">querySelector</span>(<span class="hl-str">'.menu'</span>);
+
+<span class="hl-cmt">// 2. Escutar eventos</span>
+btn.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'click'</span>, (e) =&gt; {
+  <span class="hl-cmt">// 3. Manipular classes</span>
+  menu.classList.<span class="hl-fn">toggle</span>(<span class="hl-str">'open'</span>);
+  btn.<span class="hl-fn">setAttribute</span>(<span class="hl-str">'aria-expanded'</span>, menu.classList.<span class="hl-fn">contains</span>(<span class="hl-str">'open'</span>));
+});
+
+<span class="hl-cmt">// querySelectorAll retorna NodeList — itere com forEach</span>
+document.<span class="hl-fn">querySelectorAll</span>(<span class="hl-str">'.tab'</span>).<span class="hl-fn">forEach</span>(tab =&gt; {
+  tab.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'click'</span>, () =&gt; {
+    document.<span class="hl-fn">querySelectorAll</span>(<span class="hl-str">'.tab'</span>).<span class="hl-fn">forEach</span>(t =&gt; t.classList.<span class="hl-fn">remove</span>(<span class="hl-str">'active'</span>));
+    tab.classList.<span class="hl-fn">add</span>(<span class="hl-str">'active'</span>);
+  });
+});</code></pre>
+        </div>
+
+        <table class="mat-table sr">
+          <thead><tr><th>API</th><th>O que faz</th><th>Exemplo</th></tr></thead>
+          <tbody>
+            <tr><td><code>querySelector(sel)</code></td><td>Primeiro elemento que casa o seletor CSS</td><td><code>document.querySelector('#btn')</code></td></tr>
+            <tr><td><code>querySelectorAll(sel)</code></td><td>NodeList com todos os elementos</td><td><code>document.querySelectorAll('.card')</code></td></tr>
+            <tr><td><code>addEventListener(ev, fn)</code></td><td>Anexa handler a um evento</td><td><code>btn.addEventListener('click', fn)</code></td></tr>
+            <tr><td><code>classList.add/remove/toggle</code></td><td>Manipula classes CSS</td><td><code>menu.classList.toggle('open')</code></td></tr>
+            <tr><td><code>textContent</code></td><td>Conteúdo de texto puro (seguro)</td><td><code>span.textContent = 'Olá'</code></td></tr>
+            <tr><td><code>createElement / appendChild</code></td><td>Cria e insere novos nós</td><td><code>list.appendChild(li)</code></td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ════════ 10. Eventos ════════ -->
+      <section class="mat-section" id="sec-events">
+        <h2>10. Eventos no DOM — bubbling e preventDefault</h2>
+
+        <p>Eventos são a forma como o navegador comunica ao seu JS que algo aconteceu: o usuário clicou, digitou, redimensionou a janela, terminou de carregar uma imagem. O método <code>addEventListener</code> conecta uma função ("handler") ao evento de um elemento. Quando o evento dispara, o handler é chamado com um objeto <code>Event</code> contendo metadados.</p>
+
+        <p>Dois conceitos fundamentais: <strong>capture vs bubbling</strong> e <strong>preventDefault</strong>. Quando um clique acontece em um botão dentro de uma seção dentro de um main, o navegador dispara o evento em três fases — primeiro descendo pela árvore (capture), depois no alvo (target), depois subindo pela árvore (bubbling). Por padrão, <code>addEventListener</code> escuta na fase de bubbling. Você só vai mexer nisso em casos específicos (ex.: implementar um modal que fecha ao clicar fora). Para 90% dos casos, o comportamento padrão funciona.</p>
+
+        <p>O método <code>event.preventDefault()</code> cancela a ação default do navegador para aquele evento. Em um <code>&lt;a href="..."&gt;</code>, ele impede a navegação. Em um <code>&lt;form&gt;</code>, ele impede o submit (e o reload da página). Esse método é fundamental para validação no cliente: você intercepta o submit, valida os campos via JS, e só deixa o form prosseguir se tudo estiver correto.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">JS — validação no cliente com preventDefault <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-kw">const</span> form = document.<span class="hl-fn">querySelector</span>(<span class="hl-str">'#user-form'</span>);
+<span class="hl-kw">const</span> emailInput = document.<span class="hl-fn">querySelector</span>(<span class="hl-str">'#email'</span>);
+<span class="hl-kw">const</span> emailError = document.<span class="hl-fn">querySelector</span>(<span class="hl-str">'#email-error'</span>);
+
+form.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'submit'</span>, (e) =&gt; {
+  <span class="hl-kw">const</span> email = emailInput.value.<span class="hl-fn">trim</span>();
+  <span class="hl-kw">if</span> (!email.<span class="hl-fn">includes</span>(<span class="hl-str">'@'</span>)) {
+    e.<span class="hl-fn">preventDefault</span>();          <span class="hl-cmt">// trava o submit</span>
+    emailError.textContent = <span class="hl-str">'E-mail inválido'</span>;
+    emailInput.<span class="hl-fn">focus</span>();
+  }
+});</code></pre>
+        </div>
+
+        <div class="callout callout-tip sr">
+          <div class="callout-label">Eventos comuns</div>
+          <p><code>click</code> e <code>submit</code> são os mais usados. Outros que aparecem com frequência: <code>input</code> (digitação em real-time), <code>change</code> (após perder foco), <code>focus</code>/<code>blur</code> (entrar/sair do campo), <code>keydown</code> (atalhos de teclado), <code>DOMContentLoaded</code> (HTML pronto, antes das imagens).</p>
+        </div>
+      </section>
+
+      <!-- ════════ 11. Server → Script ════════ -->
+      <section class="mat-section" id="sec-server-script">
+        <h2>11. Passando dados do servidor para o script de cliente</h2>
+
+        <p>Em SSR puro, há momentos em que o JS de cliente precisa de dados que o servidor já tem em mão. Você poderia fazer um fetch separado (e veremos isso na aula 8), mas para dados pequenos e que já chegaram com a renderização inicial, a estratégia mais eficiente é <strong>injetar os dados em uma variável global JavaScript dentro do próprio template EJS</strong>. Isso evita uma round-trip extra ao servidor.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">EJS — passando dados para o JS <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-tag">&lt;ul id=</span><span class="hl-val">"users-list"</span><span class="hl-tag">&gt;</span>
+  <span class="hl-cmt">&lt;% users.forEach(u =&gt; { %&gt;</span>
+    <span class="hl-tag">&lt;li data-id=</span><span class="hl-val">"<span class="hl-cmt">&lt;%= u.id %&gt;</span>"</span><span class="hl-tag">&gt;</span><span class="hl-cmt">&lt;%= u.nome %&gt;</span><span class="hl-tag">&lt;/li&gt;</span>
+  <span class="hl-cmt">&lt;% }) %&gt;</span>
+<span class="hl-tag">&lt;/ul&gt;</span>
+
+<span class="hl-tag">&lt;script&gt;</span>
+  <span class="hl-cmt">// JSON.stringify gera JS válido — usamos &lt;%- (raw) para não escapar as aspas</span>
+  <span class="hl-kw">window</span>.USERS = <span class="hl-cmt">&lt;%- JSON.stringify(users) %&gt;</span>;
+<span class="hl-tag">&lt;/script&gt;</span>
+
+<span class="hl-tag">&lt;script src=</span><span class="hl-val">"/js/app.js"</span><span class="hl-tag">&gt;&lt;/script&gt;</span></code></pre>
+        </div>
+
+        <p>Repare em três pontos. Primeiro, a tag <code>&lt;%- JSON.stringify(...) %&gt;</code> usa <code>&lt;%-</code> (raw) e não <code>&lt;%=</code> (escapado), porque queremos a string JSON literal — não escapada — chegar no JavaScript. Segundo, a variável global é colocada em <code>window</code> explicitamente, deixando claro que é global. Terceiro, o script externo (<code>/js/app.js</code>) deve vir <em>depois</em> do script inline, para que <code>window.USERS</code> já exista quando ele executar.</p>
+
+        <p>Outra opção, especialmente útil quando os dados são pequenos e ligados a um elemento específico, é usar <strong>data attributes</strong>: <code>&lt;li data-id="42" data-status="ativo"&gt;</code>. No JS, leia com <code>el.dataset.id</code>. Essa abordagem é elegante para listas onde cada item carrega seus próprios metadados.</p>
+
+        <div class="callout callout-warn sr">
+          <div class="callout-label">Atenção com dados sensíveis</div>
+          <p>Tudo que você imprime no template chega no HTML — view source mostra. Nunca injete tokens, hashes de senha ou dados que não devem ser visíveis ao usuário. Use o que está em <code>req.session</code> com cuidado: filtre o objeto antes de passar para o EJS.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 12. Validação dupla ════════ -->
+      <section class="mat-section" id="sec-validation">
+        <h2>12. Validação dupla — cliente para UX, servidor para segurança</h2>
+
+        <p>Toda aplicação web séria tem validação em <strong>duas camadas</strong>: no navegador e no servidor. Elas servem propósitos diferentes e nenhuma substitui a outra. A validação no <strong>cliente</strong> existe para UX — feedback rápido, antes mesmo de fazer a requisição. A validação no <strong>servidor</strong> existe para segurança e integridade — é a única que tem valor real, porque a do cliente pode ser desabilitada com 3 cliques no DevTools.</p>
+
+        <p>No cliente, a primeira linha de defesa são os <strong>atributos HTML5 nativos</strong>: <code>required</code>, <code>min</code>/<code>max</code>, <code>minlength</code>/<code>maxlength</code>, <code>pattern</code>, <code>type="email"</code>, <code>type="number"</code>. O navegador já faz a validação básica e mostra mensagens de erro. Para validação mais sofisticada (cross-field, regras de negócio), use JS com <code>preventDefault()</code> no handler de submit.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">EJS — atributos HTML5 de validação <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-tag">&lt;input</span>
+  <span class="hl-tag">name=</span><span class="hl-val">"email"</span>
+  <span class="hl-tag">type=</span><span class="hl-val">"email"</span>
+  <span class="hl-tag">required</span>
+  <span class="hl-tag">maxlength=</span><span class="hl-val">"120"</span>
+  <span class="hl-tag">pattern=</span><span class="hl-val">"^\S+@\S+\.\S+$"</span>
+<span class="hl-tag">&gt;</span>
+
+<span class="hl-tag">&lt;input</span>
+  <span class="hl-tag">name=</span><span class="hl-val">"idade"</span>
+  <span class="hl-tag">type=</span><span class="hl-val">"number"</span>
+  <span class="hl-tag">min=</span><span class="hl-val">"0"</span>
+  <span class="hl-tag">max=</span><span class="hl-val">"120"</span>
+  <span class="hl-tag">required</span>
+<span class="hl-tag">&gt;</span></code></pre>
+        </div>
+
+        <p>No servidor, vimos na aula 6 o uso de <code>express-validator</code> e middlewares próprios para validar <code>req.body</code> antes de chegar no controller. <strong>Isso permanece obrigatório</strong> mesmo quando o cliente já validou. Um atacante pode enviar uma requisição direto via <code>curl</code>, ignorando todo o seu HTML. Tratar o cliente como adversário é a postura correta — não paranoia, e sim defesa em profundidade.</p>
+
+        <table class="mat-table sr">
+          <thead><tr><th>Camada</th><th>Quando roda</th><th>Pode ser burlada?</th><th>Propósito</th></tr></thead>
+          <tbody>
+            <tr><td>Cliente (HTML5 + JS)</td><td>Antes do submit</td><td>SIM (DevTools)</td><td>UX — feedback rápido</td></tr>
+            <tr><td>Servidor (express-validator)</td><td>Antes do controller</td><td>NÃO</td><td>Segurança e integridade</td></tr>
+          </tbody>
+        </table>
+      </section>
+
+      <!-- ════════ 13. XSS ════════ -->
+      <section class="mat-section" id="sec-xss">
+        <h2>13. Segurança · XSS e o uso correto de <code>&lt;%= %&gt;</code></h2>
+
+        <p>XSS (Cross-Site Scripting) é uma das vulnerabilidades mais comuns da web. Acontece quando um atacante consegue injetar JavaScript malicioso na página exibida para outro usuário. Em uma aplicação SSR com EJS, o vetor clássico é o <strong>conteúdo do usuário renderizado sem escape</strong>. Imagine um campo de comentário onde o atacante envia <code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code> — se o template imprime isso com <code>&lt;%- %&gt;</code> (raw), o script roda no navegador da próxima vítima.</p>
+
+        <p>A defesa primária é simples: <strong>use sempre <code>&lt;%= %&gt;</code> para conteúdo vindo de usuário ou banco</strong>. Esta tag escapa caracteres HTML especiais — <code>&lt;</code> vira <code>&amp;lt;</code>, <code>&gt;</code> vira <code>&amp;gt;</code>, etc. O navegador exibe os caracteres mas não os interpreta como tags. O <code>&lt;%- %&gt;</code> deve ser reservado para situações em que você sabe que o conteúdo é seguro: includes de partials, HTML pré-renderizado por outra parte do servidor que você controla.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">EJS — XSS na prática <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-cmt">// SEGURO: o &lt;script&gt; vira &amp;lt;script&amp;gt; no HTML</span>
+<span class="hl-tag">&lt;p&gt;</span><span class="hl-cmt">&lt;%= comentario.texto %&gt;</span><span class="hl-tag">&lt;/p&gt;</span>
+
+<span class="hl-cmt">// PERIGOSO: se texto = "&lt;script&gt;alert('xss')&lt;/script&gt;",</span>
+<span class="hl-cmt">// o script EXECUTA no navegador da vítima.</span>
+<span class="hl-tag">&lt;p&gt;</span><span class="hl-cmt">&lt;%- comentario.texto %&gt;</span><span class="hl-tag">&lt;/p&gt;</span></code></pre>
+        </div>
+
+        <p>Outras camadas de defesa contra XSS — todas válidas e complementares:</p>
+        <ul>
+          <li><strong>Sanitização no servidor</strong>: bibliotecas como <code>DOMPurify</code> ou <code>sanitize-html</code> removem tags perigosas antes de salvar/exibir.</li>
+          <li><strong>Content Security Policy (CSP)</strong>: header HTTP que diz ao navegador quais scripts são permitidos. Bloqueia <code>&lt;script&gt;</code> inline desconhecidos mesmo se eles passarem.</li>
+          <li><strong>HttpOnly cookies</strong>: cookies com flag HttpOnly não são acessíveis via <code>document.cookie</code>, frustrando o roubo de sessão.</li>
+          <li><strong>Validação rígida</strong>: rejeitar input com tags HTML quando o campo deveria ser texto puro.</li>
+        </ul>
+
+        <div class="callout callout-danger sr">
+          <div class="callout-label">Regra de ouro</div>
+          <p>Em dúvida, use <code>&lt;%= %&gt;</code>. O EJS por design favorece a tag escapada — só desça para <code>&lt;%- %&gt;</code> quando você tiver certeza absoluta de que o conteúdo é seguro. "Acho que é seguro" não é certeza absoluta.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 14. Helpers ════════ -->
+      <section class="mat-section" id="sec-helpers">
+        <h2>14. Helpers EJS via <code>app.locals</code> e <code>res.locals</code></h2>
+
+        <p>A 6ª camada da arquitetura do projeto — Helpers — comporta funções utilitárias reusadas em vários lugares. Algumas dessas funções são úteis dentro dos templates: formatar datas, formatar moeda, pluralizar palavras, gerar URLs canônicas. EJS aceita funções como variáveis: se você passar uma função no objeto de <code>res.render</code>, ela fica disponível para chamada no template.</p>
+
+        <p>Quando uma função é usada em <em>todos</em> os templates, é uma má prática passá-la em cada controller. A solução é <code>app.locals</code> (variáveis globais para todas as requisições) ou <code>res.locals</code> (variáveis para a requisição atual). Tudo que está nesses objetos fica acessível no EJS sem precisar passar pelo <code>render</code>.</p>
+
+        <div class="code-wrap">
+          <div class="code-label">TS — registrando helpers globais <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-cmt">// src/helpers/format.ts</span>
+<span class="hl-kw">export const</span> <span class="hl-fn">formatCurrency</span> = (cents: <span class="hl-typ">number</span>) =&gt;
+  (cents / <span class="hl-num">100</span>).<span class="hl-fn">toLocaleString</span>(<span class="hl-str">'pt-BR'</span>, { style: <span class="hl-str">'currency'</span>, currency: <span class="hl-str">'BRL'</span> });
+
+<span class="hl-kw">export const</span> <span class="hl-fn">formatDate</span> = (d: <span class="hl-typ">Date</span>) =&gt;
+  <span class="hl-typ">Intl</span>.<span class="hl-fn">DateTimeFormat</span>(<span class="hl-str">'pt-BR'</span>).<span class="hl-fn">format</span>(d);
+
+<span class="hl-cmt">// src/app.ts — registra UMA vez ao iniciar</span>
+<span class="hl-kw">import</span> { formatCurrency, formatDate } <span class="hl-kw">from</span> <span class="hl-str">'./helpers/format'</span>;
+app.locals.formatCurrency = formatCurrency;
+app.locals.formatDate = formatDate;</code></pre>
+        </div>
+
+        <div class="code-wrap">
+          <div class="code-label">EJS — usando os helpers <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code><span class="hl-tag">&lt;td&gt;</span><span class="hl-cmt">&lt;%= formatCurrency(produto.preco_centavos) %&gt;</span><span class="hl-tag">&lt;/td&gt;</span>
+<span class="hl-tag">&lt;td&gt;</span><span class="hl-cmt">&lt;%= formatDate(pedido.criado_em) %&gt;</span><span class="hl-tag">&lt;/td&gt;</span></code></pre>
+        </div>
+
+        <p>A diferença prática entre <code>app.locals</code> e <code>res.locals</code>: o primeiro é setado uma única vez ao iniciar o servidor e vale para todas as requisições; o segundo é setado dentro de um middleware (típico para o usuário logado, flash messages, configs por requisição) e vale só para aquela requisição. O EJS vê os dois como variáveis disponíveis no template — a fonte é transparente.</p>
+      </section>
+
+      <!-- ════════ 15. Checklist ════════ -->
+      <section class="mat-section" id="sec-checklist">
+        <h2>15. Checklist de Estudo</h2>
+        <p>Clique nos itens à medida que dominar cada conceito:</p>
+        <ul class="checklist" id="checklist">
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Consigo explicar a diferença entre SSR, CSR e hydration com um exemplo concreto.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Configuro o EJS no Express com <code>app.set('view engine', 'ejs')</code> e <code>app.set('views', ...)</code>.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Organizo <code>views/</code> com layouts, partials e pastas por recurso.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei a diferença entre <code>&lt;%= %&gt;</code>, <code>&lt;%- %&gt;</code> e <code>&lt;% %&gt;</code> e quando usar cada um.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Uso <code>&lt;%- include('partials/...') %&gt;</code> para compor templates.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">No controller, chamo <code>res.render('caminho', { dados })</code> seguindo o fluxo MVC.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Escrevo HTML com tags semânticas (<code>header</code>, <code>nav</code>, <code>main</code>, <code>article</code>, <code>footer</code>).</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Configuro <code>express.static('public')</code> e referencio CSS/JS por caminhos absolutos.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Crio um form HTML que faz POST e processo o body com <code>express.urlencoded</code>.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Uso <code>querySelector</code>, <code>addEventListener</code> e <code>classList.toggle</code> no JS de cliente.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Uso <code>event.preventDefault()</code> em submits para validação client-side.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei passar dados do servidor para o JS via <code>&lt;script&gt;window.X = &lt;%- JSON.stringify(...) %&gt;&lt;/script&gt;</code>.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Entendo por que validação no cliente NUNCA substitui validação no servidor.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei reconhecer um vetor de XSS e por que <code>&lt;%= %&gt;</code> é a defesa primária.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Registro helpers globais em <code>app.locals</code> e os uso dentro do EJS.</span></li>
+        </ul>
+      </section>
+
+      <!-- ════════ Referências ════════ -->
+      <section class="mat-section" id="sec-refs">
+        <h2>Referências</h2>
+        <ul>
+          <li><a href="https://ejs.co/" target="_blank" rel="noopener noreferrer">EJS · Documentação Oficial</a> — sintaxe, includes, options e API completa</li>
+          <li><a href="https://expressjs.com/en/guide/using-template-engines.html" target="_blank" rel="noopener noreferrer">Express · Using Template Engines</a> — guia oficial sobre <code>res.render</code> e setup de engines</li>
+          <li><a href="https://expressjs.com/en/starter/static-files.html" target="_blank" rel="noopener noreferrer">Express · Serving Static Files</a> — middleware <code>express.static</code></li>
+          <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/HTML/Element" target="_blank" rel="noopener noreferrer">MDN · HTML Element Reference</a> — referência completa de tags HTML, semântica e atributos</li>
+          <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/API/Document_Object_Model/Introduction" target="_blank" rel="noopener noreferrer">MDN · Introduction to the DOM</a> — visão geral da árvore DOM e APIs principais</li>
+          <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/API/EventTarget/addEventListener" target="_blank" rel="noopener noreferrer">MDN · addEventListener</a> — assinaturas, fases capture/bubbling e options</li>
+          <li><a href="https://owasp.org/www-community/attacks/xss/" target="_blank" rel="noopener noreferrer">OWASP · Cross-Site Scripting (XSS)</a> — fundamentos da vulnerabilidade e como evitar</li>
+          <li><a href="https://web.dev/articles/rendering-on-the-web" target="_blank" rel="noopener noreferrer">web.dev · Rendering on the Web</a> — artigo do Google sobre SSR, CSR, hydration e static rendering</li>
+        </ul>
+      </section>
+
+    </article>
+  </div>
+
+  <div class="text-center py-4">
+    <img src="https://res.cloudinary.com/dyhjjms8y/image/upload/v1769427095/9c2796bb-d4da-4f4e-846a-d38d547249ee_pwwh3l.png" alt="Inteli Logo" style="max-width:140px;">
+  </div>
+  <footer class="py-4 bg-light border-top">
+    <div class="container text-center">
+      <p class="mb-1">Material criado pelo professor <strong>Afonso Brandão</strong> para o <strong>Inteli</strong>.</p>
+      <small class="text-muted">Licença de leitura aberta</small>
+    </div>
+  </footer>
+
+  <script>
+    // ── Progress bar + floating nav ─────────────────────────────────────
+    const floatNav = document.getElementById('float-nav');
+    const matHeader = document.querySelector('.mat-header');
+    window.addEventListener('scroll', () => {
+      const h = document.documentElement;
+      const pct = (h.scrollTop / (h.scrollHeight - h.clientHeight)) * 100;
+      document.getElementById('progress-bar').style.width = pct + '%';
+      const headerBottom = matHeader.getBoundingClientRect().bottom;
+      if (headerBottom < 0) { floatNav.classList.add('visible'); }
+      else { floatNav.classList.remove('visible'); }
+    });
+
+    // ── Scroll reveal ───────────────────────────────────────────────────
+    const srObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) { e.target.classList.add('vis'); srObserver.unobserve(e.target); }
+      });
+    }, { threshold: 0.12 });
+    document.querySelectorAll('.sr').forEach(el => srObserver.observe(el));
+
+    // ── Checklist ───────────────────────────────────────────────────────
+    function toggleCk(li) { li.classList.toggle('done'); }
+
+    // ── Copy code ───────────────────────────────────────────────────────
+    function copyCode(btn) {
+      const pre = btn.closest('.code-wrap').querySelector('pre');
+      navigator.clipboard.writeText(pre.innerText).then(() => {
+        btn.textContent = 'copiado ok';
+        setTimeout(() => btn.textContent = 'copiar', 2000);
+      });
+    }
+
+    // ── Active TOC on scroll ────────────────────────────────────────────
+    const sections = document.querySelectorAll('.mat-section[id]');
+    const tocLinks = document.querySelectorAll('.mat-toc a');
+    const tocObserver = new IntersectionObserver((entries) => {
+      entries.forEach(e => {
+        if (e.isIntersecting) {
+          const id = e.target.id;
+          tocLinks.forEach(a => {
+            a.classList.toggle('active', a.getAttribute('href') === '#' + id);
+          });
+        }
+      });
+    }, { rootMargin: '-20% 0px -70% 0px' });
+    sections.forEach(s => tocObserver.observe(s));
+  </script>
+</body>
+</html>
