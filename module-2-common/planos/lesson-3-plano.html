@@ -4,7 +4,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗂️</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aula 3 — Plano de Ensino — Banco de Dados II · CRUD — Inteli</title>
+  <title>Aula 3 — Plano de Ensino — Banco de Dados II · CRUD — BrPec — Inteli</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../../css/inteli-styles.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -12,6 +12,7 @@
     :root {
       --ac:#4b5563; --hi:#b2b6bf; --dk:#2e2640; --gr:#0d9488; --re:#dc2626; --am:#d97706;
       --text:#1e293b; --muted:#64748b; --border:#e2e8f0; --bg:#f8fafc; --card:#ffffff;
+      --pasture:#3f6d3a;
     }
     *, *::before, *::after { box-sizing: border-box; }
     body { font-family:'Manrope',sans-serif; color:var(--text); background:var(--bg); }
@@ -23,9 +24,9 @@
     .fn-btn-back { background:var(--dk); color:white; }
     .fn-btn-slides { background:white; color:var(--ac); border:2px solid var(--ac); }
     .fn-btn-mat { background:white; color:var(--gr); border:2px solid var(--gr); }
-    .mat-header { background:linear-gradient(135deg,#1f2937 0%,#4b5563 50%,#b2b6bf 100%); color:white; padding:44px 0 36px; }
+    .mat-header { background:linear-gradient(135deg,#1f2937 0%,#3f6d3a 60%,#7eb6d9 100%); color:white; padding:44px 0 36px; }
     .mat-header h1 { font-size:2.2rem; font-weight:800; margin:0 0 8px; }
-    .mat-header .subtitle { font-size:1.02rem; opacity:.88; margin:0 0 20px; max-width:780px; }
+    .mat-header .subtitle { font-size:1.02rem; opacity:.88; margin:0 0 20px; max-width:820px; }
     .mat-badge { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); color:white; padding:4px 14px; border-radius:999px; font-size:.78rem; font-weight:700; display:inline-block; margin-bottom:12px; margin-right:6px; }
     .mat-layout { display:grid; grid-template-columns:260px 1fr; gap:32px; max-width:1200px; margin:0 auto; padding:36px 24px; }
     @media(max-width:900px){ .mat-layout { grid-template-columns:1fr; } .mat-sidebar { display:none; } }
@@ -53,25 +54,20 @@
     .id-cell .id-val { font-size:.92rem; font-weight:700; color:var(--dk); margin-top:2px; }
     .day-timeline { display:grid; gap:14px; margin-top:12px; }
     .day-block { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 22px; box-shadow:0 2px 6px rgba(0,0,0,.04); border-left:5px solid var(--ac); }
-    .day-block.autoest { border-left-color:#3b82f6; }
-    .day-block.pe      { border-left-color:#8b5cf6; }
-    .day-block.lunch   { border-left-color:#eab308; background:#fefce8; }
-    .day-block.dev     { border-left-color:#0d9488; }
+    .day-block.daily   { border-left-color:#8b5cf6; }
+    .day-block.quiz    { border-left-color:#3b82f6; }
+    .day-block.story   { border-left-color:#3f6d3a; }
+    .day-block.formal  { border-left-color:#1d4ed8; }
+    .day-block.setup   { border-left-color:#0ea5e9; }
+    .day-block.group   { border-left-color:#d97706; }
+    .day-block.crud    { border-left-color:#0d9488; }
+    .day-block.brief   { border-left-color:#dc2626; }
+    .day-block.pondera { border-left-color:#7f1d1d; background:#fef2f2; }
     .day-block .blk-head { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px; }
-    .day-block .blk-time { font-family:'JetBrains Mono',monospace; font-size:.85rem; font-weight:700; color:var(--dk); background:#f1f5f9; padding:3px 10px; border-radius:6px; white-space:nowrap; }
-    .day-block .blk-title { font-size:1.05rem; font-weight:800; color:var(--dk); margin:0; }
-    .day-block p { margin:0 0 6px; font-size:.93rem; }
+    .day-block .blk-time { font-family:'JetBrains Mono',monospace; font-size:.82rem; font-weight:700; color:var(--dk); background:#f1f5f9; padding:3px 10px; border-radius:6px; white-space:nowrap; }
+    .day-block .blk-title { font-size:1rem; font-weight:800; color:var(--dk); margin:0; }
+    .day-block p { margin:0 0 6px; font-size:.91rem; }
     .day-block ul { margin:6px 0 0; padding-left:1.3rem; }
-    .class-line { display:grid; grid-template-columns:90px 1fr; gap:14px; padding:12px 0; border-bottom:1px dashed var(--border); }
-    .class-line:last-child { border-bottom:none; }
-    .class-line .cl-time { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--ac); font-size:.85rem; padding-top:2px; }
-    .class-line .cl-content h4 { font-size:.95rem; font-weight:800; color:var(--dk); margin:0 0 4px; }
-    .class-line .cl-content p { margin:0 0 4px; font-size:.9rem; line-height:1.6; }
-    .class-line .cl-tag { display:inline-block; padding:1px 8px; border-radius:5px; font-size:.7rem; font-weight:700; margin-right:6px; }
-    .cl-tag-am  { background:#ede9fe; color:#7c3aed; }
-    .cl-tag-tk  { background:#dbeafe; color:#1d4ed8; }
-    .cl-tag-co  { background:#dcfce7; color:#15803d; }
-    .cl-tag-dy  { background:#fef3c7; color:#92400e; }
     .obj-list, .crit-list { list-style:none; padding:0; margin:0; }
     .obj-list li, .crit-list li { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--border); font-size:.93rem; color:#374151; }
     .obj-list li:last-child, .crit-list li:last-child { border-bottom:none; }
@@ -85,14 +81,18 @@
     .callout-info { background:#eff6ff; border-color:#3b82f6; }
     .callout-tip  { background:#f0fdf4; border-color:#22c55e; }
     .callout-warn { background:#fffbeb; border-color:#f59e0b; }
+    .callout-danger { background:#fef2f2; border-color:#ef4444; }
     .callout-label { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px; }
     .callout-info .callout-label { color:#1d4ed8; }
     .callout-tip  .callout-label { color:#15803d; }
     .callout-warn .callout-label { color:#b45309; }
+    .callout-danger .callout-label { color:#b91c1c; }
     .callout p { margin:0; font-size:.92rem; line-height:1.65; color:#374151; }
     .back-cta { text-align:center; padding:26px 0 6px; }
     .back-cta a { color:var(--dk); font-weight:700; text-decoration:none; border:2px solid var(--dk); padding:9px 22px; border-radius:999px; transition:all .2s; }
     .back-cta a:hover { background:var(--dk); color:white; }
+    .group-table { font-size:.86rem; }
+    .group-table .gnum { font-weight:800; color:var(--dk); width:80px; }
   </style>
 </head>
 <body>
@@ -105,10 +105,10 @@
 
   <header class="mat-header">
     <div class="container">
-      <span class="mat-badge">Módulo 2 · Ciclo Comum · IN02</span>
+      <span class="mat-badge">Módulo 2 · IN02 · Turma 26</span>
       <span class="mat-badge">Plano de Ensino</span>
       <h1>Aula 3 — Banco de Dados II · CRUD</h1>
-      <p class="subtitle">Plano operacional do dia: dominar o ciclo CRUD em SQL (INSERT, SELECT, UPDATE, DELETE) com filtragem, ordenação, transações ACID e índices, e implementar todas as operações de dados do projeto.</p>
+      <p class="subtitle">Aprofundamento na modelagem relacional formal e tradução mecânica do modelo conceitual ao físico em SGBD, com rastreabilidade analítica da regra de negócio do BrPec até as tabelas indexadas em SQLite.</p>
       <a href="../../index.html" class="btn btn-outline-light btn-sm">← Voltar ao Módulo</a>
     </div>
   </header>
@@ -119,143 +119,217 @@
         <h4>Neste plano</h4>
         <a href="#sec-id">Identificação</a>
         <a href="#sec-resumo">Resumo</a>
+        <a href="#sec-vis">Visão RM-ODP e RNF</a>
         <a href="#sec-obj">Objetivos de aprendizagem</a>
+        <a href="#sec-onde">Onde queremos chegar</a>
         <a href="#sec-pre">Pré-requisitos</a>
-        <a href="#sec-day">Cronograma do dia</a>
-        <a href="#sec-class">Detalhamento da instrução PE</a>
+        <a href="#sec-day">Cronograma da aula (2h)</a>
+        <a href="#sec-class">Detalhamento minuto a minuto</a>
+        <a href="#sec-grupos">Os 5 grupos</a>
         <a href="#sec-am">Estratégias de metodologia ativa</a>
         <a href="#sec-rec">Recursos e ferramentas</a>
         <a href="#sec-aval">Verificação de aprendizagem</a>
+        <a href="#sec-pond">Ponderada I em sala</a>
         <a href="#sec-next">Conexão com a aula 4</a>
       </div>
     </aside>
 
     <article class="mat-article">
+
       <section class="mat-section" id="sec-id">
         <h2>Identificação</h2>
         <div class="id-grid">
-          <div class="id-cell"><div class="id-lbl">Disciplina</div><div class="id-val">IN02 · Desenvolvimento Web</div></div>
+          <div class="id-cell"><div class="id-lbl">Disciplina</div><div class="id-val">IN02 · Aplicação Web</div></div>
           <div class="id-cell"><div class="id-lbl">Módulo</div><div class="id-val">2 — Ciclo Comum</div></div>
           <div class="id-cell"><div class="id-lbl">Aula</div><div class="id-val">3 de 11</div></div>
-          <div class="id-cell"><div class="id-lbl">Carga horária do dia</div><div class="id-val">6h (2h + 2h + 2h)</div></div>
-          <div class="id-cell"><div class="id-lbl">Modalidade</div><div class="id-val">Presencial · Metodologia ativa</div></div>
-          <div class="id-cell"><div class="id-lbl">Pré-aula</div><div class="id-val">Autoestudo guiado</div></div>
+          <div class="id-cell"><div class="id-lbl">Data</div><div class="id-val">05/05/2026 · Semana 03</div></div>
+          <div class="id-cell"><div class="id-lbl">Carga horária</div><div class="id-val">2h presenciais</div></div>
+          <div class="id-cell"><div class="id-lbl">Modalidade</div><div class="id-val">Sala de aula invertida · metodologia ativa</div></div>
+          <div class="id-cell"><div class="id-lbl">Pré-aula</div><div class="id-val">Autoestudo guiado (7 referências)</div></div>
+          <div class="id-cell"><div class="id-lbl">Parceiro / domínio</div><div class="id-val">BrPec Agropecuária</div></div>
         </div>
       </section>
 
       <section class="mat-section" id="sec-resumo">
         <h2>Resumo</h2>
         <div class="intro-card">
-          <p>A aula 3 aprofunda o <strong>SQL operacional</strong> sobre o esquema construído na aula 2. O foco é o <strong>ciclo CRUD completo</strong> com refinamentos de consulta (<code>WHERE</code>, <code>ORDER BY</code>, <code>LIMIT</code>, <code>OFFSET</code>), comandos de mutação seguros (<code>UPDATE</code> e <code>DELETE</code> sempre com <code>WHERE</code>) e os mecanismos do banco que protegem a integridade: <strong>transações ACID</strong> e <strong>índices</strong> para performance.</p>
-          <p>O fechamento revisita o RM-ODP (visão Information) e prepara a tarde de desenvolvimento, em que cada equipe implementa todas as operações de dados do minimundo no banco da equipe.</p>
+          <p>A aula 3 cimenta a base formal da modelagem relacional. O ciclo CRUD não é o fim — é o teste: <em>se a tabela aceita um INSERT/SELECT/UPDATE/DELETE coerente com a regra de negócio, o modelo está bom.</em> Saímos do conceitual (substantivos do problema) e chegamos no físico (DDL em SQLite com PK, FK, CHECK, UNIQUE) por uma tradução mecânica que pode ser auditada.</p>
+          <p>O fio condutor é o problema da <strong>BrPec Agropecuária</strong>: digitalizar o que hoje é boleta de papel. Cada conceito de modelagem é apresentado com exemplo da fazenda — capataz, retiro, bovino, evento zootécnico — e cada grupo da turma assume uma regra de negócio diferente do MVP para modelar em pares.</p>
+          <p>Os últimos 30 minutos são dedicados à <strong>Ponderada I</strong> em sala, sobre RNFs e diagramas de sequência — usando como base as entidades modeladas na primeira metade da aula.</p>
         </div>
+      </section>
+
+      <section class="mat-section" id="sec-vis">
+        <h2>Visão RM-ODP e RNF (8 eixos)</h2>
+        <ul>
+          <li><strong>Visão RM-ODP predominante:</strong> <em>Information</em> — o foco é o esquema lógico/físico de dados.</li>
+          <li><strong>RF coberto:</strong> garantir que o modelo suporte o CRUD principal de cada regra de negócio do BrPec.</li>
+          <li><strong>RNF tocados:</strong> Desempenho (índices) · Suportabilidade (normalização e legibilidade do esquema).</li>
+          <li><strong>Artefatos produzidos:</strong> Diagrama de Classes do Domínio → ER → DER → Modelo Físico em DDL SQLite.</li>
+        </ul>
       </section>
 
       <section class="mat-section" id="sec-obj">
         <h2>Objetivos de aprendizagem</h2>
         <ul class="obj-list">
-          <li><span class="obj-tag">OA-1</span><span><strong>Aplicar</strong> os 4 comandos do CRUD (<code>INSERT</code>, <code>SELECT</code>, <code>UPDATE</code>, <code>DELETE</code>) com sintaxe correta em PostgreSQL.</span></li>
-          <li><span class="obj-tag">OA-2</span><span><strong>Compor</strong> consultas com <code>WHERE</code>, <code>ORDER BY</code>, <code>LIMIT</code> e <code>OFFSET</code> para filtragem, ordenação e paginação.</span></li>
-          <li><span class="obj-tag">OA-3</span><span><strong>Identificar</strong> o risco de <code>UPDATE</code>/<code>DELETE</code> sem <code>WHERE</code> e adotar checklist defensivo antes de executar.</span></li>
-          <li><span class="obj-tag">OA-4</span><span><strong>Operar</strong> transações com <code>BEGIN</code>, <code>COMMIT</code> e <code>ROLLBACK</code> respeitando as propriedades ACID.</span></li>
-          <li><span class="obj-tag">OA-5</span><span><strong>Criar</strong> índices simples e justificar quando vale a pena usá-los.</span></li>
-          <li><span class="obj-tag">OA-6</span><span><strong>Implementar</strong> todas as operações de dados do minimundo da equipe no banco do projeto.</span></li>
+          <li><span class="obj-tag">OA-1</span><span><strong>Distinguir</strong> os artefatos de modelagem (Classes do Domínio, ER, DER, Modelo Físico) e quando cada um é apropriado.</span></li>
+          <li><span class="obj-tag">OA-2</span><span><strong>Identificar</strong> cardinalidades (1:1, 1:N, N:N) em uma regra de negócio do BrPec e justificar a escolha.</span></li>
+          <li><span class="obj-tag">OA-3</span><span><strong>Aplicar</strong> as três primeiras formas normais reconhecendo violações típicas e propondo decomposição.</span></li>
+          <li><span class="obj-tag">OA-4</span><span><strong>Traduzir</strong> um DER em <code>CREATE TABLE</code> SQLite com PK, FK, NOT NULL, UNIQUE e CHECK que protejam a RN.</span></li>
+          <li><span class="obj-tag">OA-5</span><span><strong>Executar</strong> os 4 verbos do CRUD em SQLite com refinamentos básicos (<code>WHERE</code>, <code>ORDER BY</code>) e justificar quando criar índice.</span></li>
+          <li><span class="obj-tag">OA-6</span><span><strong>Cravar</strong> a rastreabilidade RN → Entidade → Tabela → Constraint para o cenário do grupo.</span></li>
+        </ul>
+      </section>
+
+      <section class="mat-section" id="sec-onde">
+        <h2>Onde queremos chegar</h2>
+        <p>Ao final dos 75 minutos de instrução (e antes da Ponderada), cada grupo deve sair com:</p>
+        <ul>
+          <li>☐ Diagrama de classes do domínio do seu cenário</li>
+          <li>☐ ER com entidades e relacionamentos</li>
+          <li>☐ DER com cardinalidades e chaves</li>
+          <li>☐ <code>CREATE TABLE</code> em SQLite (DDL)</li>
+          <li>☐ Linha de rastreabilidade: RN → Entidade → Tabela → Constraint</li>
         </ul>
       </section>
 
       <section class="mat-section" id="sec-pre">
         <h2>Pré-requisitos</h2>
         <ul>
-          <li>Aula 2 concluída: tabelas criadas no banco da equipe a partir do <code>CREATE TABLE</code>.</li>
-          <li>Massa de dados mínima inserida (3+ <code>INSERT</code>s na aula anterior).</li>
-          <li>Cliente SQL operacional (<code>psql</code>, DBeaver, TablePlus ou extensão SQL do VS Code).</li>
-          <li>Repositório com <code>db/01_create_tables.sql</code> mergeado na <code>develop</code>.</li>
+          <li>Aula 2 (Banco de Dados I) concluída: leitura conceitual + SQL básico.</li>
+          <li>Autoestudo da aula 3 lido (Codd, Chen, ORM Anti-Pattern, capítulo SQL, SWEBOK Data Design, vídeo CRUD em PostgreSQL — atenção: usaremos SQLite, mas a sintaxe CRUD é idêntica).</li>
+          <li><strong>SQLite instalado</strong> e cliente operacional (DBeaver Community, SQLite Studio ou extensão SQLite no VS Code) — instruções no slide do Bloco 4.</li>
+          <li>Turma já dividida em <strong>5 grupos</strong> (organização da turma 26).</li>
         </ul>
       </section>
 
       <section class="mat-section" id="sec-day">
-        <h2>Cronograma do dia</h2>
-        <p>Mesma estrutura: três blocos de duas horas, com a janela da tarde dedicada a transformar o conteúdo em CRUD real no projeto.</p>
+        <h2>Cronograma da aula (2h)</h2>
+        <p>A aula tem <strong>120 minutos</strong>. Dos quais:</p>
+        <ul>
+          <li><strong>15 min</strong> de daily (abertura).</li>
+          <li><strong>75 min</strong> de instrução em 7 blocos curtos (sala invertida + metodologia ativa).</li>
+          <li><strong>30 min</strong> de Ponderada I em sala (alunos trabalham individualmente, professor circula como tutor).</li>
+        </ul>
         <div class="day-timeline">
-          <div class="day-block autoest">
-            <div class="blk-head"><h3 class="blk-title">📚 Bloco 1 · Autoestudo</h3><span class="blk-time">08h00 — 10h00</span></div>
-            <p>Estudo individual orientado pelo material da aula 3.</p>
+          <div class="day-block daily">
+            <div class="blk-head"><h3 class="blk-title">🗣️ Bloco 0 · Daily</h3><span class="blk-time">00:00 — 00:15</span></div>
+            <p>Cada aluno responde, em até 1 minuto: <em>o que do autoestudo me marcou / qual RN do BrPec ainda me confunde / qual dúvida concreta trouxe pra aula</em>.</p>
+            <p style="font-size:.85rem;color:var(--muted)"><em>Cronômetro disponível no slide 2.</em></p>
+          </div>
+          <div class="day-block quiz">
+            <div class="blk-head"><h3 class="blk-title">⚡ Bloco 1 · Quiz socrático (3 perguntas)</h3><span class="blk-time">00:15 — 00:22 · 7 min</span></div>
+            <p>Diagnóstico de leitura. 3 perguntas projetadas (Codd · ORM · ER vs DER). 30s de silêncio · 2-3 voluntários · revele a âncora ao final. Notas em <code>notas-do-professor/aula-3-perguntas-socraticas.md</code>.</p>
+          </div>
+          <div class="day-block story">
+            <div class="blk-head"><h3 class="blk-title">🐂 Bloco 2 · "Da boleta à tabela" — storytelling BrPec</h3><span class="blk-time">00:22 — 00:32 · 10 min</span></div>
+            <p>Slide-narrativa: boleta de papel → frase do capataz no rádio → substantivos circulados → diagrama de classes → ER → DER → DDL SQLite. Mostra o caminho mecânico inteiro com o exemplo do nascimento do bezerro 47.</p>
+          </div>
+          <div class="day-block formal">
+            <div class="blk-head"><h3 class="blk-title">📐 Bloco 3 · Revisão formal — Chen + Formas Normais</h3><span class="blk-time">00:32 — 00:47 · 15 min</span></div>
+            <p>Cardinalidades de Chen (1:1, 1:N, N:N) com <strong>animações de direção</strong> e exemplos BrPec. Em seguida 1FN/2FN/3FN com violação típica → decomposição. Foco prático: o que cada FN <em>nos protege</em> de quebrar no BrPec.</p>
+          </div>
+          <div class="day-block setup">
+            <div class="blk-head"><h3 class="blk-title">💾 Bloco 4 · Setup SQLite + IDE</h3><span class="blk-time">00:47 — 00:52 · 5 min</span></div>
+            <p>Slide com abas Windows · macOS · Linux · comando de instalação e verificação. Slide seguinte com 3 IDEs (DBeaver Community recomendado, SQLite Studio, extensão VS Code). Quem ainda não tiver instalado, instala agora ou senta em dupla com quem tem.</p>
+          </div>
+          <div class="day-block group">
+            <div class="blk-head"><h3 class="blk-title">👥 Bloco 5 · Modelagem em 5 grupos</h3><span class="blk-time">00:52 — 01:12 · 20 min</span></div>
+            <p>Cada grupo recebe (no slide) uma RN do BrPec e modela: entidades + cardinalidade + DDL SQLite + 1 constraint que protege a RN. <strong>Cronômetro de 20 min visível no slide.</strong></p>
             <ul>
-              <li>Leitura completa do <strong>Material da Aula 3</strong> (CRUD, transações, índices).</li>
-              <li>Listar 5 operações de negócio do minimundo da equipe — uma para cada verbo CRUD + uma de paginação.</li>
-              <li>Validar conexão ao banco da equipe e revisar dados existentes (<code>SELECT * FROM ...</code>).</li>
-              <li>Caderno de bordo: registrar dúvidas concretas sobre transações e índices.</li>
+              <li>15 min de trabalho no grupo.</li>
+              <li>5 min de apresentação relâmpago de 2 grupos voluntários no quadro/Miro projetado.</li>
             </ul>
           </div>
-          <div class="day-block pe">
-            <div class="blk-head"><h3 class="blk-title">🎓 Bloco 2 · Instrução PE — Aula em metodologia ativa</h3><span class="blk-time">10h00 — 12h00</span></div>
-            <p>Encontro síncrono com o professor especialista. 15 minutos de daily seguidos de 1h45 de aula.</p>
-            <ul>
-              <li><strong>10h00 — 10h15</strong> · Daily: andamento do banco e impedimentos.</li>
-              <li><strong>10h15 — 12h00</strong> · CRUD em laboratório, transações com cenário real e índices na prática.</li>
-            </ul>
+          <div class="day-block crud">
+            <div class="blk-head"><h3 class="blk-title">⚡ Bloco 6 · Síntese — CRUD ao vivo + rastreabilidade</h3><span class="blk-time">01:12 — 01:22 · 10 min</span></div>
+            <p>Pega-se a tabela de 1 grupo voluntário e roda INSERT, SELECT, UPDATE, DELETE no SQLite projetado. Cada operação dispara 1 pergunta socrática. Demonstração intencional do <code>UPDATE</code> sem <code>WHERE</code>. Fechamento com tabela de rastreabilidade RN → Entidade → Tabela → Constraint.</p>
           </div>
-          <div class="day-block lunch">
-            <div class="blk-head"><h3 class="blk-title">🍴 Intervalo · Almoço</h3><span class="blk-time">12h00 — 14h00</span></div>
-            <p>Janela livre. Recomenda-se não tratar conteúdo da aula nesse período.</p>
+          <div class="day-block brief">
+            <div class="blk-head"><h3 class="blk-title">📋 Bloco 7 · Briefing da Ponderada I</h3><span class="blk-time">01:22 — 01:30 · 8 min</span></div>
+            <p>Apresenta o enunciado, a entrega mínima (8 RNFs + 3 diagramas de sequência + tabela de rastreabilidade), o critério de qualidade ("se o RNF não puder ser testado, reescreva") e o formato de entrega (foto em papel A4 no GitLab).</p>
           </div>
-          <div class="day-block dev">
-            <div class="blk-head"><h3 class="blk-title">🛠️ Bloco 3 · Desenvolvimento do projeto</h3><span class="blk-time">14h00 — 16h00</span></div>
-            <p>Janela de trabalho da equipe sobre o projeto integrador, com mentoria disponível.</p>
-            <ul>
-              <li>Escrever <code>db/02_seed.sql</code> com massa de teste realista para todas as tabelas.</li>
-              <li>Escrever <code>db/queries.sql</code> com 10+ queries representativas das operações do minimundo.</li>
-              <li>Implementar pelo menos 2 transações relevantes (ex.: criar pedido + atualizar estoque).</li>
-              <li>Avaliar 2 candidatos a índices e justificar no <code>docs/banco/decisoes.md</code>.</li>
-              <li>Abrir Merge Request <code>feat(db): crud e transações</code>.</li>
-            </ul>
+          <div class="day-block pondera">
+            <div class="blk-head"><h3 class="blk-title">📝 Bloco 8 · Ponderada I em sala</h3><span class="blk-time">01:30 — 02:00 · 30 min</span></div>
+            <p>Alunos trabalham <strong>individualmente em papel A4</strong>. Professor circula respondendo dúvidas — <em>não revele respostas, valide critérios.</em> <strong>Cronômetro hero visível no slide.</strong></p>
           </div>
         </div>
       </section>
 
       <section class="mat-section" id="sec-class">
-        <h2>Detalhamento da instrução PE (10h00 — 12h00)</h2>
-        <p>Estrutura idêntica às aulas anteriores: blocos curtos de exposição alternados com prática em pares.</p>
-        <div class="class-line">
-          <div class="cl-time">10h00<br>10h15</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-dy">Daily</span>Daily de abertura</h4><p>Cada aluno responde, em até 1 minuto: <em>como está o banco da equipe / qual operação do CRUD trouxe pronta / qual minha dúvida concreta</em>.</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">10h15<br>10h30</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>CRUD em síntese · O ciclo operacional</h4><p>Exposição curta (12 min) revisando a anatomia dos 4 verbos com exemplos lado a lado e seus padrões de retorno.</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">10h30<br>10h55</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Laboratório de SELECT — WHERE, ORDER BY, LIMIT</h4><p>Em duplas, os alunos respondem 6 perguntas de negócio do minimundo escrevendo apenas <code>SELECT</code>. Três duplas apresentam alternativas — debate sobre legibilidade e cardinalidade do resultado.</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">10h55<br>11h15</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>UPDATE e DELETE com defesa</h4><p>Demonstração intencional do desastre: <code>UPDATE produtos SET preco=0;</code> sem <code>WHERE</code>. Em duplas, os alunos definem checklist defensivo (testar com <code>SELECT</code> primeiro, usar transação, fazer backup) e aplicam para reescrever 2 mutações.</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">11h15<br>11h35</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Transações ACID em cenário real</h4><p>Live coding: criar pedido + dar baixa no estoque dentro de uma única transação. Ao vivo, o professor injeta uma falha no meio para mostrar o <code>ROLLBACK</code>. Alunos replicam em pares com a transação da própria equipe.</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">11h35<br>11h50</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Índices — quando vale a pena?</h4><p>Apresentação de uma tabela de 100k linhas. Cada dupla recebe uma query e decide se cria (ou não) um índice, justificando o trade-off (leitura rápida vs. escrita mais lenta). Consolidação coletiva.</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">11h50<br>12h00</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Síntese e contrato do dia</h4><p>Cada aluno escreve no caderno de bordo, em uma frase, <em>"a aula 3 me ensinou que..."</em>. O professor anuncia a entrega esperada das 14h às 16h.</p></div>
-        </div>
+        <h2>Detalhamento minuto a minuto (instrução PE)</h2>
+        <p>Esse detalhe orienta o ritmo dos slides. Cada bloco tem início, meio e fim definidos.</p>
+
+        <h3>Bloco 1 (15:00 — 22:00) · Quiz socrático</h3>
+        <ol>
+          <li><strong>15:00 — 15:30</strong> · projete a pergunta 1 (Codd). Silêncio de 30 segundos.</li>
+          <li><strong>15:30 — 17:00</strong> · 2-3 voluntários respondem. Sem corrigir ainda. Revele a âncora e amarre com Codd.</li>
+          <li><strong>17:00 — 19:00</strong> · pergunta 2 (ORM). Mesmo ritmo.</li>
+          <li><strong>19:00 — 22:00</strong> · pergunta 3 (ER vs DER). Mesmo ritmo. <strong>Sinal de alarme:</strong> se mais da metade errar essa, reduza o exercício do bloco 5 e dedique 5 min extras a ER→DER guiado.</li>
+        </ol>
+
+        <h3>Bloco 2 (22:00 — 32:00) · Da boleta à tabela</h3>
+        <p>Storytelling com 7 slides em ritmo rápido (~1 min cada). Não tente esgotar conteúdo — o objetivo é mostrar que <strong>a tradução é mecânica</strong> quando a modelagem é boa. O DDL final fica como ponto de chegada visível.</p>
+
+        <h3>Bloco 3 (32:00 — 47:00) · Chen + Formas Normais</h3>
+        <ul>
+          <li><strong>32:00 — 38:00</strong> · 3 slides de cardinalidade (1:N, N:N, 1:1) com a "bolinha viajante" mostrando a direção da relação. Para cada uma, mostre onde a FK mora no DDL.</li>
+          <li><strong>38:00 — 45:00</strong> · 3 slides de Forma Normal (1FN, 2FN, 3FN) — cada um mostra <strong>violação BrPec</strong> em vermelho ao lado da <strong>decomposição</strong> em verde.</li>
+          <li><strong>45:00 — 47:00</strong> · pergunta de fixação à turma: "qual FN está sendo violada se eu armazenar lista de bovinos numa coluna como string CSV?" (1FN — atomicidade).</li>
+        </ul>
+
+        <h3>Bloco 4 (47:00 — 52:00) · Setup</h3>
+        <p>Em 5 minutos, mostre os comandos de instalação por SO (slide com abas Windows/macOS/Linux) e a recomendação de IDE. <strong>Não pause</strong> para esperar instalação — alunos sem ferramenta sentam em dupla no Bloco 5.</p>
+
+        <h3>Bloco 5 (52:00 — 1:12) · Modelagem em 5 grupos</h3>
+        <ul>
+          <li><strong>52:00 — 53:00</strong> · projete o slide com os 5 cenários e os 4 entregáveis. <strong>Inicie o cronômetro</strong> manualmente após explicar.</li>
+          <li><strong>53:00 — 1:08</strong> · 15 min de trabalho dos grupos. <strong>Você circula</strong>. Boas intervenções: "essa cardinalidade é 1:N ou N:N?", "qual constraint protege essa regra?", "o que aconteceria se o capataz registrasse evento num retiro inexistente?".</li>
+          <li><strong>1:08 — 1:12</strong> · 2 grupos voluntários compartilham seu DER no quadro/Miro projetado. Você comenta ao vivo. <strong>Não corrija para "perfeito" — corrija para "rastreável".</strong></li>
+        </ul>
+
+        <h3>Bloco 6 (1:12 — 1:22) · CRUD ao vivo</h3>
+        <p>Pegue uma das tabelas do Bloco 5 e abra o SQLite projetado. Execute, na ordem:</p>
+        <ol>
+          <li><code>INSERT</code> → pergunte "se eu omitir <code>capataz_id</code>, o que acontece?" (NOT NULL).</li>
+          <li><code>SELECT</code> → pergunte "como faço esse SELECT ser rápido com 100k linhas?" (CREATE INDEX).</li>
+          <li><code>UPDATE</code> sem <code>WHERE</code> → <strong>execute ao vivo</strong>, deixe a turma rir, reverta e mostre transação.</li>
+          <li><code>DELETE</code> → introduza soft delete (<code>deleted_at</code>) e diga por que faz sentido em fazenda (auditoria zootécnica).</li>
+        </ol>
+        <p>Encerre com a tabela de rastreabilidade preenchida (slide 24). <strong>Frase de bordão:</strong> "<em>quando a turma perguntar 'e se o usuário fizer X', a resposta nunca deve começar com 'eu valido no controller' — começa com 'o banco rejeita por causa da constraint Y'</em>".</p>
+
+        <h3>Bloco 7 (1:22 — 1:30) · Briefing</h3>
+        <p>Slide com a Entrega Mínima e o Formato. Mostre que <strong>o exercício do Bloco 5 já produziu metade do que a Ponderada pede</strong> — o trabalho de agora é organizar e fechar. Distribua papel A4 e canetas se a turma não trouxer.</p>
+
+        <h3>Bloco 8 (1:30 — 2:00) · Ponderada em sala</h3>
+        <p>Alunos trabalham. Você circula. Aceite responder "<em>seu RNF está testável?</em>" mas <strong>não dite a métrica</strong>. Aos 5 minutos finais, avise: "5 minutos para fotografar e enviar". Aos 0 segundos: pasta no GitLab fecha.</p>
+      </section>
+
+      <section class="mat-section" id="sec-grupos">
+        <h2>Os 5 grupos — RNs distribuídas</h2>
+        <table class="res-table group-table">
+          <thead><tr><th>Grupo</th><th>Regra de negócio do BrPec</th><th>Ator principal</th><th>Constraint-chave esperada</th></tr></thead>
+          <tbody>
+            <tr><td class="gnum">Grupo 1</td><td>Gerente cria tarefa calendarizada para 1 capataz, com prazo, descrição e prioridade</td><td>Gerente → Capataz</td><td><code>FK capataz_id</code> + <code>CHECK(prioridade IN (...))</code></td></tr>
+            <tr><td class="gnum">Grupo 2</td><td>Capataz anexa evidência (foto/áudio/texto) ao concluir tarefa — várias evidências por tarefa</td><td>Capataz</td><td><code>FK tarefa_id NOT NULL</code> + <code>CHECK(tipo IN ('foto','audio','texto'))</code></td></tr>
+            <tr><td class="gnum">Grupo 3</td><td>Capataz registra nascimento de bezerro (mãe é vaca existente, sexo, peso, retiro)</td><td>Capataz</td><td><code>FK mae_id REFERENCES bovinos(id)</code> + <code>CHECK(sexo IN ('M','F'))</code></td></tr>
+            <tr><td class="gnum">Grupo 4</td><td>Transferência de 1 bovino entre retiros (origem → destino, data) — histórico auditável</td><td>Capataz</td><td><code>FK origem_id, destino_id REFERENCES retiros(id)</code> + <code>CHECK(origem_id != destino_id)</code></td></tr>
+            <tr><td class="gnum">Grupo 5</td><td>Capataz dispara alerta sobre problema no retiro (cerca, animal, água), gravidade e foto opcional</td><td>Capataz → Gerente</td><td><code>CHECK(gravidade IN ('baixa','media','alta'))</code> + <code>FK retiro_id NOT NULL</code></td></tr>
+          </tbody>
+        </table>
       </section>
 
       <section class="mat-section" id="sec-am">
         <h2>Estratégias de metodologia ativa</h2>
         <ul>
-          <li><strong>Aprendizagem por desastre controlado</strong> — viver, em sala, o efeito do <code>UPDATE</code> sem <code>WHERE</code> para internalizar a regra defensiva.</li>
-          <li><strong>Aprendizagem baseada em problema</strong> — toda query nasce de uma pergunta de negócio do minimundo, nunca de um exercício abstrato.</li>
-          <li><strong>Decisão fundamentada em pares</strong> — sobre índices e transações, a dupla precisa <em>defender</em> a escolha antes de implementar.</li>
+          <li><strong>Sala de aula invertida:</strong> as referências de Codd/Chen/Bugayenko/SQL/SWEBOK são lidas <em>antes</em>. O quiz do Bloco 1 não é prova — é diagnóstico de leitura e gancho pra aula.</li>
+          <li><strong>Aprendizagem por desastre controlado:</strong> rodar <code>UPDATE sem WHERE</code> ao vivo no Bloco 6. A turma vê o estrago e o checklist defensivo nasce sozinho.</li>
+          <li><strong>Modelagem em pares/grupos:</strong> cada grupo trabalha numa RN diferente, garantindo cobertura horizontal do MVP. Em 15 min, todos saem com algo concreto.</li>
+          <li><strong>Decisão fundamentada:</strong> a constraint exigida no Bloco 5 não é "qualquer constraint" — tem que <em>defender</em> uma RN específica. Dá rastreabilidade explícita.</li>
         </ul>
         <div class="callout callout-tip">
           <div class="callout-label">Princípio orientador</div>
-          <p>Toda mutação no banco precisa estar precedida por um <code>SELECT</code> que prova o que vai mudar.</p>
+          <p>Toda mutação no banco precisa estar precedida pelo <code>SELECT</code> que prova o que vai mudar.</p>
         </div>
       </section>
 
@@ -264,43 +338,69 @@
         <table class="res-table">
           <thead><tr><th>Categoria</th><th>Recurso</th><th>Uso</th></tr></thead>
           <tbody>
-            <tr><td>Slides</td><td><code>slides/slide-lesson-3.html</code></td><td>Exposição na instrução PE</td></tr>
-            <tr><td>Material</td><td><code>materials/lesson-3-material.html</code></td><td>Autoestudo</td></tr>
-            <tr><td>SGBD</td><td>PostgreSQL 15+</td><td>Execução de DDL/DML</td></tr>
-            <tr><td>Cliente SQL</td><td><code>psql</code> ou DBeaver</td><td>Transações e <code>EXPLAIN</code></td></tr>
-            <tr><td>Repositório</td><td><code>db/02_seed.sql</code> e <code>db/queries.sql</code></td><td>Massa de teste e queries</td></tr>
-            <tr><td>Documentação</td><td><code>docs/banco/decisoes.md</code></td><td>Justificativa de índices</td></tr>
+            <tr><td>Slides da aula</td><td><code>slides/slide-lesson-3.html</code></td><td>Apresentação com cronômetros embutidos para daily, exercício e ponderada</td></tr>
+            <tr><td>Material de leitura</td><td><code>materials/lesson-3-material.html</code></td><td>Autoestudo prévio + consulta durante a aula + base da ponderada</td></tr>
+            <tr><td>Notas do professor</td><td><code>notas-do-professor/aula-3-perguntas-socraticas.md</code></td><td>Cola privada com perguntas + respostas-âncora + exemplos BrPec</td></tr>
+            <tr><td>SGBD</td><td>SQLite 3.x</td><td>Execução do DDL e do CRUD ao vivo</td></tr>
+            <tr><td>IDE</td><td>DBeaver Community (rec.) · SQLite Studio · extensão VS Code</td><td>Inspeção visual do esquema e dados</td></tr>
+            <tr><td>Modelagem visual dos grupos</td><td>Miro · Excalidraw · quadro branco</td><td>Diagrama de classes e DER em colaboração</td></tr>
+            <tr><td>Entrega ponderada</td><td>Papel A4 + foto + GitLab</td><td>Conforme padrão da disciplina</td></tr>
           </tbody>
         </table>
       </section>
 
       <section class="mat-section" id="sec-aval">
         <h2>Verificação de aprendizagem</h2>
-        <p>Avaliação <strong>formativa</strong> ao longo do dia.</p>
+        <p>Avaliação <strong>formativa</strong> ao longo da aula (a Ponderada I tem rubrica própria).</p>
         <ul class="crit-list">
-          <li><span class="obj-tag">CR-1</span><span>Participou da daily com diagnóstico claro do estado do banco da equipe.</span></li>
-          <li><span class="obj-tag">CR-2</span><span>Resolveu, em par, ao menos 4 das 6 perguntas de negócio do laboratório de <code>SELECT</code>.</span></li>
-          <li><span class="obj-tag">CR-3</span><span>Aplicou checklist defensivo antes de executar <code>UPDATE</code>/<code>DELETE</code> em sala.</span></li>
-          <li><span class="obj-tag">CR-4</span><span>Demonstrou uma transação com <code>ROLLBACK</code> intencional no banco da equipe.</span></li>
-          <li><span class="obj-tag">CR-5</span><span>Abriu Merge Request <code>feat(db): crud e transações</code> com seed, queries e decisões de índice até as 16h00.</span></li>
+          <li><span class="obj-tag">CR-1</span><span>Participou da daily com diagnóstico claro do que leu e o que confunde.</span></li>
+          <li><span class="obj-tag">CR-2</span><span>No Bloco 5, o grupo entregou os 4 itens (entidades · cardinalidade · DDL · constraint).</span></li>
+          <li><span class="obj-tag">CR-3</span><span>A constraint apresentada está <strong>explicitamente associada</strong> a uma RN do BrPec (rastreabilidade).</span></li>
+          <li><span class="obj-tag">CR-4</span><span>O grupo identificou corretamente a cardinalidade do relacionamento principal do seu cenário.</span></li>
+          <li><span class="obj-tag">CR-5</span><span>Entregou a Ponderada I em sala dentro dos 30 minutos.</span></li>
         </ul>
         <div class="callout callout-warn">
-          <div class="callout-label">Critério mínimo</div>
-          <p>Aluno que sair às 16h sem o <strong>CRUD completo do minimundo</strong> rodando está em débito técnico para a aula 4 (JOINs).</p>
+          <div class="callout-label">Sinal de alerta</div>
+          <p>Grupo que entrega DDL sem nenhuma constraint além da PK <strong>não absorveu o ponto central</strong> da aula. Marque pra retomar individualmente nas mentorias da semana.</p>
         </div>
       </section>
 
-      <section class="mat-section" id="sec-next">
-        <h2>Conexão com a aula 4</h2>
-        <p>A aula 4 introduz <strong>JOINs</strong>. As queries refinadas hoje serão a base para relatórios cruzando múltiplas tabelas.</p>
+      <section class="mat-section" id="sec-pond">
+        <h2>Ponderada I em sala (30 min finais)</h2>
+        <h3>Enunciado</h3>
+        <p>Nas aulas 1 e 2 vocês mapearam atores, regras de negócio e entidades do projeto. Agora é hora de traduzir isso em <strong>design computacional</strong>: descrever os RNFs de forma técnica e verificável, e representar os fluxos principais como <strong>diagramas de sequência UML</strong> entre as camadas do back-end.</p>
+
+        <h3>Entrega mínima (não garante nota máxima)</h3>
         <ul>
-          <li>A massa do <code>seed.sql</code> precisa ter pedidos com vários produtos para os JOINs renderem resultados úteis.</li>
-          <li>As <code>FOREIGN KEY</code>s do esquema serão exploradas em <code>INNER</code>, <code>LEFT</code> e agregações.</li>
-          <li>Manter o minimundo: nenhuma troca de domínio entre as aulas do bloco de banco.</li>
+          <li><strong>Tabela de RNFs nos 8 eixos</strong>, com pelo menos uma métrica ou critério concreto por eixo.</li>
+          <li><strong>3 diagramas de sequência</strong> com 4 camadas (Controller → Service → Repository → Banco), fluxo principal e ao menos 1 fluxo alternativo cada.</li>
+          <li><strong>Tabela de rastreabilidade RF → RNF → Diagrama</strong> preenchida para os 3 diagramas.</li>
+        </ul>
+
+        <h3>Critério de qualidade</h3>
+        <div class="callout callout-danger">
+          <div class="callout-label">Regra de ouro</div>
+          <p>Se o RNF não puder ser testado ou inspecionado, reescreva até que possa.</p>
+        </div>
+
+        <h3>Formato de entrega</h3>
+        <p>Foto da resposta em papel A4 numa pasta no grupo de ponderadas no GitLab. Numere as páginas e identifique cada diagrama (Sequência 1, 2, 3).</p>
+
+        <h3>Conexão com o que foi feito hoje</h3>
+        <p>O DER e o DDL produzidos no Bloco 5 alimentam diretamente o "Banco" dos diagramas de sequência. Os RFs implícitos no cenário do grupo aparecem nos eixos da tabela RNF.</p>
+      </section>
+
+      <section class="mat-section" id="sec-next">
+        <h2>Conexão com a aula 4 (Banco de Dados III · Joins)</h2>
+        <p>A aula 4 (12/05/2026) usa as tabelas modeladas hoje como base para <code>INNER JOIN</code>, <code>LEFT JOIN</code> e agregações:</p>
+        <ul>
+          <li>Relatórios do Coordenador unindo <code>eventos_zootecnicos</code> + <code>retiros</code> + <code>capatazes</code>.</li>
+          <li>Contagem de bovinos por retiro (<code>GROUP BY retiro_id</code>).</li>
+          <li>Histórico de movimentações com <code>LEFT JOIN</code> em retiro de origem e destino.</li>
         </ul>
         <div class="callout callout-info">
           <div class="callout-label">Para o autoestudo da aula 4</div>
-          <p>Antes das 8h do próximo dia: ler o material da aula 4, identificar 3 relatórios do minimundo que exigem unir tabelas e anotar dúvidas sobre cardinalidade dos resultados.</p>
+          <p>Antes da próxima aula: anotar 3 perguntas de relatório do BrPec que exigiriam unir tabelas. Quanto melhor a modelagem de hoje, mais fáceis serão os JOINs.</p>
         </div>
       </section>
 
@@ -314,7 +414,7 @@
 
   <footer class="inteli-footer mt-auto py-4 bg-light border-top">
     <div class="container text-center">
-      <p class="mb-1">Material criado pelo professor <strong>Afonso Brandão</strong> para o <strong>Inteli</strong>.</p>
+      <p class="mb-1">Adaptação para a turma 26 por <strong>Prof. Ovidio Lopes Netto da Cruz</strong> · material-base de <strong>Prof. Afonso Brandão</strong>.</p>
       <small class="text-muted">🔓 Licença de leitura aberta</small>
     </div>
   </footer>
@@ -331,17 +431,11 @@
     });
     const tocLinks = document.querySelectorAll('.mat-toc a');
     const sections = document.querySelectorAll('.mat-section');
-    const spy = () => {
+    window.addEventListener('scroll', () => {
       let current = '';
-      sections.forEach((s) => {
-        const top = s.getBoundingClientRect().top;
-        if (top < 120) current = s.id;
-      });
-      tocLinks.forEach((a) => {
-        a.classList.toggle('active', a.getAttribute('href') === '#' + current);
-      });
-    };
-    window.addEventListener('scroll', spy);
+      sections.forEach((s) => { if (s.getBoundingClientRect().top < 120) current = s.id; });
+      tocLinks.forEach((a) => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
+    });
   </script>
 </body>
 </html>
