@@ -4,12 +4,16 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🗂️</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aula 4 — Plano de Ensino — Banco de Dados III · JOINs — Inteli</title>
+  <title>Aula 4 — Plano de Ensino — BD III · JOINs — BrPec — Inteli</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../../css/inteli-styles.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
   <style>
-    :root { --ac:#4b5563; --hi:#b2b6bf; --dk:#2e2640; --gr:#0d9488; --re:#dc2626; --am:#d97706; --text:#1e293b; --muted:#64748b; --border:#e2e8f0; --bg:#f8fafc; --card:#ffffff; }
+    :root {
+      --ac:#4b5563; --hi:#b2b6bf; --dk:#2e2640; --gr:#0d9488; --re:#dc2626; --am:#d97706;
+      --text:#1e293b; --muted:#64748b; --border:#e2e8f0; --bg:#f8fafc; --card:#ffffff;
+      --pasture:#3f6d3a; --pri:#1d4ed8;
+    }
     *, *::before, *::after { box-sizing: border-box; }
     body { font-family:'Manrope',sans-serif; color:var(--text); background:var(--bg); }
     #progress-bar { position:fixed; top:0; left:0; height:3px; background:linear-gradient(90deg,var(--ac),var(--hi)); width:0%; z-index:9999; transition:width .1s; }
@@ -20,9 +24,10 @@
     .fn-btn-back { background:var(--dk); color:white; }
     .fn-btn-slides { background:white; color:var(--ac); border:2px solid var(--ac); }
     .fn-btn-mat { background:white; color:var(--gr); border:2px solid var(--gr); }
-    .mat-header { background:linear-gradient(135deg,#1f2937 0%,#4b5563 50%,#b2b6bf 100%); color:white; padding:44px 0 36px; }
+    .fn-btn-sandbox { background:#1d4ed8; color:white; }
+    .mat-header { background:linear-gradient(135deg,#1f2937 0%,#3f6d3a 60%,#7eb6d9 100%); color:white; padding:44px 0 36px; }
     .mat-header h1 { font-size:2.2rem; font-weight:800; margin:0 0 8px; }
-    .mat-header .subtitle { font-size:1.02rem; opacity:.88; margin:0 0 20px; max-width:780px; }
+    .mat-header .subtitle { font-size:1.02rem; opacity:.88; margin:0 0 20px; max-width:820px; }
     .mat-badge { background:rgba(255,255,255,.15); border:1px solid rgba(255,255,255,.3); color:white; padding:4px 14px; border-radius:999px; font-size:.78rem; font-weight:700; display:inline-block; margin-bottom:12px; margin-right:6px; }
     .mat-layout { display:grid; grid-template-columns:260px 1fr; gap:32px; max-width:1200px; margin:0 auto; padding:36px 24px; }
     @media(max-width:900px){ .mat-layout { grid-template-columns:1fr; } .mat-sidebar { display:none; } }
@@ -41,7 +46,8 @@
     .mat-section strong { color:var(--dk); }
     .mat-section code { background:#eef2f7; color:#1f2937; padding:1px 6px; border-radius:5px; font-family:'JetBrains Mono',monospace; font-size:.84em; }
     .intro-card { background:var(--card); border:1px solid var(--border); border-left:4px solid var(--dk); border-radius:12px; padding:18px 22px; margin-bottom:28px; }
-    .intro-card p { margin-bottom:8px; } .intro-card p:last-child { margin-bottom:0; }
+    .intro-card p { margin-bottom:8px; }
+    .intro-card p:last-child { margin-bottom:0; }
     .id-grid { display:grid; grid-template-columns:repeat(2,1fr); gap:10px; margin:8px 0 0; }
     @media(max-width:560px){ .id-grid { grid-template-columns:1fr; } }
     .id-cell { background:#f1f5f9; border-radius:10px; padding:10px 14px; }
@@ -49,25 +55,19 @@
     .id-cell .id-val { font-size:.92rem; font-weight:700; color:var(--dk); margin-top:2px; }
     .day-timeline { display:grid; gap:14px; margin-top:12px; }
     .day-block { background:var(--card); border:1px solid var(--border); border-radius:14px; padding:18px 22px; box-shadow:0 2px 6px rgba(0,0,0,.04); border-left:5px solid var(--ac); }
-    .day-block.autoest { border-left-color:#3b82f6; }
-    .day-block.pe      { border-left-color:#8b5cf6; }
-    .day-block.lunch   { border-left-color:#eab308; background:#fefce8; }
-    .day-block.dev     { border-left-color:#0d9488; }
+    .day-block.daily   { border-left-color:#8b5cf6; }
+    .day-block.recap   { border-left-color:#3b82f6; }
+    .day-block.theory  { border-left-color:#0d9488; }
+    .day-block.agg     { border-left-color:#1d4ed8; }
+    .day-block.demo    { border-left-color:#0ea5e9; }
+    .day-block.lab     { border-left-color:#d97706; }
+    .day-block.quiz    { border-left-color:#7c3aed; }
+    .day-block.pondera { border-left-color:#7f1d1d; background:#fef2f2; }
     .day-block .blk-head { display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; margin-bottom:8px; }
-    .day-block .blk-time { font-family:'JetBrains Mono',monospace; font-size:.85rem; font-weight:700; color:var(--dk); background:#f1f5f9; padding:3px 10px; border-radius:6px; white-space:nowrap; }
-    .day-block .blk-title { font-size:1.05rem; font-weight:800; color:var(--dk); margin:0; }
-    .day-block p { margin:0 0 6px; font-size:.93rem; }
+    .day-block .blk-time { font-family:'JetBrains Mono',monospace; font-size:.82rem; font-weight:700; color:var(--dk); background:#f1f5f9; padding:3px 10px; border-radius:6px; white-space:nowrap; }
+    .day-block .blk-title { font-size:1rem; font-weight:800; color:var(--dk); margin:0; }
+    .day-block p { margin:0 0 6px; font-size:.91rem; }
     .day-block ul { margin:6px 0 0; padding-left:1.3rem; }
-    .class-line { display:grid; grid-template-columns:90px 1fr; gap:14px; padding:12px 0; border-bottom:1px dashed var(--border); }
-    .class-line:last-child { border-bottom:none; }
-    .class-line .cl-time { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--ac); font-size:.85rem; padding-top:2px; }
-    .class-line .cl-content h4 { font-size:.95rem; font-weight:800; color:var(--dk); margin:0 0 4px; }
-    .class-line .cl-content p { margin:0 0 4px; font-size:.9rem; line-height:1.6; }
-    .class-line .cl-tag { display:inline-block; padding:1px 8px; border-radius:5px; font-size:.7rem; font-weight:700; margin-right:6px; }
-    .cl-tag-am  { background:#ede9fe; color:#7c3aed; }
-    .cl-tag-tk  { background:#dbeafe; color:#1d4ed8; }
-    .cl-tag-co  { background:#dcfce7; color:#15803d; }
-    .cl-tag-dy  { background:#fef3c7; color:#92400e; }
     .obj-list, .crit-list { list-style:none; padding:0; margin:0; }
     .obj-list li, .crit-list li { display:flex; gap:10px; align-items:flex-start; padding:8px 0; border-bottom:1px solid var(--border); font-size:.93rem; color:#374151; }
     .obj-list li:last-child, .crit-list li:last-child { border-bottom:none; }
@@ -81,14 +81,18 @@
     .callout-info { background:#eff6ff; border-color:#3b82f6; }
     .callout-tip  { background:#f0fdf4; border-color:#22c55e; }
     .callout-warn { background:#fffbeb; border-color:#f59e0b; }
+    .callout-danger { background:#fef2f2; border-color:#ef4444; }
     .callout-label { font-size:.72rem; font-weight:800; text-transform:uppercase; letter-spacing:.08em; margin-bottom:4px; }
     .callout-info .callout-label { color:#1d4ed8; }
     .callout-tip  .callout-label { color:#15803d; }
     .callout-warn .callout-label { color:#b45309; }
+    .callout-danger .callout-label { color:#b91c1c; }
     .callout p { margin:0; font-size:.92rem; line-height:1.65; color:#374151; }
     .back-cta { text-align:center; padding:26px 0 6px; }
     .back-cta a { color:var(--dk); font-weight:700; text-decoration:none; border:2px solid var(--dk); padding:9px 22px; border-radius:999px; transition:all .2s; }
     .back-cta a:hover { background:var(--dk); color:white; }
+    .group-table { font-size:.88rem; }
+    .group-table .gnum { font-weight:800; color:var(--dk); width:90px; }
   </style>
 </head>
 <body>
@@ -96,15 +100,16 @@
   <div id="float-nav">
     <a href="../slides/slide-lesson-4.html" class="fn-btn fn-btn-slides">🎞️ Slides</a>
     <a href="../materials/lesson-4-material.html" class="fn-btn fn-btn-mat">📝 Material</a>
+    <a href="../assets/brpec/sandbox-sqljs.html" class="fn-btn fn-btn-sandbox" target="_blank">🐄 Sandbox</a>
     <a href="../../index.html" class="fn-btn fn-btn-back">← Módulo</a>
   </div>
 
   <header class="mat-header">
     <div class="container">
-      <span class="mat-badge">Módulo 2 · Ciclo Comum · IN02</span>
+      <span class="mat-badge">Módulo 2 · IN02 · Turma 26</span>
       <span class="mat-badge">Plano de Ensino</span>
-      <h1>Aula 4 — Banco de Dados III · JOINs</h1>
-      <p class="subtitle">Plano operacional do dia: relacionar tabelas com <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">JOIN</code>s, agregar com <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">GROUP BY</code> e responder, em SQL, perguntas reais de negócio do projeto.</p>
+      <h1>Aula 4 — Banco de Dados III · JOINs no retiro</h1>
+      <p class="subtitle">Encontro de 2 horas presenciais para juntar tabelas com <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">JOIN</code>, agregar com <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">GROUP BY</code> e responder, em SQL, perguntas reais de operação do BrPec — tudo rodando dentro do navegador via <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">sql.js</code> (WebAssembly).</p>
       <a href="../../index.html" class="btn btn-outline-light btn-sm">← Voltar ao Módulo</a>
     </div>
   </header>
@@ -116,9 +121,11 @@
         <a href="#sec-id">Identificação</a>
         <a href="#sec-resumo">Resumo</a>
         <a href="#sec-obj">Objetivos de aprendizagem</a>
-        <a href="#sec-pre">Pré-requisitos</a>
-        <a href="#sec-day">Cronograma do dia</a>
-        <a href="#sec-class">Detalhamento da instrução PE</a>
+        <a href="#sec-pre">Pré-requisitos &amp; autoestudo</a>
+        <a href="#sec-day">Cronograma do encontro</a>
+        <a href="#sec-class">Detalhamento da instrução</a>
+        <a href="#sec-lab">Lab nos 5 grupos</a>
+        <a href="#sec-pond">Ponderada em sala</a>
         <a href="#sec-am">Estratégias de metodologia ativa</a>
         <a href="#sec-rec">Recursos e ferramentas</a>
         <a href="#sec-aval">Verificação de aprendizagem</a>
@@ -130,120 +137,195 @@
       <section class="mat-section" id="sec-id">
         <h2>Identificação</h2>
         <div class="id-grid">
-          <div class="id-cell"><div class="id-lbl">Disciplina</div><div class="id-val">IN02 · Desenvolvimento Web</div></div>
+          <div class="id-cell"><div class="id-lbl">Disciplina</div><div class="id-val">IN02 · Aplicação Web</div></div>
           <div class="id-cell"><div class="id-lbl">Módulo</div><div class="id-val">2 — Ciclo Comum</div></div>
           <div class="id-cell"><div class="id-lbl">Aula</div><div class="id-val">4 de 11</div></div>
-          <div class="id-cell"><div class="id-lbl">Carga horária do dia</div><div class="id-val">6h (2h + 2h + 2h)</div></div>
+          <div class="id-cell"><div class="id-lbl">Data</div><div class="id-val">12 / mai / 2026 (terça)</div></div>
+          <div class="id-cell"><div class="id-lbl">Duração</div><div class="id-val">2 h presenciais</div></div>
           <div class="id-cell"><div class="id-lbl">Modalidade</div><div class="id-val">Presencial · Metodologia ativa</div></div>
-          <div class="id-cell"><div class="id-lbl">Pré-aula</div><div class="id-val">Autoestudo guiado</div></div>
+          <div class="id-cell"><div class="id-lbl">Pré-aula</div><div class="id-val">Autoestudo guiado (material da aula)</div></div>
+          <div class="id-cell"><div class="id-lbl">Parceiro</div><div class="id-val">BrPec Agropecuária</div></div>
         </div>
       </section>
 
       <section class="mat-section" id="sec-resumo">
         <h2>Resumo</h2>
         <div class="intro-card">
-          <p>A aula 4 fecha o bloco de banco com o aprendizado mais característico do modelo relacional: <strong>JOINs</strong>. Abordamos os tipos clássicos (<code>INNER</code>, <code>LEFT</code>, <code>RIGHT</code>, <code>FULL</code>), agregações (<code>GROUP BY</code>, <code>HAVING</code>, funções como <code>COUNT</code>, <code>SUM</code>, <code>AVG</code>), modelagem de relações N:N com tabela de junção e <strong>subconsultas</strong>.</p>
-          <p>O fechamento traz a leitura de <code>EXPLAIN</code> como ferramenta para entender performance — preparando a equipe para escrever todos os relatórios analíticos do projeto à tarde.</p>
+          <p>A aula 4 fecha o bloco de banco de dados com o conceito mais característico do modelo relacional: <strong>JOINs</strong>. Trabalhamos os tipos clássicos (<code>INNER</code>, <code>LEFT</code>, <code>RIGHT</code>, <code>FULL</code>, <code>SELF</code>), agregação (<code>GROUP BY</code>, <code>HAVING</code>, funções <code>COUNT</code>/<code>SUM</code>/<code>AVG</code>), a tabela de junção para N:N e subconsultas em três posições (<code>WHERE</code>, <code>FROM</code>, <code>SELECT</code>).</p>
+          <p>O diferencial desta aula é a <strong>execução no navegador</strong> via <code>sql.js</code>: o banco <code>brpec.db</code> roda em WebAssembly, sem servidor, sem internet (após o primeiro load). Isso prepara o terreno para a aula 5, em que essa mesma página vira <strong>PWA instalável</strong> com persistência e sync.</p>
+          <p>O encontro fecha com uma <strong>ponderada em sala de 30 minutos</strong>: cada aluno entrega 1 arquivo <code>.sql</code> com 5 queries individuais resolvendo perguntas de negócio do BrPec — validadas no próprio sandbox.</p>
         </div>
       </section>
 
       <section class="mat-section" id="sec-obj">
         <h2>Objetivos de aprendizagem</h2>
         <ul class="obj-list">
-          <li><span class="obj-tag">OA-1</span><span><strong>Diferenciar</strong> os tipos de <code>JOIN</code> (<code>INNER</code>, <code>LEFT</code>, <code>RIGHT</code>, <code>FULL</code>) e prever quais linhas aparecem no resultado.</span></li>
-          <li><span class="obj-tag">OA-2</span><span><strong>Compor</strong> consultas com <code>JOIN</code> + <code>WHERE</code> resolvendo perguntas de negócio reais.</span></li>
-          <li><span class="obj-tag">OA-3</span><span><strong>Agregar</strong> dados com <code>GROUP BY</code>, <code>HAVING</code> e funções de agregação.</span></li>
-          <li><span class="obj-tag">OA-4</span><span><strong>Modelar</strong> relações N:N com tabela de junção e consultar via duplo <code>JOIN</code>.</span></li>
-          <li><span class="obj-tag">OA-5</span><span><strong>Escrever</strong> subconsultas em <code>WHERE</code>, <code>FROM</code> e <code>SELECT</code>.</span></li>
-          <li><span class="obj-tag">OA-6</span><span><strong>Ler</strong> a saída de <code>EXPLAIN</code> e identificar gargalos básicos.</span></li>
+          <li><span class="obj-tag">OA-1</span><span><strong>Diferenciar</strong> os tipos de <code>JOIN</code> (<code>INNER</code>, <code>LEFT</code>, <code>RIGHT</code>, <code>FULL</code>, <code>SELF</code>) e <strong>prever</strong> quais linhas aparecem no resultado.</span></li>
+          <li><span class="obj-tag">OA-2</span><span><strong>Compor</strong> consultas com <code>JOIN</code> + <code>WHERE</code> que resolvam perguntas de operação do BrPec (eventos por capataz, bovinos sem evento, vacinas por retiro).</span></li>
+          <li><span class="obj-tag">OA-3</span><span><strong>Agregar</strong> dados com <code>GROUP BY</code>, <code>HAVING</code> e funções de agregação, distinguindo <code>WHERE</code> de <code>HAVING</code>.</span></li>
+          <li><span class="obj-tag">OA-4</span><span><strong>Modelar</strong> relação N:N com tabela de junção e <strong>consultar</strong> via duplo <code>JOIN</code> + <code>GROUP_CONCAT</code>.</span></li>
+          <li><span class="obj-tag">OA-5</span><span><strong>Escrever</strong> subconsultas em <code>WHERE</code>, <code>FROM</code> e <code>SELECT</code>, identificando quando cada forma é a apropriada.</span></li>
+          <li><span class="obj-tag">OA-6</span><span><strong>Ler</strong> a saída de <code>EXPLAIN QUERY PLAN</code> no SQLite e identificar uso de índice vs. scan.</span></li>
+          <li><span class="obj-tag">OA-7</span><span><strong>Executar</strong> SQL diretamente no navegador via <code>sql.js</code>, entendendo a primeira camada da estratégia offline-first do BrPec.</span></li>
         </ul>
       </section>
 
       <section class="mat-section" id="sec-pre">
-        <h2>Pré-requisitos</h2>
+        <h2>Pré-requisitos &amp; autoestudo</h2>
+        <p><strong>Pré-requisitos:</strong> aulas 1–3 concluídas (introdução à web, modelagem relacional formal, CRUD em SQLite com o esquema do BrPec).</p>
+        <h3>O que fazer antes da aula (autoestudo)</h3>
         <ul>
-          <li>Aula 3 concluída: CRUD completo do minimundo no banco da equipe.</li>
-          <li>Massa de teste com pedidos contendo múltiplos produtos (para os JOINs renderem resultados úteis).</li>
-          <li>Tabela de junção identificada no DER (caso o minimundo tenha relação N:N).</li>
+          <li>Leitura completa do <a href="../materials/lesson-4-material.html">Material da Aula 4</a> (JOINs, agregação, subconsultas, EXPLAIN, sql.js).</li>
+          <li>Abrir o <a href="../assets/brpec/sandbox-sqljs.html" target="_blank">BrPec Sandbox</a> e rodar 2 das consultas-modelo (P01–P09) — registrar dúvida no caderno de bordo.</li>
+          <li>Listar 1 pergunta de negócio do BrPec (em <em>linguagem natural</em>) que exija pelo menos 1 <code>JOIN</code> para ser respondida — trazer para a daily.</li>
         </ul>
+        <div class="callout callout-tip">
+          <div class="callout-label">Dica</div>
+          <p>O sandbox carrega <code>brpec.db</code> via <code>fetch</code> — então funciona apenas servido por HTTP. Rodar local com <code>python3 -m http.server</code> dentro de <code>module-2-common/assets/brpec/</code> e abrir <code>http://localhost:8000/sandbox-sqljs.html</code>.</p>
+        </div>
       </section>
 
       <section class="mat-section" id="sec-day">
-        <h2>Cronograma do dia</h2>
+        <h2>Cronograma do encontro</h2>
+        <p><strong>2 horas presenciais</strong>, divididas em 6 blocos. Daily (15&nbsp;min) → instrução com Venn animado (75&nbsp;min) → ponderada em sala (30&nbsp;min).</p>
         <div class="day-timeline">
-          <div class="day-block autoest">
-            <div class="blk-head"><h3 class="blk-title">📚 Bloco 1 · Autoestudo</h3><span class="blk-time">08h00 — 10h00</span></div>
-            <p>Estudo individual orientado pelo material da aula 4.</p>
+          <div class="day-block daily">
+            <div class="blk-head"><h3 class="blk-title">Bloco 1 · Daily com pergunta de JOIN</h3><span class="blk-time">10:00 — 10:15 · 15 min</span></div>
+            <p>Cada aluno traz 1 minuto: pergunta de negócio + qual tipo de junção acha que ela exige. O professor mapeia padrões no quadro e amarra com o Bloco 2. <strong>Cronômetro no slide.</strong></p>
+          </div>
+          <div class="day-block recap">
+            <div class="blk-head"><h3 class="blk-title">Bloco 2 · Recap do DER + anatomia do JOIN</h3><span class="blk-time">10:15 — 10:25 · 10 min</span></div>
+            <p>Recap relâmpago do DER do BrPec (aula 3) — por que tabelas separadas, onde mora a FK. Forma geral da sintaxe <code>JOIN ... ON ...</code> e "5 perguntas mentais" antes de cada query.</p>
+          </div>
+          <div class="day-block theory">
+            <div class="blk-head"><h3 class="blk-title">Bloco 3 · Tipos de JOIN com Venn animado</h3><span class="blk-time">10:25 — 10:45 · 20 min</span></div>
+            <p>Para cada tipo: diagrama de Venn → SQL no BrPec → tabela de resultado.</p>
             <ul>
-              <li>Leitura completa do <strong>Material da Aula 4</strong> (JOINs, agregações, subconsultas).</li>
-              <li>Listar 3 relatórios de negócio do minimundo que exigem unir tabelas (ex.: total vendido por usuário no mês).</li>
-              <li>Validar que existe massa de teste suficiente para os relatórios.</li>
-              <li>Caderno de bordo: anotar dúvidas sobre cardinalidade dos resultados.</li>
+              <li><strong>INNER</strong> — capataz × evento (Vitor sumido).</li>
+              <li><strong>LEFT</strong> — capataz × evento (Vitor aparece com 0).</li>
+              <li><strong>RIGHT / FULL</strong> — espelhos do LEFT; nota sobre SQLite 3.39+.</li>
+              <li><strong>SELF</strong> — bovino × bovino (bezerro/mãe).</li>
+              <li><strong>N:N + tabela de junção</strong> — capataz_retiro.</li>
             </ul>
           </div>
-          <div class="day-block pe">
-            <div class="blk-head"><h3 class="blk-title">🎓 Bloco 2 · Instrução PE — Aula em metodologia ativa</h3><span class="blk-time">10h00 — 12h00</span></div>
-            <p>Encontro síncrono com o professor especialista. 15 minutos de daily seguidos de 1h45 de aula.</p>
-            <ul>
-              <li><strong>10h00 — 10h15</strong> · Daily: relatórios trazidos do autoestudo.</li>
-              <li><strong>10h15 — 12h00</strong> · Tipos de JOIN, laboratório, agregação, subconsultas e <code>EXPLAIN</code>.</li>
-            </ul>
+          <div class="day-block agg">
+            <div class="blk-head"><h3 class="blk-title">Bloco 4 · Agregação + subconsultas</h3><span class="blk-time">10:45 — 11:05 · 20 min</span></div>
+            <p><code>GROUP BY</code>, funções de agregação, pegadinha <code>WHERE</code> vs <code>HAVING</code>, e os 3 lugares onde subqueries vivem (<code>WHERE</code>, <code>FROM</code>, <code>SELECT</code>).</p>
           </div>
-          <div class="day-block lunch">
-            <div class="blk-head"><h3 class="blk-title">🍴 Intervalo · Almoço</h3><span class="blk-time">12h00 — 14h00</span></div>
-            <p>Janela livre.</p>
+          <div class="day-block demo">
+            <div class="blk-head"><h3 class="blk-title">Bloco 5 · EXPLAIN + sql.js no navegador</h3><span class="blk-time">11:05 — 11:15 · 10 min</span></div>
+            <p>Demo ao vivo do <code>EXPLAIN QUERY PLAN</code> com e sem índice. Mostra a sandbox sql.js carregando <code>brpec.db</code> via WebAssembly. <em>Ponte para a PWA da aula 5.</em></p>
           </div>
-          <div class="day-block dev">
-            <div class="blk-head"><h3 class="blk-title">🛠️ Bloco 3 · Desenvolvimento do projeto</h3><span class="blk-time">14h00 — 16h00</span></div>
-            <p>Janela de trabalho da equipe sobre o projeto integrador.</p>
-            <ul>
-              <li>Escrever em <code>db/relatorios.sql</code> as 5 consultas analíticas mais relevantes do minimundo.</li>
-              <li>Cada consulta deve ter pelo menos 1 <code>JOIN</code>, e ao menos 2 devem usar agregação.</li>
-              <li>Rodar <code>EXPLAIN</code> nas 2 consultas mais pesadas e registrar conclusões em <code>docs/banco/performance.md</code>.</li>
-              <li>Abrir Merge Request <code>feat(db): relatórios e joins</code> com evidência de execução.</li>
-            </ul>
+          <div class="day-block lab">
+            <div class="blk-head"><h3 class="blk-title">Bloco 6 · Lab nos 5 grupos · sandbox</h3><span class="blk-time">11:15 — 11:30 · 15 min · cronômetro no slide</span></div>
+            <p>Cada grupo recebe 1 pergunta de retiro (Cabeceira/Mata-Burro/Vargem/Faxinal/Cocho Novo) e responde no sandbox. 1 representante por grupo cola a query na tela e narra a estratégia. <em>O exercício gabarita o que vem a seguir na ponderada.</em></p>
+          </div>
+          <div class="day-block pondera">
+            <div class="blk-head"><h3 class="blk-title">Bloco 7 · Ponderada em sala (individual)</h3><span class="blk-time">11:30 — 12:00 · 30 min · cronômetro no slide</span></div>
+            <p>5 queries individuais sobre o BrPec, entregues como <code>aula4-ponderada-NOME.sql</code> via Teams. Validação ao vivo no sandbox.</p>
           </div>
         </div>
       </section>
 
       <section class="mat-section" id="sec-class">
-        <h2>Detalhamento da instrução PE (10h00 — 12h00)</h2>
-        <div class="class-line">
-          <div class="cl-time">10h00<br>10h15</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-dy">Daily</span>Daily de abertura</h4><p>Cada aluno apresenta, em 1 minuto, um relatório do minimundo que precisa de JOIN para existir.</p></div>
+        <h2>Detalhamento da instrução (10:00 — 11:15)</h2>
+        <p>Sequência completa do que rola em cada bloco — para o professor não precisar improvisar o ritmo.</p>
+
+        <h3>10:00 — 10:15 · Daily</h3>
+        <ul>
+          <li>Professor abre o slide com o cronômetro (15:00) e <em>inicia</em> ao primeiro aluno levantar a mão.</li>
+          <li>Cada aluno traz: <em>"a pergunta que trouxe é X. Eu acho que ela exige um Y JOIN porque…"</em>.</li>
+          <li>Professor anota no quadro a tabela esquerda → tipo de JOIN → tabela direita.</li>
+          <li>No fim, o professor identifica padrões repetidos e calibra o foco do Bloco 2.</li>
+        </ul>
+
+        <h3>10:15 — 10:25 · Recap + anatomia</h3>
+        <ul>
+          <li>Slide 4 — recap DER: capataz, retiro, bovino, evento — quem aponta para quem.</li>
+          <li>Slide 5 — sintaxe <code>FROM a JOIN b ON b.fk = a.id</code> + as 5 perguntas mentais.</li>
+          <li>O professor lê em voz alta: <em>"a tabela esquerda é a matriz da pergunta. A direita, o satélite. A escolha de a/b determina quem fica de fora em LEFT vs INNER."</em></li>
+        </ul>
+
+        <h3>10:25 — 10:45 · Venn animado · 5 tipos</h3>
+        <ul>
+          <li><strong>INNER</strong> (slide 6) — predição antes da execução: "quem vocês acham que vai sumir?". Revela: Vitor Gomes.</li>
+          <li><strong>LEFT</strong> (slide 7) — mesma query, mesma tabela esquerda, troca <code>INNER</code> por <code>LEFT</code>. Vitor aparece com 0 eventos. <strong>Discussão crítica:</strong> <code>COUNT(*)</code> vs <code>COUNT(e.id)</code>.</li>
+          <li><strong>RIGHT/FULL</strong> (slide 8) — passar rápido. Reforçar "convenção do time" (sempre LEFT).</li>
+          <li><strong>SELF</strong> (slide 9) — exemplo bezerro-mãe. Reforçar uso obrigatório de alias.</li>
+          <li><strong>N:N + junção</strong> (slide 10) — capataz_retiro com <code>GROUP_CONCAT</code>. Vitor aparece com NULL (não tem retiro vinculado).</li>
+        </ul>
+
+        <h3>10:45 — 11:05 · Agregação + subqueries</h3>
+        <ul>
+          <li>Slide 11 — anatomia mental: FROM → WHERE → GROUP BY → agregação → HAVING → ORDER BY.</li>
+          <li>Slide 12 — pegadinha WHERE vs HAVING ao vivo no sandbox. Roda o errado, mostra o erro, troca para o certo.</li>
+          <li>Slide 13 — 3 lugares de subquery, com exemplos curtos para cada.</li>
+        </ul>
+
+        <h3>11:05 — 11:15 · EXPLAIN + sql.js</h3>
+        <ul>
+          <li>Slide 14 — <code>EXPLAIN QUERY PLAN</code>. Roda uma query com índice e uma sem. Mostra <em>USING INDEX</em> vs <em>SCAN</em>.</li>
+          <li>Slide 15 — abre o sandbox em nova aba, executa 2 das consultas-modelo (P01 e P07). Mostra a UI dark, o schema lateral, o resultado em milissegundos.</li>
+          <li>Anúncio: "na quinta-feira, essa mesma página vira PWA instalável no celular."</li>
+        </ul>
+
+        <div class="callout callout-warn">
+          <div class="callout-label">Atenção operacional</div>
+          <p>Conferir antes da aula: (1) sandbox abre sem erro em <code>localhost</code>; (2) <code>brpec.db</code> retorna 60 eventos em <code>SELECT COUNT(*) FROM evento_zootecnico</code>; (3) projeção e som funcionando. Se o sandbox falhar, plano B: rodar <code>sqlite3 brpec.db</code> no terminal projetado.</p>
         </div>
-        <div class="class-line">
-          <div class="cl-time">10h15<br>10h35</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Tipos de JOIN — exercício visual</h4><p>O professor mostra dois conjuntos de linhas em quadro. Em pares, os alunos preenchem o resultado esperado de <code>INNER</code>, <code>LEFT</code>, <code>RIGHT</code> e <code>FULL</code> antes de qualquer SQL ser escrito. Conferência coletiva.</p></div>
+      </section>
+
+      <section class="mat-section" id="sec-lab">
+        <h2>Lab nos 5 grupos (11:15 — 11:30)</h2>
+        <p>15 minutos. Cada grupo já está formado desde o início do módulo (5 grupos). A cada grupo é atribuído um <strong>retiro do BrPec</strong> como contexto da pergunta — o que reforça a identidade do exercício e evita queries genéricas.</p>
+        <table class="res-table group-table">
+          <thead><tr><th>Grupo</th><th>Retiro</th><th>Pergunta de negócio</th><th>Construções esperadas</th></tr></thead>
+          <tbody>
+            <tr><td class="gnum">Grupo 1</td><td>Cabeceira</td><td>Bovinos do retiro Cabeceira pesados em 2025</td><td><code>INNER JOIN</code> + <code>WHERE retiro = 'Cabeceira' AND tipo = 'pesagem'</code></td></tr>
+            <tr><td class="gnum">Grupo 2</td><td>Mata-Burro</td><td>Capatazes ativos em Mata-Burro nos últimos 12 meses</td><td><code>INNER JOIN</code> + <code>WHERE data >= '2025-05-12'</code> + <code>GROUP BY</code></td></tr>
+            <tr><td class="gnum">Grupo 3</td><td>Vargem do Sucuri</td><td>Bovinos sem vacinação contra aftosa</td><td><code>LEFT JOIN ... AND tipo='vacinacao'</code> + <code>IS NULL</code></td></tr>
+            <tr><td class="gnum">Grupo 4</td><td>Faxinal</td><td>Matrizes e seus filhotes nascidos no retiro</td><td><code>SELF JOIN</code> + <code>GROUP BY mae_id</code></td></tr>
+            <tr><td class="gnum">Grupo 5</td><td>Cocho Novo</td><td>Capatazes atuando em mais de um retiro</td><td><code>capataz_retiro</code> + <code>HAVING COUNT(*) &gt; 1</code></td></tr>
+          </tbody>
+        </table>
+        <div class="callout callout-tip">
+          <div class="callout-label">Bônus</div>
+          <p>Para qualquer grupo: rodar <code>EXPLAIN QUERY PLAN</code> na própria query e hipotetizar por que ela usou <code>INDEX</code> ou <code>SCAN</code>. Pontuação extra na ponderada se entregar essa análise junto.</p>
         </div>
-        <div class="class-line">
-          <div class="cl-time">10h35<br>10h55</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>INNER e LEFT na prática</h4><p>Em pares: escrever <code>SELECT</code> com <code>INNER JOIN</code> e depois <code>LEFT JOIN</code> sobre a mesma pergunta. A turma debate quando cada um faz sentido (clientes ativos vs. todos os clientes).</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">10h55<br>11h20</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Desafio de agregação · GROUP BY + HAVING</h4><p>Cada equipe recebe uma pergunta agregada (ex.: "produtos com mais de 10 vendas") e escreve a query. Três equipes apresentam — debate sobre o erro clássico de filtrar grupo no <code>WHERE</code>.</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">11h20<br>11h40</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>Relação N:N e subconsultas</h4><p>Apresentação da tabela de junção como ponte entre duas entidades de cardinalidade muitos-muitos. Demo de subconsulta correlacionada e subconsulta no <code>FROM</code>.</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">11h40<br>11h55</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>EXPLAIN — o plano por trás da query</h4><p>O professor roda <code>EXPLAIN</code> em uma query lenta, lê o resultado em voz alta e introduz o índice como solução. Em duplas, alunos repetem na própria base.</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">11h55<br>12h00</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Síntese</h4><p>Cada aluno escreve <em>"a aula 4 me ensinou que..."</em>. O professor anuncia a entrega da tarde: 5 consultas analíticas + análise de performance.</p></div>
+      </section>
+
+      <section class="mat-section" id="sec-pond">
+        <h2>Ponderada em sala (11:30 — 12:00)</h2>
+        <p>Entrega individual de 1 arquivo <code>aula4-ponderada-NOME.sql</code> contendo 5 queries comentadas. Validação no sandbox.</p>
+        <h3>As 5 perguntas (fixas)</h3>
+        <ol>
+          <li><strong>Q1</strong> · Top 3 bovinos com mais eventos registrados (brinco + total).</li>
+          <li><strong>Q2</strong> · Para cada retiro, a <em>média de eventos por mês</em> em 2025 (use <code>substr(data, 1, 7)</code> e duas agregações em sequência).</li>
+          <li><strong>Q3</strong> · Capatazes que <em>nunca</em> registraram um evento do tipo <code>tratamento</code> (use <code>LEFT JOIN</code> com filtro + <code>IS NULL</code>, ou <code>NOT IN</code>).</li>
+          <li><strong>Q4</strong> · Bezerros nascidos em 2026, com brinco da mãe e nome do capataz que registrou o nascimento (3 JOINs).</li>
+          <li><strong>Q5</strong> · Para cada par <em>(retiro, mês)</em>, contagem por tipo de evento, com <code>HAVING qtd &gt;= 3</code>.</li>
+        </ol>
+        <h3>Critérios de correção</h3>
+        <ul class="crit-list">
+          <li><span class="obj-tag">CR-1</span><span>Cada query roda no sandbox sem erro (peso 50%).</span></li>
+          <li><span class="obj-tag">CR-2</span><span>Cada query usa o tipo de JOIN apropriado para a pergunta — não simplifica indevidamente (peso 25%).</span></li>
+          <li><span class="obj-tag">CR-3</span><span>Cada query é comentada com <code>-- Q1: ...</code> explicando a pergunta resolvida (peso 15%).</span></li>
+          <li><span class="obj-tag">CR-4</span><span>Bônus: análise <code>EXPLAIN QUERY PLAN</code> de pelo menos 1 query, em comentário (peso 10%).</span></li>
+        </ul>
+        <div class="callout callout-danger">
+          <div class="callout-label">Critério mínimo</div>
+          <p>Aluno que entregar com <strong>menos de 3 queries</strong> rodando sem erro está em débito técnico para a aula 5 — onde essas queries virarão endpoints do servidor de sync.</p>
         </div>
       </section>
 
       <section class="mat-section" id="sec-am">
         <h2>Estratégias de metodologia ativa</h2>
         <ul>
-          <li><strong>Predição antes da execução</strong> — alunos escrevem o resultado esperado do JOIN antes de rodar a query, reforçando o modelo mental.</li>
-          <li><strong>Aprendizagem por relatório real</strong> — cada query nasce de uma pergunta de negócio do minimundo, não de exercício abstrato.</li>
-          <li><strong>Diagnóstico em pares</strong> — ler <code>EXPLAIN</code> em conjunto, debatendo trade-offs antes de criar índice.</li>
+          <li><strong>Predição antes da execução</strong> — antes de rodar cada JOIN, o aluno escreve qual cardinalidade de saída espera. Reforça o modelo mental de junção como produto-filtrado.</li>
+          <li><strong>Aprendizagem por pergunta de negócio real</strong> — toda query nasce de uma demanda do coordenador do BrPec, não de um exercício abstrato.</li>
+          <li><strong>Pegadinha pedagógica explícita</strong> — <code>WHERE</code> vs <code>HAVING</code> é mostrado <em>errado primeiro</em>; o erro do SQLite vira professor.</li>
+          <li><strong>Diagrama de Venn animado</strong> — o conceito é geométrico antes de ser sintático. Quem entende a figura, escreve o SQL.</li>
+          <li><strong>Pareamento por retiro</strong> — o lab atribui um retiro a cada grupo: cria identidade de exercício e evita 5 queries iguais.</li>
         </ul>
       </section>
 
@@ -252,11 +334,13 @@
         <table class="res-table">
           <thead><tr><th>Categoria</th><th>Recurso</th><th>Uso</th></tr></thead>
           <tbody>
-            <tr><td>Slides</td><td><code>slides/slide-lesson-4.html</code></td><td>Exposição na instrução PE</td></tr>
-            <tr><td>Material</td><td><code>materials/lesson-4-material.html</code></td><td>Autoestudo</td></tr>
-            <tr><td>Cliente SQL</td><td><code>psql</code> ou DBeaver</td><td>Execução e <code>EXPLAIN</code></td></tr>
-            <tr><td>Repositório</td><td><code>db/relatorios.sql</code></td><td>5 consultas analíticas</td></tr>
-            <tr><td>Documentação</td><td><code>docs/banco/performance.md</code></td><td>Análise de <code>EXPLAIN</code></td></tr>
+            <tr><td>Slides</td><td><code>slides/slide-lesson-4.html</code></td><td>Exposição com Venn, código e cronômetros</td></tr>
+            <tr><td>Material</td><td><code>materials/lesson-4-material.html</code></td><td>Autoestudo aprofundado</td></tr>
+            <tr><td>Sandbox</td><td><code>assets/brpec/sandbox-sqljs.html</code></td><td>Execução SQL no navegador via WebAssembly</td></tr>
+            <tr><td>Banco</td><td><code>assets/brpec/brpec.db</code></td><td>Dataset BrPec (30 bovinos, 60 eventos, 5 retiros)</td></tr>
+            <tr><td>Schema</td><td><code>assets/brpec/brpec.sql</code></td><td>DDL + seed reproduzível (regenerar com <code>sqlite3 brpec.db &lt; brpec.sql</code>)</td></tr>
+            <tr><td>Notas</td><td><code>notas-do-professor/aula-4-perguntas-socraticas.md</code></td><td>Cola para os 3 quizzes</td></tr>
+            <tr><td>Entrega</td><td>Teams (canal IN02 · Turma 26)</td><td>Upload de <code>aula4-ponderada-NOME.sql</code></td></tr>
           </tbody>
         </table>
       </section>
@@ -264,28 +348,26 @@
       <section class="mat-section" id="sec-aval">
         <h2>Verificação de aprendizagem</h2>
         <ul class="crit-list">
-          <li><span class="obj-tag">CR-1</span><span>Apresentou na daily um relatório do minimundo viável apenas com JOIN.</span></li>
-          <li><span class="obj-tag">CR-2</span><span>Previu corretamente, em par, a saída de <code>INNER</code> vs. <code>LEFT</code> antes da execução.</span></li>
+          <li><span class="obj-tag">CR-1</span><span>Trouxe à daily uma pergunta de negócio viável apenas com JOIN, com hipótese de tipo.</span></li>
+          <li><span class="obj-tag">CR-2</span><span>Previu corretamente em par a saída de <code>INNER</code> vs <code>LEFT</code> antes da execução.</span></li>
           <li><span class="obj-tag">CR-3</span><span>Resolveu a pergunta agregada com <code>GROUP BY</code> + <code>HAVING</code> sem confundir com <code>WHERE</code>.</span></li>
-          <li><span class="obj-tag">CR-4</span><span>Leu uma saída de <code>EXPLAIN</code> e identificou ao menos um ponto de atenção.</span></li>
-          <li><span class="obj-tag">CR-5</span><span>Abriu Merge Request <code>feat(db): relatórios e joins</code> com 5 consultas + análise de performance até as 16h00.</span></li>
+          <li><span class="obj-tag">CR-4</span><span>Identificou no <code>EXPLAIN</code> ao menos uma diferença entre query indexada e não-indexada.</span></li>
+          <li><span class="obj-tag">CR-5</span><span>Entregou a ponderada com pelo menos 3 das 5 queries rodando sem erro no sandbox.</span></li>
         </ul>
-        <div class="callout callout-warn">
-          <div class="callout-label">Critério mínimo</div>
-          <p>Aluno que sair às 16h sem ao menos <strong>3 relatórios funcionais</strong> com JOIN está em débito técnico para o início do back-end.</p>
-        </div>
       </section>
 
       <section class="mat-section" id="sec-next">
         <h2>Conexão com a aula 5</h2>
-        <p>A aula 5 abre o bloco de <strong>back-end</strong>: as queries escritas nas aulas 2–4 deixarão o cliente SQL e passarão a viver dentro de Models do Node.js + Express.</p>
+        <p>A aula 5 (<strong>PWA + sync offline-first com Node</strong>) transforma o sandbox da aula 4 em um <strong>app instalável</strong> no celular do capataz:</p>
         <ul>
-          <li>O <code>db/queries.sql</code> e o <code>db/relatorios.sql</code> serão a fonte das primeiras funções dos Models.</li>
-          <li>O esquema do banco está congelado a partir daqui (alterações exigem migração documentada).</li>
+          <li>O <code>brpec.db</code> sai do reload-volatile (sql.js) e ganha persistência via <strong>sqlite-wasm + OPFS</strong>.</li>
+          <li>Ganha <code>manifest.json</code> + <code>service-worker.js</code> — instala como app, abre offline.</li>
+          <li>Os <code>INSERTs</code> feitos offline ficam em uma fila local e sobem para o <strong>servidor Node</strong> via <code>POST /sync/deltas</code> quando o sinal voltar.</li>
+          <li>As 5 queries da ponderada de hoje viram os <strong>relatórios offline</strong> da PWA — o coordenador puxa do cache local sem internet.</li>
         </ul>
         <div class="callout callout-info">
           <div class="callout-label">Para o autoestudo da aula 5</div>
-          <p>Antes das 8h do próximo dia: instalar Node.js LTS, ler o material da aula 5 e listar 3 endpoints HTTP que você imagina existir no projeto.</p>
+          <p>Antes da próxima aula (14/05): (1) instalar Node.js LTS; (2) abrir o sandbox de hoje no <em>celular</em> e tentar registrar um <code>INSERT</code> — observar que ele "some" no reload (esse é o problema que vamos resolver); (3) ler o material da aula 5 sobre PWA.</p>
         </div>
       </section>
 
@@ -299,7 +381,8 @@
 
   <footer class="inteli-footer mt-auto py-4 bg-light border-top">
     <div class="container text-center">
-      <p class="mb-1">Material criado pelo professor <strong>Afonso Brandão</strong> para o <strong>Inteli</strong>.</p>
+      <p class="mb-1">Adaptação para a turma 26 (IN02T26 · 2026.1) por <strong>Prof. Ovidio Lopes Netto da Cruz</strong>.</p>
+      <p class="mb-1"><small>Material-base do <strong>Prof. Afonso Brandão</strong> — <a href="https://github.com/afonsolelis/aulas" target="_blank">repositório original</a>.</small></p>
       <small class="text-muted">🔓 Licença de leitura aberta</small>
     </div>
   </footer>
@@ -316,12 +399,11 @@
     });
     const tocLinks = document.querySelectorAll('.mat-toc a');
     const sections = document.querySelectorAll('.mat-section');
-    const spy = () => {
+    window.addEventListener('scroll', () => {
       let current = '';
       sections.forEach((s) => { const top = s.getBoundingClientRect().top; if (top < 120) current = s.id; });
       tocLinks.forEach((a) => { a.classList.toggle('active', a.getAttribute('href') === '#' + current); });
-    };
-    window.addEventListener('scroll', spy);
+    });
   </script>
 </body>
 </html>

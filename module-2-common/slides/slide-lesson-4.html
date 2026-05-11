@@ -1,713 +1,882 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🔗</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aula 4 - Banco de Dados III - Inteli</title>
+  <title>Aula 4 — Banco de Dados III · JOINs — BrPec — Inteli</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="../../css/inteli-styles.css" rel="stylesheet">
   <style>
-    :root { --ac:#4b5563; --hi:#b2b6bf; --dk:#2e2640; --gr:#0d9488; --re:#dc2626; --am:#d97706; }
-    body { margin:0; padding:0; overflow:hidden; font-family:'Manrope',sans-serif; background:#f5f7fb; color:var(--dk); }
+    :root {
+      --ac:#4b5563; --hi:#b2b6bf; --dk:#2e2640; --gr:#0d9488; --re:#dc2626; --am:#d97706;
+      --bg:#f5f7fb; --pasture:#3f6d3a; --sky:#7eb6d9; --pri:#1d4ed8;
+    }
+    body { margin:0; padding:0; overflow:hidden; font-family:'Manrope',sans-serif; background:var(--bg); color:var(--dk); }
     .slide-container { width:100vw; height:100vh; position:relative; overflow:hidden; }
-    .slide { width:100%; height:100%; display:none; padding:44px 52px 88px; box-sizing:border-box; position:absolute; }
-    .slide.active { display:flex; flex-direction:column; justify-content:center; animation:slideIn 0.35s ease-in-out; }
+    .slide { width:100%; height:100%; display:none; padding:42px 56px 92px; box-sizing:border-box; position:absolute; }
+    .slide.active { display:flex; flex-direction:column; justify-content:center; animation:slideIn .35s ease-in-out; }
     @keyframes slideIn { from{opacity:0;transform:translateX(36px)} to{opacity:1;transform:translateX(0)} }
-    .sc { width:min(1140px,100%); margin:0 auto; font-size:1.05rem; line-height:1.55; }
-    /* slide header */
-    .sh { color:white; padding:16px 22px; border-radius:14px; margin-bottom:14px; }
-    .sh.blue  { background:linear-gradient(135deg,#374151,#b2b6bf); }
-    .sh.dark  { background:linear-gradient(135deg,var(--dk),#4a3d6b); }
-    .sh.green { background:linear-gradient(135deg,var(--gr),#10b981); }
-    .st { font-size:1.9rem; font-weight:800; margin:0 0 4px; line-height:1.15; }
-    .ss { font-size:0.95rem; opacity:.9; margin:0; }
-    /* boxes */
-    .box { background:white; border:1px solid #dfe5ec; border-left:5px solid var(--hi); border-radius:12px; padding:14px 18px; box-shadow:0 4px 14px rgba(46,38,64,.06); }
-    .box h3 { font-size:1rem; font-weight:700; margin:0 0 6px; color:var(--dk); }
-    .box p  { margin:0 0 5px; font-size:.88rem; line-height:1.5; color:#374151; }
-    .box ul { margin:3px 0; padding-left:1.1rem; }
-    .box li { font-size:.87rem; margin-bottom:3px; line-height:1.4; color:#374151; }
+    .sc { width:min(1180px,100%); margin:0 auto; font-size:1.05rem; line-height:1.6; }
+
+    .sh { color:white; padding:16px 24px; border-radius:14px; margin-bottom:18px; }
+    .sh.dark   { background:linear-gradient(135deg,var(--dk),#4a3d6b); }
+    .sh.green  { background:linear-gradient(135deg,var(--gr),#10b981); }
+    .sh.amber  { background:linear-gradient(135deg,#b45309,var(--am)); }
+    .sh.blue   { background:linear-gradient(135deg,#1e3a8a,#3b82f6); }
+    .sh.pasture{ background:linear-gradient(135deg,#2f5a2c,var(--pasture)); }
+    .sh.red    { background:linear-gradient(135deg,#7f1d1d,var(--re)); }
+    .st { font-size:1.85rem; font-weight:800; margin:0 0 4px; line-height:1.15; }
+    .ss { font-size:.96rem; opacity:.92; margin:0; }
+
+    .box { background:white; border:1px solid #dfe5ec; border-left:5px solid var(--hi); border-radius:12px; padding:16px 20px; box-shadow:0 4px 14px rgba(46,38,64,.06); }
+    .box h3 { font-size:1.05rem; font-weight:800; margin:0 0 8px; color:var(--dk); }
+    .box p  { margin:0 0 8px; font-size:.95rem; line-height:1.6; color:#374151; }
+    .box ul { margin:6px 0; padding-left:1.2rem; }
+    .box li { font-size:.93rem; margin-bottom:6px; line-height:1.55; color:#374151; }
     .box.acc { border-left-color:var(--ac); }
     .box.grn { border-left-color:var(--gr); }
     .box.amr { border-left-color:var(--am); }
+    .box.dkb { border-left-color:var(--dk); }
+    .box.blu { border-left-color:var(--pri); }
     .box.red { border-left-color:var(--re); }
+
+    code, .mono { font-family:'JetBrains Mono',monospace; }
     code { background:#f1f5f9; color:var(--dk); padding:1px 6px; border-radius:5px; font-size:.86em; }
-    /* grids */
-    .g2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
-    .g4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; }
-    .g5 { display:grid; grid-template-columns:repeat(5,1fr); gap:8px; }
+    blockquote { border-left:4px solid var(--am); background:#fffbeb; padding:10px 16px; margin:14px 0; border-radius:0 10px 10px 0; color:#78350f; font-size:.94rem; line-height:1.55; }
 
-    /* ===== COVER ===== */
-    .cover-bg { background:linear-gradient(135deg,#1f2937 0%,#4b5563 50%,#b2b6bf 100%) !important; }
-    .cv-badge { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); color:white; padding:5px 16px; border-radius:999px; font-size:.82rem; font-weight:600; display:inline-block; margin-bottom:18px; }
-    .cv-title { font-size:3rem; font-weight:800; color:white; line-height:1.15; margin:0 0 14px; }
-    .cv-sub   { font-size:1.1rem; color:rgba(255,255,255,.82); margin:0 0 28px; }
-    .cv-tags  { display:flex; flex-wrap:wrap; gap:8px; }
-    .cv-tag { background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.28); backdrop-filter:blur(8px); color:white; padding:7px 16px; border-radius:10px; font-weight:700; font-size:.84rem; opacity:0; transform:translateY(18px); transition:all .5s cubic-bezier(.34,1.3,.64,1); }
-    .cv-tag.vis { opacity:1; transform:translateY(0); }
+    .g2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
+    .g4 { display:grid; grid-template-columns:repeat(4,1fr); gap:10px; }
 
-    /* ===== PIPELINE ===== */
-    .pipe { display:flex; align-items:flex-start; justify-content:center; gap:0; margin:14px 0; }
-    .ps { flex:1; display:flex; flex-direction:column; align-items:center; text-align:center; position:relative; }
-    .pn { width:52px; height:52px; border-radius:50%; display:flex; align-items:center; justify-content:center; font-size:1.3rem; color:white; font-weight:800; z-index:2; box-shadow:0 4px 14px rgba(0,0,0,.18); flex-shrink:0; }
-    .pl { font-size:.8rem; font-weight:700; color:var(--dk); margin-top:7px; }
-    .ps2 { font-size:.68rem; color:#64748b; margin-top:2px; }
-    .pc { position:absolute; top:26px; left:calc(50% + 26px); width:calc(100% - 52px); height:4px; z-index:1; }
-    .pcb { width:100%; height:100%; border-radius:2px; background:linear-gradient(90deg,var(--fc,#4b5563),var(--tc,#b2b6bf)); }
-    .ps:last-child .pc { display:none; }
-    .pcl { position:absolute; top:-14px; left:50%; transform:translateX(-50%); font-size:.6rem; font-weight:700; color:#64748b; white-space:nowrap; }
-    /* pipeline anim */
-    .ps.an .pn { opacity:0; transform:scale(.3); transition:all .5s cubic-bezier(.34,1.56,.64,1); }
-    .ps.an .pl,.ps.an .ps2 { opacity:0; transform:translateY(7px); transition:all .4s ease .18s; }
-    .ps.an .pcb { transform:scaleX(0); transform-origin:left; transition:transform .6s cubic-bezier(.22,1,.36,1); }
-    .ps.an.sv .pn { opacity:1; transform:scale(1); box-shadow:0 4px 14px rgba(0,0,0,.18),0 0 20px rgba(24,99,220,.25); }
-    .ps.an.sv .pl,.ps.an.sv .ps2 { opacity:1; transform:translateY(0); }
-    .ps.an.sv .pcb { transform:scaleX(1); }
+    /* Cover */
+    .cover-bg { background:linear-gradient(135deg,#1f2937 0%,#3f6d3a 60%,#7eb6d9 100%) !important; position:relative; overflow:hidden; }
+    .cover-bg::before { content:""; position:absolute; inset:0; background-image:radial-gradient(circle at 12% 80%, rgba(255,255,255,.08), transparent 35%), radial-gradient(circle at 90% 18%, rgba(255,255,255,.06), transparent 30%); pointer-events:none; }
+    .cv-badge { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); color:white; padding:5px 16px; border-radius:999px; font-size:.82rem; font-weight:600; display:inline-block; margin-bottom:14px; }
+    .cv-title { font-size:2.85rem; font-weight:800; color:white; line-height:1.12; margin:0 0 10px; }
+    .cv-sub   { font-size:1.06rem; color:rgba(255,255,255,.9); margin:0 0 18px; max-width:820px; }
+    .cv-tags  { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+    .cv-tag   { background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.28); backdrop-filter:blur(8px); color:white; padding:6px 14px; border-radius:10px; font-weight:700; font-size:.82rem; }
+    .agenda-card { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.22); border-radius:14px; padding:16px 20px; backdrop-filter:blur(10px); }
+    .agenda-card h4 { color:white; font-weight:800; font-size:.98rem; margin:0 0 10px; letter-spacing:.02em; }
+    .agenda-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .daily-tag { background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.32); padding:8px 11px; border-radius:9px; font-weight:700; font-size:.74rem; color:white; line-height:1.3; }
+    .daily-tag .step { display:block; font-size:.62rem; opacity:.78; font-weight:600; margin-bottom:3px; letter-spacing:.06em; text-transform:uppercase; }
+    .daily-tag .when { display:block; font-size:.66rem; opacity:.7; font-weight:600; margin-top:4px; font-family:'JetBrains Mono',monospace; }
 
-    /* ===== TERMINAL ===== */
-    .term { background:#1e1e2e; border-radius:14px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.3); display:flex; flex-direction:column; }
-    .term-bar { background:#313244; padding:7px 12px; display:flex; align-items:center; gap:6px; }
-    .dot { width:10px; height:10px; border-radius:50%; }
-    .dot.r{background:#f38ba8;} .dot.y{background:#f9e2af;} .dot.g{background:#a6e3a1;}
-    .term-ttl { color:#6c7086; font-size:.7rem; font-weight:600; margin-left:7px; font-family:monospace; }
-    .term-body { padding:12px 14px; font-family:'Courier New',monospace; font-size:.8rem; line-height:1.65; flex:1; overflow:hidden; }
-    .tl { white-space:pre; min-height:1.65em; opacity:0; transform:translateY(3px); transition:opacity .25s ease,transform .25s ease; }
-    .tl.vis { opacity:1; transform:translateY(0); }
-    .kw{color:#89b4fa;font-weight:700;} .pth{color:#a6e3a1;} .ver{color:#f9e2af;}
-    .hn{color:#cba6f7;} .hv{color:#cdd6f4;} .hok{color:#a6e3a1;font-weight:700;}
-    .jk{color:#cba6f7;} .js{color:#a6e3a1;} .jn{color:#fab387;} .jb{color:#89b4fa;}
-    .cmt{color:#6c7086;font-style:italic;} .txt{color:#cdd6f4;}
-    .tcur{display:inline-block;width:7px;height:1.1em;background:#89b4fa;vertical-align:text-bottom;animation:tblink .7s step-end infinite;}
-    @keyframes tblink{0%,100%{opacity:1}50%{opacity:0}}
-    .tdiv { border:none; border-top:1px solid #313244; margin:8px 0; }
+    /* Pills */
+    .pill-row { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 12px; }
+    .pill { display:inline-block; padding:5px 12px; border-radius:999px; font-size:.78rem; font-weight:700; background:#eef2ff; color:#4338ca; border:1px solid #c7d2fe; }
+    .pill.green { background:#ecfdf5; color:#047857; border-color:#a7f3d0; }
+    .pill.amber { background:#fffbeb; color:#b45309; border-color:#fde68a; }
+    .pill.red   { background:#fef2f2; color:#b91c1c; border-color:#fecaca; }
+    .pill.dark  { background:#e5e7eb; color:#1f2937; border-color:#cbd5e1; }
 
-    /* ===== METHOD CARDS ===== */
-    .mc { background:white; border-radius:11px; padding:12px 14px; border-top:4px solid var(--mc,var(--ac)); box-shadow:0 4px 14px rgba(46,38,64,.08); opacity:0; transform:translateY(18px) scale(.93); transition:all .5s cubic-bezier(.34,1.3,.64,1); }
-    .mc.vis { opacity:1; transform:translateY(0) scale(1); }
-    .mb { font-size:.74rem; font-weight:800; padding:2px 9px; border-radius:5px; background:var(--mc,var(--ac)); color:white; display:inline-block; margin-bottom:6px; font-family:monospace; }
-    .mt { font-size:.84rem; font-weight:700; color:var(--dk); margin-bottom:3px; }
-    .md { font-size:.76rem; color:#64748b; line-height:1.35; }
-    .mex{ font-family:monospace; font-size:.68rem; color:#475569; background:#f8fafc; padding:3px 7px; border-radius:5px; margin-top:5px; }
+    /* Tables */
+    .rstbl { width:100%; border-collapse:separate; border-spacing:0; border-radius:12px; overflow:hidden; box-shadow:0 4px 14px rgba(46,38,64,.06); margin:8px 0; font-size:.86rem; }
+    .rstbl th { background:var(--dk); color:white; padding:9px 12px; text-align:left; font-size:.76rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+    .rstbl td { background:white; padding:8px 12px; border-bottom:1px solid #e5e7eb; vertical-align:top; line-height:1.5; font-family:'JetBrains Mono',monospace; font-size:.84rem; }
+    .rstbl tr:last-child td { border-bottom:none; }
+    .rstbl tr.dim td { color:#94a3b8; }
+    .rstbl td.label { font-family:'Manrope',sans-serif; font-weight:700; }
 
-    /* ===== STATUS BARS ===== */
-    .sbr { display:flex; align-items:center; gap:10px; opacity:0; transform:translateX(-18px); transition:all .5s cubic-bezier(.34,1.56,.64,1); margin-bottom:7px; }
-    .sbr.vis { opacity:1; transform:translateX(0); }
-    .scg { width:48px; font-size:.78rem; font-weight:800; font-family:monospace; color:var(--dk); text-align:right; flex-shrink:0; }
-    .str { flex:1; height:26px; background:#f1f5f9; border-radius:8px; overflow:hidden; }
-    .sf  { height:100%; border-radius:8px; display:flex; align-items:center; padding-left:10px; transition:width .85s cubic-bezier(.34,1.56,.64,1); }
-    .sfl { font-size:.74rem; font-weight:700; color:white; }
-    .sds { font-size:.76rem; color:#64748b; width:200px; flex-shrink:0; line-height:1.3; }
+    /* Code blocks */
+    pre.codeblock { background:#1e1e2e; color:#cdd6f4; padding:14px 16px; margin:10px 0; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:.82rem; line-height:1.65; overflow-x:auto; box-shadow:0 4px 14px rgba(0,0,0,.18); }
+    .hl-kw  { color:#89b4fa; font-weight:600; }
+    .hl-str { color:#a6e3a1; }
+    .hl-num { color:#fab387; }
+    .hl-cmt { color:#6c7086; font-style:italic; }
+    .hl-typ { color:#cba6f7; }
+    .hl-fn  { color:#f9e2af; }
 
-    /* ===== STORY TABLE ===== */
-    .stbl { width:100%; border-collapse:separate; border-spacing:0 5px; }
-    .stbl th { padding:9px 12px; font-size:.86rem; font-weight:800; text-align:left; border-radius:9px; }
-    .stbl th:nth-child(1){background:var(--dk);color:white;width:22%;}
-    .stbl th:nth-child(2){background:linear-gradient(135deg,#4b5563,#6b7280);color:white;}
-    .stbl th:nth-child(3){background:linear-gradient(135deg,var(--gr),#10b981);color:white;}
-    .stbl td { padding:9px 12px; font-size:.86rem; vertical-align:top; border-radius:8px; }
-    .stbl td:nth-child(1){background:var(--dk);color:white;font-weight:700;}
-    .stbl td:nth-child(2){background:rgba(24,99,220,.07);color:var(--dk);}
-    .stbl td:nth-child(3){background:rgba(13,148,136,.07);color:var(--dk);}
-    .scc { opacity:0; transform:translateY(8px); transition:all .4s cubic-bezier(.34,1.3,.64,1); display:inline-block; }
-    .scc.vis { opacity:1; transform:translateY(0); }
-    .scc.pop { animation:scpop .5s ease; }
-    @keyframes scpop { 0%{transform:scale(.85) translateY(10px);opacity:0} 60%{transform:scale(1.04) translateY(-2px);opacity:1} 100%{transform:scale(1) translateY(0);opacity:1} }
-
-    /* ===== LAYERS ===== */
-    .lstack { display:flex; flex-direction:column; gap:8px; margin:8px 0; }
-    .alayer { border-radius:12px; padding:13px 18px; display:flex; align-items:center; gap:14px; opacity:0; transform:translateX(-28px) scale(.95); transition:all .6s cubic-bezier(.34,1.3,.64,1); }
-    .alayer.vis { opacity:1; transform:translateX(0) scale(1); }
-    .li { font-size:1.9rem; flex-shrink:0; }
-    .ln { font-size:1rem; font-weight:800; color:white; margin-bottom:2px; }
-    .lt { font-size:.78rem; color:rgba(255,255,255,.88); }
-    .ld { font-size:.76rem; color:rgba(255,255,255,.72); margin-top:2px; }
-    .larr { text-align:center; font-size:1rem; color:#94a3b8; opacity:0; transition:opacity .4s ease; line-height:1; padding:2px 0; }
-    .larr.vis { opacity:1; }
-
-    /* ===== ROADMAP ITEMS ===== */
-    .ri { display:flex; align-items:flex-start; gap:10px; padding:9px 12px; border-radius:10px; background:white; border:1px solid #e2e8f0; opacity:0; transform:translateX(-14px); transition:all .4s ease; margin-bottom:5px; }
-    .ri.vis { opacity:1; transform:translateX(0); }
-    .ri.cur { background:linear-gradient(135deg,rgba(75,85,99,.09),rgba(107,114,128,.09)); border-color:var(--ac); }
-    .rn { width:26px; height:26px; border-radius:50%; background:var(--dk); color:white; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.78rem; flex-shrink:0; margin-top:1px; }
-    .ri.cur .rn { background:linear-gradient(135deg,#374151,#b2b6bf); }
-    .rtl { font-size:.86rem; font-weight:700; color:var(--dk); margin-bottom:1px; }
-    .rds { font-size:.76rem; color:#64748b; }
-
-    /* ===== FOOTER ===== */
-    .slide-footer { position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.97); border-top:1px solid #dfe5ec; padding:10px 24px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 -2px 10px rgba(46,38,64,.06); z-index:100; gap:12px; }
+    /* Footer / nav */
+    .slide-footer { position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.97); border-top:1px solid #dfe5ec; padding:9px 22px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 -2px 10px rgba(46,38,64,.06); z-index:100; gap:12px; }
     .footer-links { display:flex; gap:10px; }
-    .back-home { color:var(--dk); text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:5px; padding:8px 14px; border-radius:10px; background:#f1f4f8; font-size:.9rem; }
+    .back-home { color:var(--dk); text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:5px; padding:7px 13px; border-radius:10px; background:#f1f4f8; font-size:.86rem; }
     .back-home:hover { background:#e2e8f0; }
-    .back-home.material { background: #2f8f78 !important; color: white !important; }
+    .back-home.material { background:#2f8f78 !important; color:white !important; }
     .back-home.material:hover { background:#267562 !important; color:white !important; }
+    .back-home.sandbox { background:#1d4ed8 !important; color:white !important; }
+    .back-home.sandbox:hover { background:#1e40af !important; color:white !important; }
     .nav-wrapper { display:flex; align-items:center; gap:14px; background:#f1f4f8; padding:7px 18px; border-radius:30px; }
-    .nav-buttons button { background:var(--dk); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; }
+    .nav-buttons button { background:var(--dk); color:white; border:none; padding:7px 14px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; font-size:.86rem; }
     .nav-buttons button:disabled { background:#caced6; cursor:not-allowed; }
-    .slide-counter { font-weight:700; color:var(--dk); min-width:70px; text-align:center; }
-    .fullscreen-btn { background:#f1f4f8; border:none; font-size:1.1rem; cursor:pointer; padding:8px 12px; border-radius:8px; }
+    .slide-counter { font-weight:700; color:var(--dk); min-width:64px; text-align:center; font-size:.88rem; }
+    .fullscreen-btn { background:#f1f4f8; border:none; font-size:1.05rem; cursor:pointer; padding:7px 11px; border-radius:8px; }
 
-    /* ===== JOIN DIAGRAM ===== */
-    .jvenn { position:relative; width:80px; height:48px; flex-shrink:0; margin-right:8px; }
-    .jvenn .jc1,.jvenn .jc2 { position:absolute; width:36px; height:36px; border-radius:50%; top:6px; opacity:.7; }
-    .jvenn .jc1 { left:0; }
-    .jvenn .jc2 { right:0; }
+    /* ── Venn diagram for JOIN types ─────────────────────────── */
+    .venn-stage { display:flex; align-items:center; justify-content:center; gap:22px; flex-wrap:wrap; }
+    .venn-svg { width:280px; height:200px; display:block; }
+    .venn-svg circle { fill-opacity:.18; stroke-width:2.5; }
+    .venn-svg .c-a { fill:#3b82f6; stroke:#1d4ed8; }
+    .venn-svg .c-b { fill:#ef4444; stroke:#b91c1c; }
+    .venn-svg .label { font-family:'Manrope',sans-serif; font-weight:800; font-size:18px; fill:white; text-anchor:middle; dominant-baseline:middle; }
+    .venn-svg .lbl-out { font-family:'Manrope',sans-serif; font-weight:700; font-size:14px; fill:var(--dk); text-anchor:middle; }
+    /* highlight via clip-path: filled overlay regions */
+    .venn-fill { fill:#22c55e; fill-opacity:.55; }
+    .venn-caption { font-size:.94rem; color:var(--ac); margin-top:8px; max-width:280px; text-align:center; }
+    .venn-caption strong { color:var(--dk); }
 
-    /* ===== RESULT TABLE ===== */
-    .rtbl { width:100%; border-collapse:collapse; font-size:.76rem; font-family:'Courier New',monospace; }
-    .rtbl th { background:#313244; color:#a6e3a1; padding:5px 10px; text-align:left; font-weight:700; }
-    .rtbl td { background:#2a2a3e; color:#cdd6f4; padding:4px 10px; border-top:1px solid #313244; }
-    .rtbl tr { opacity:0; transform:translateY(4px); transition:all .3s ease; }
-    .rtbl tr.vis { opacity:1; transform:translateY(0); }
+    /* Timer */
+    .timer-bar { background:linear-gradient(135deg,#0f172a,#1e293b); color:white; border-radius:14px; padding:16px 22px; display:flex; align-items:center; justify-content:space-between; margin:14px 0; box-shadow:0 6px 18px rgba(15,23,42,.25); }
+    .timer-display { font-family:'JetBrains Mono',monospace; font-size:2.4rem; font-weight:800; color:#86efac; transition:color .3s; min-width:160px; text-align:center; }
+    .timer-display.warn { color:#fde047; }
+    .timer-display.crit { color:#fca5a5; animation:blink 1s step-end infinite; }
+    @keyframes blink { 50% { opacity:0; } }
+    .timer-controls { display:flex; gap:8px; }
+    .timer-btn { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); color:white; padding:8px 16px; border-radius:8px; font-family:'Manrope',sans-serif; font-weight:700; font-size:.86rem; cursor:pointer; transition:all .2s; }
+    .timer-btn:hover { background:rgba(255,255,255,.22); }
+    .timer-btn.start { background:#22c55e; border-color:#22c55e; color:#052e16; }
+    .timer-btn.pause { background:#eab308; border-color:#eab308; color:#422006; }
+    .timer-btn.reset { background:rgba(239,68,68,.18); border-color:rgba(239,68,68,.4); }
+    .timer-label { font-size:.78rem; opacity:.7; letter-spacing:.06em; text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+    .timer-hero { background:linear-gradient(135deg,#0f172a,#7c2d12); color:white; border-radius:16px; padding:24px 28px; text-align:center; box-shadow:0 12px 32px rgba(15,23,42,.35); }
+    .timer-hero .timer-label { font-size:.88rem; opacity:.85; }
+    .timer-hero .timer-display { font-size:4.2rem; min-width:auto; margin:8px 0 12px; color:#fbbf24; }
+    .timer-hero .timer-display.warn { color:#fde047; }
+    .timer-hero .timer-display.crit { color:#fca5a5; }
+    .timer-hero .timer-controls { justify-content:center; }
 
-    /* ===== ER BOXES ===== */
-    .er-box { background:#1e1e2e; border:2px solid #89b4fa; border-radius:10px; padding:10px 14px; font-family:'Courier New',monospace; font-size:.76rem; color:#cdd6f4; flex:1; }
-    .er-box h4 { color:#89b4fa; font-weight:700; margin:0 0 6px; font-size:.8rem; border-bottom:1px solid #313244; padding-bottom:4px; }
-    .er-box .er-pk { color:#f9e2af; }
-    .er-box .er-fk { color:#fab387; }
-    .er-box .er-col { color:#a6e3a1; }
-    .er-wrap { display:flex; align-items:center; gap:10px; margin:10px 0; opacity:0; transform:translateY(12px); transition:all .5s cubic-bezier(.34,1.3,.64,1); }
-    .er-wrap.vis { opacity:1; transform:translateY(0); }
-    .er-arrow { font-size:1.4rem; color:#89b4fa; flex-shrink:0; }
+    /* Quiz */
+    .quiz-stage { background:linear-gradient(135deg,#0f172a,#1e293b); color:white; border-radius:16px; padding:34px 38px; text-align:center; box-shadow:0 14px 40px rgba(15,23,42,.35); }
+    .quiz-num { display:inline-block; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); padding:4px 14px; border-radius:999px; font-size:.78rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin-bottom:14px; }
+    .quiz-q { font-size:1.55rem; font-weight:700; line-height:1.4; margin:0 0 18px; color:white; max-width:920px; margin-inline:auto; }
+    .quiz-tag { font-size:.82rem; color:#94a3b8; font-style:italic; margin:0 0 22px; }
+    .quiz-reveal { display:none; background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.4); border-radius:12px; padding:18px 22px; margin-top:14px; text-align:left; }
+    .quiz-reveal.show { display:block; animation:slideIn .35s ease-out; }
+    .quiz-reveal h4 { color:#86efac; font-size:.9rem; font-weight:800; margin:0 0 8px; text-transform:uppercase; letter-spacing:.06em; }
+    .quiz-reveal p { color:#e2e8f0; font-size:.95rem; line-height:1.65; margin:0 0 8px; }
+    .quiz-reveal p:last-child { margin-bottom:0; }
+    .quiz-reveal strong { color:#fde047; }
+    .quiz-btn { background:#22c55e; color:#052e16; border:none; padding:10px 24px; border-radius:10px; font-family:'Manrope',sans-serif; font-weight:800; font-size:.92rem; cursor:pointer; box-shadow:0 4px 14px rgba(34,197,94,.3); transition:transform .15s; }
+    .quiz-btn:hover { transform:translateY(-2px); }
+    .quiz-btn.hide { display:none; }
 
-    .daily-timer { font-size:3.5rem; font-weight:800; font-family:monospace; background:rgba(255,255,255,.15); border-radius:16px; padding:10px 28px; display:inline-block; margin-bottom:16px; letter-spacing:4px; color:white; }
-    .daily-tag { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); padding:6px 16px; border-radius:8px; font-weight:700; font-size:.85rem; color:white; opacity:0; transform:translateY(14px); transition:all .45s cubic-bezier(.34,1.3,.64,1); display:inline-block; margin:4px; }
-    .daily-tag.vis { opacity:1; transform:translateY(0); }
+    /* Sandbox tease */
+    .sandbox-tease { background:linear-gradient(135deg,#0b1322,#1e293b); border-radius:16px; padding:22px 26px; color:#cbd5e1; box-shadow:0 8px 24px rgba(15,23,42,.3); }
+    .sandbox-tease h3 { color:#5eead4; font-size:1.1rem; margin:0 0 8px; font-weight:800; }
+    .sandbox-tease p { color:#cbd5e1; font-size:.92rem; line-height:1.6; margin:0 0 12px; }
+    .sandbox-tease .demo-row { display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start; margin-top:10px; }
+    .sandbox-tease pre { background:#020617; color:#e2e8f0; padding:12px 14px; border-radius:8px; font-size:.78rem; line-height:1.65; margin:0; border:1px solid #1e293b; overflow-x:auto; }
+    .sandbox-tease .out-mini { background:white; border-radius:8px; padding:6px; }
+    .sandbox-tease .out-mini table { width:100%; border-collapse:collapse; font-family:'JetBrains Mono',monospace; font-size:.76rem; }
+    .sandbox-tease .out-mini th { background:#0d9488; color:white; padding:5px 8px; text-align:left; font-size:.7rem; }
+    .sandbox-tease .out-mini td { padding:4px 8px; border-bottom:1px solid #e2e8f0; color:#0f172a; }
+    .sandbox-tease .out-mini tr:last-child td { border-bottom:none; }
+    .sandbox-tease .link-btn { display:inline-block; background:#5eead4; color:#042f2e; padding:8px 16px; border-radius:8px; text-decoration:none; font-weight:800; font-size:.86rem; margin-top:8px; }
+    .sandbox-tease .link-btn:hover { background:#2dd4bf; color:#042f2e; }
+
+    /* Lab cards */
+    .lab-card { background:white; border:1px solid #dfe5ec; border-left:5px solid var(--pri); border-radius:12px; padding:14px 16px; }
+    .lab-card h4 { margin:0 0 4px; color:var(--pri); font-size:.88rem; font-weight:800; }
+    .lab-card p  { margin:0; font-size:.84rem; color:#374151; line-height:1.55; }
+
+    /* Hint */
+    .hint { background:#eef2ff; border:1px solid #c7d2fe; border-radius:10px; padding:10px 14px; color:#3730a3; font-size:.88rem; }
+    .hint strong { color:#1e1b4b; }
+
+    /* Highlight stripe — visual pop on cover transitions */
+    .stripe { display:inline-block; background:#fde047; color:#422006; padding:1px 10px; border-radius:6px; font-weight:800; font-size:.86em; }
   </style>
 </head>
 <body>
 <div class="slide-container">
 
-  <!-- ====== SLIDE 1: COVER ====== -->
-  <div class="slide cover-bg">
-    <div class="sc">
-      <div class="cv-badge">Módulo 2 · Ciclo Comum · IN02 · Aula 4 de 11</div>
-      <div class="cv-title">Banco de Dados III</div>
-      <div class="cv-sub">JOINs e Consultas Avançadas — cruzando dados entre tabelas relacionadas</div>
+  <!-- ╔══════════════════════ 01 — Cover ═══════════════════════╗ -->
+  <div class="slide active cover-bg">
+    <div class="sc" style="color:white;">
+      <div class="cv-badge">Módulo 2 · Aula 4 · BD III · 12 / mai / 2026</div>
+      <h1 class="cv-title">JOINs no retiro</h1>
+      <p class="cv-sub">O capataz não tem WiFi no campo. Então o banco vai junto dele, no celular — e respondemos às perguntas de negócio do BrPec usando o motor relacional <em>de dentro do navegador</em>.</p>
       <div class="cv-tags">
-        <div class="cv-tag" id="ct0">🔗 INNER JOIN</div>
-        <div class="cv-tag" id="ct1">⬅️ LEFT JOIN</div>
-        <div class="cv-tag" id="ct2">🔢 GROUP BY</div>
-        <div class="cv-tag" id="ct3">📊 HAVING</div>
-        <div class="cv-tag" id="ct4">🔍 Subconsultas</div>
-        <div class="cv-tag" id="ct5">🏗️ Relações N:N</div>      </div>
+        <span class="cv-tag">INNER · LEFT · RIGHT · FULL · SELF</span>
+        <span class="cv-tag">GROUP BY · HAVING</span>
+        <span class="cv-tag">subconsultas</span>
+        <span class="cv-tag">EXPLAIN QUERY PLAN</span>
+        <span class="cv-tag">sql.js · WebAssembly</span>
+      </div>
+      <div class="agenda-card" style="margin-top:14px;">
+        <h4>Plano de voo · 2 h</h4>
+        <div class="agenda-grid">
+          <div class="daily-tag"><span class="step">Bloco 1</span>Daily · perguntas trazidas<span class="when">15 min</span></div>
+          <div class="daily-tag"><span class="step">Bloco 2</span>JOINs com Venn animado<span class="when">25 min</span></div>
+          <div class="daily-tag"><span class="step">Bloco 3</span>Agregação + subqueries<span class="when">20 min</span></div>
+          <div class="daily-tag"><span class="step">Bloco 4</span>EXPLAIN + sql.js demo<span class="when">10 min</span></div>
+          <div class="daily-tag" style="grid-column:span 2;"><span class="step">Bloco 5</span>Lab nos 5 grupos · sandbox no navegador<span class="when">20 min</span></div>
+          <div class="daily-tag" style="grid-column:span 2; background:rgba(252,165,165,.18); border-color:rgba(252,165,165,.35);"><span class="step">Bloco 6</span>Ponderada em sala · 5 queries individuais<span class="when">30 min</span></div>
+        </div>
+      </div>
     </div>
   </div>
 
-  <!-- ====== SLIDE 2: DAILY ====== -->
-  <div class="slide cover-bg" style="background:linear-gradient(135deg,#1f2937 0%,#4b5563 50%,#b2b6bf 100%)!important;">
-    <div class="sc" style="text-align:center;">
-      <div style="background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:28px 32px;">
-        <div style="font-size:2rem;font-weight:800;color:white;margin-bottom:6px;">⏱️ Daily — 15 Minutos</div>
-        <div style="font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:18px;">O que você fez? O que vai fazer? Algum impedimento?</div>
-        <div class="daily-timer" id="daily-timer">15:00</div>
-        <div style="margin-bottom:18px;">
-          <button id="daily-start-btn" onclick="startDaily()" style="background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">▶ Iniciar</button>
-          <button onclick="resetDaily()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">↺ Reset</button>
+  <!-- ╔══════════════════════ 02 — Por que essa aula importa ════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><h2 class="st">Por que esta aula importa para o BrPec</h2><p class="ss">O ciclo "anota no papel → digita à noite" some quando a equipe começa a operar com dados de verdade.</p></div>
+      <div class="g2">
+        <div class="box dkb">
+          <h3>O retiro pede relatórios que <em>cruzam tabelas</em></h3>
+          <ul>
+            <li>"Quantos eventos zootécnicos por capataz no último mês?"</li>
+            <li>"Quais bovinos passaram <strong>mais de 30 dias</strong> sem nenhum registro?"</li>
+            <li>"Quais retiros tiveram a campanha de aftosa <strong>completa</strong>?"</li>
+            <li>"Qual a média de pesagem por mãe (lote da BR0001 vs lote da BR0007)?"</li>
+          </ul>
         </div>
+        <div class="box grn">
+          <h3>Sem JOIN, a resposta sai errada — ou sai no Excel</h3>
+          <ul>
+            <li>Exportar duas planilhas e <em>casar à mão</em> é como a fazenda funcionava antes do BrPec.</li>
+            <li>Cada conferência manual é um dia de coordenador que não foi para campo.</li>
+            <li>Quando o relatório é <strong>uma query</strong>, ele é reprodutível, auditável e versionável.</li>
+          </ul>
+        </div>
+      </div>
+      <blockquote>A aula de hoje transforma o esquema da aula 3 em <strong>perguntas de negócio respondidas em uma frase</strong>. E faz isso rodando o banco <em>dentro do navegador do capataz</em>.</blockquote>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 03 — Daily ═══════════════════════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><h2 class="st">Daily · qual JOIN você precisaria?</h2><p class="ss">15 minutos · cada aluno traz 1 minuto · pergunta de negócio + a junção que ela exige</p></div>
+      <div class="g2">
+        <div class="box dkb">
+          <h3>Como vai funcionar</h3>
+          <ol>
+            <li>Cada aluno cita <strong>uma pergunta</strong> que enxergou no autoestudo (slide ou material).</li>
+            <li>Diz qual tipo de junção acha que ela exige: <code>INNER</code>, <code>LEFT</code>, <code>SELF</code>…</li>
+            <li>Não precisa estar certo — o que sustenta a discussão é a hipótese.</li>
+            <li>O professor mapeia padrões e amarra com o bloco seguinte.</li>
+          </ol>
+        </div>
+        <div class="box amr">
+          <h3>Banco de perguntas (se faltar inspiração)</h3>
+          <ul>
+            <li>"Bovinos sem evento há mais de 30 dias"</li>
+            <li>"Capatazes que atuam em mais de um retiro"</li>
+            <li>"Eventos por bovino × mãe — herança de saúde"</li>
+            <li>"Bovinos do retiro X que ainda <em>não</em> receberam aftosa"</li>
+            <li>"Médias de peso por capataz responsável pela pesagem"</li>
+          </ul>
+        </div>
+      </div>
+      <div class="timer-bar">
         <div>
-          <span class="daily-tag" id="dt0">✅ O que fiz</span>
-          <span class="daily-tag" id="dt1">🎯 O que vou fazer</span>
-          <span class="daily-tag" id="dt2">🚧 Impedimentos</span>
-          <span class="daily-tag" id="dt3">📦 Progresso do projeto</span>
+          <div class="timer-label">Cronômetro · Daily</div>
+          <div class="timer-display" id="t-daily-disp">15:00</div>
+        </div>
+        <div class="timer-controls">
+          <button class="timer-btn start" onclick="Timer.start('daily')">▶ Iniciar</button>
+          <button class="timer-btn pause" onclick="Timer.pause('daily')">⏸ Pausar</button>
+          <button class="timer-btn reset" onclick="Timer.reset('daily')">↺ Reset</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== SLIDE 3: AGENDA ====== -->
+  <!-- ╔══════════════════════ 04 — Recap: por que tabelas separadas ╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh dark"><div class="st">📋 Agenda da Aula 4</div><div class="ss">Estrutura e objetivos da aula de hoje</div></div>
-      <div class="g2" style="gap:12px;">
-        <div id="ag0" class="box" style="opacity:0;">
-          <h3>🕐 Bloco 1 — JOINs (25 min)</h3>
-          <p>INNER JOIN, LEFT JOIN, RIGHT JOIN e FULL JOIN com exemplos práticos.</p>
+      <div class="sh blue"><h2 class="st">Por que tabelas separadas?</h2><p class="ss">Recap relâmpago do DER do BrPec — para entender o que estamos juntando.</p></div>
+      <div class="g2">
+        <div class="box blu">
+          <h3>Decisões do DER (aula 3)</h3>
+          <ul>
+            <li><strong>capataz</strong>, <strong>retiro</strong>, <strong>bovino</strong>, <strong>evento_zootecnico</strong> em tabelas próprias — evita repetição e mentira de dado.</li>
+            <li><strong>FK</strong> mora no lado N — <code>capataz_id</code>, <code>bovino_id</code>, <code>retiro_id</code> ficam em <code>evento_zootecnico</code>.</li>
+            <li>Quando a cardinalidade é <strong>N:N</strong> (capataz pode atuar em vários retiros), criamos a tabela <strong>capataz_retiro</strong>.</li>
+            <li>A herança "filho de…" é uma <strong>auto-referência</strong>: <code>bovino.mae_id → bovino.id</code>.</li>
+          </ul>
         </div>
-        <div id="ag1" class="box" style="opacity:0;">
-          <h3>🕑 Bloco 2 — Agregações e Agrupamentos (25 min)</h3>
-          <p>GROUP BY, HAVING, funções de agregação COUNT, SUM, AVG, MIN, MAX.</p>
-        </div>
-        <div id="ag2" class="box" style="opacity:0;">
-          <h3>🕒 Bloco 3 — Subconsultas e Window Functions (20 min)</h3>
-          <p>Subconsultas correlacionadas e funções de janela ROW_NUMBER, RANK.</p>
-        </div>
-        <div id="ag3" class="box acc" style="opacity:0;">
-          <h3>🎯 Objetivo da Aula</h3>
-          <p>Ao final, o aluno deve combinar tabelas com JOINs e produzir relatórios com agrupamentos.</p>
-        </div>
-      </div>
-    </div>
-  </div>
-
-
-    </div>
-  </div>
-
-
-  <!-- ====== SLIDE 3: POR QUE JOINs? ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh blue"><div class="st">Por que JOINs?</div><div class="ss">O problema de dados separados em tabelas</div></div>
-      <div class="g2" style="gap:14px;align-items:start;margin-bottom:12px;">
-        <div id="tbl-usuarios" style="opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);">
-          <div class="term">
-            <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">tabela: usuarios</div></div>
-            <div class="term-body">
-              <div class="tl vis"><span class="kw">id</span>  <span class="txt">|</span> <span class="kw">nome</span>         <span class="txt">|</span> <span class="kw">email</span></div>
-              <div class="tl vis"><span class="txt">----+-------------+------------------</span></div>
-              <div class="tl vis"><span class="jn">1</span>   <span class="txt">|</span> <span class="js">Ana Lima</span>     <span class="txt">|</span> <span class="pth">ana@inteli.edu</span></div>
-              <div class="tl vis"><span class="jn">2</span>   <span class="txt">|</span> <span class="js">Bruno Costa</span>  <span class="txt">|</span> <span class="pth">bruno@inteli.edu</span></div>
-              <div class="tl vis"><span class="jn">3</span>   <span class="txt">|</span> <span class="js">Carla Dias</span>   <span class="txt">|</span> <span class="pth">carla@inteli.edu</span></div>
-            </div>
-          </div>
-        </div>
-        <div id="tbl-pedidos" style="opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1) .3s;">
-          <div class="term">
-            <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">tabela: pedidos</div></div>
-            <div class="term-body">
-              <div class="tl vis"><span class="kw">id</span>  <span class="txt">|</span> <span class="kw">usuario_id</span> <span class="txt">|</span> <span class="kw">total</span>   <span class="txt">|</span> <span class="kw">status</span></div>
-              <div class="tl vis"><span class="txt">----+-----------+---------+----------</span></div>
-              <div class="tl vis"><span class="jn">10</span>  <span class="txt">|</span> <span class="jn">1</span>          <span class="txt">|</span> <span class="jn">249.90</span>  <span class="txt">|</span> <span class="js">aprovado</span></div>
-              <div class="tl vis"><span class="jn">11</span>  <span class="txt">|</span> <span class="jn">1</span>          <span class="txt">|</span> <span class="jn">89.00</span>   <span class="txt">|</span> <span class="js">aprovado</span></div>
-              <div class="tl vis"><span class="jn">12</span>  <span class="txt">|</span> <span class="jn">2</span>          <span class="txt">|</span> <span class="jn">510.50</span>  <span class="txt">|</span> <span class="ver">pendente</span></div>
-            </div>
-          </div>
-        </div>
-      </div>
-      <div id="tbl-arrow" style="text-align:center;font-size:1.6rem;color:var(--hi);opacity:0;transition:opacity .4s ease .7s;margin-bottom:10px;">⬇️ Como cruzar esses dados? ⬇️</div>
-      <div id="tbl-box" style="opacity:0;transform:translateY(12px);transition:all .5s cubic-bezier(.34,1.3,.64,1) .9s;">
         <div class="box acc">
-          <h3>🔗 A solução: JOIN</h3>
-          <p>Sistemas reais têm <strong>dezenas de tabelas relacionadas</strong>. O JOIN permite combinar linhas de duas ou mais tabelas com base em uma coluna em comum — normalmente uma chave estrangeira (<code>usuario_id</code>) ligada à chave primária (<code>id</code>).</p>
+          <h3>Consequência prática</h3>
+          <p>Nenhuma tabela do BrPec, sozinha, responde à pergunta "qual o histórico zootécnico do bovino BR0001 no retiro Cabeceira em 2025-08?". Cada relatório que importa para o coordenador <strong>cruza pelo menos três tabelas</strong>.</p>
+          <p>Hoje, vamos aprender a fazer esses cruzamentos sem largar o SQL — e sem mentir nos números.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== SLIDE 4: TIPOS DE JOIN ====== -->
+  <!-- ╔══════════════════════ 05 — JOIN: anatomia ═════════════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh dark"><div class="st">Tipos de JOIN — Diagrama Visual</div><div class="ss">Cada tipo define quais linhas aparecem no resultado</div></div>
-      <div class="g4" style="margin-bottom:12px;">
-        <div class="mc" id="jt0" style="--mc:#4b5563;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <div class="jvenn">
-              <div class="jc1" style="background:#4b5563;"></div>
-              <div class="jc2" style="background:#4b5563;opacity:.5;"></div>
-            </div>
-            <div class="mb" style="background:#4b5563;">INNER JOIN</div>
-          </div>
-          <div class="mt">Interseção</div>
-          <div class="md">Somente registros com correspondência em <strong>AMBAS</strong> as tabelas. Linhas sem par são descartadas.</div>
-          <div class="mex">FROM a INNER JOIN b ON a.id = b.a_id</div>
+      <div class="sh dark"><h2 class="st">JOIN, sem mistério</h2><p class="ss">Sintaxe genérica e leitura "da esquerda para a direita".</p></div>
+      <div class="g2">
+        <div class="box dkb">
+          <h3>Forma geral</h3>
+<pre class="codeblock"><span class="hl-kw">SELECT</span>  a.col, b.col
+<span class="hl-kw">FROM</span>    tabela_a a
+<span class="hl-kw">JOIN</span>    tabela_b b  <span class="hl-cmt">-- INNER por padrão</span>
+  <span class="hl-kw">ON</span>    b.fk = a.id
+<span class="hl-kw">WHERE</span>   a.algo = <span class="hl-str">'x'</span>;</pre>
+          <p><strong>5 perguntas a fazer mentalmente:</strong></p>
+          <ol>
+            <li>Quem é a tabela <em>esquerda</em>? (<code>FROM</code>)</li>
+            <li>Quem é a <em>direita</em>? (<code>JOIN</code>)</li>
+            <li>Por qual <em>chave</em> elas se ligam? (<code>ON</code>)</li>
+            <li>Quero <em>todas</em> as linhas de algum lado? (escolhe o tipo)</li>
+            <li>Filtro <em>antes</em> ou <em>depois</em> de agrupar? (<code>WHERE</code> vs <code>HAVING</code>)</li>
+          </ol>
         </div>
-        <div class="mc" id="jt1" style="--mc:#0d9488;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <div class="jvenn">
-              <div class="jc1" style="background:#0d9488;"></div>
-              <div class="jc2" style="background:#0d9488;opacity:.3;"></div>
-            </div>
-            <div class="mb" style="background:#0d9488;">LEFT JOIN</div>
-          </div>
-          <div class="mt">Todos da esquerda</div>
-          <div class="md"><strong>TODOS</strong> da esquerda + correspondências da direita. <code>NULL</code> se não houver correspondência.</div>
-          <div class="mex">FROM a LEFT JOIN b ON a.id = b.a_id</div>
+        <div class="box amr">
+          <h3>Sinal verde do BrPec</h3>
+          <p>Por convenção: <code>a</code> é "matriz" da pergunta, <code>b</code> é "satélite".</p>
+          <ul>
+            <li>Para "eventos de cada bovino": <strong>a = bovino</strong>, <strong>b = evento_zootecnico</strong>.</li>
+            <li>Para "retiros e suas pesagens": <strong>a = retiro</strong>, <strong>b = evento_zootecnico</strong> (filtrando <code>tipo = 'pesagem'</code>).</li>
+            <li>Para "capataz × retiros sob sua responsabilidade": <strong>a = capataz</strong>, <strong>b = capataz_retiro</strong> + <strong>c = retiro</strong> (dois JOINs encadeados).</li>
+          </ul>
+          <p class="mono" style="font-size:.84rem; color:var(--ac);">A escolha de a / b muda <em>quem fica de fora</em> em LEFT vs INNER.</p>
         </div>
-        <div class="mc" id="jt2" style="--mc:#d97706;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <div class="jvenn">
-              <div class="jc1" style="background:#d97706;opacity:.3;"></div>
-              <div class="jc2" style="background:#d97706;"></div>
-            </div>
-            <div class="mb" style="background:#d97706;">RIGHT JOIN</div>
-          </div>
-          <div class="mt">Todos da direita</div>
-          <div class="md"><strong>TODOS</strong> da direita + correspondências da esquerda. <code>NULL</code> se não houver correspondência.</div>
-          <div class="mex">FROM a RIGHT JOIN b ON a.id = b.a_id</div>
-        </div>
-        <div class="mc" id="jt3" style="--mc:#6b7280;">
-          <div style="display:flex;align-items:center;gap:8px;margin-bottom:8px;">
-            <div class="jvenn">
-              <div class="jc1" style="background:#6b7280;"></div>
-              <div class="jc2" style="background:#6b7280;left:auto;right:0;"></div>
-            </div>
-            <div class="mb" style="background:#6b7280;">FULL OUTER</div>
-          </div>
-          <div class="mt">União total</div>
-          <div class="md"><strong>TODOS</strong> de ambas as tabelas. <code>NULL</code> onde não há correspondência em nenhum dos lados.</div>
-          <div class="mex">FROM a FULL OUTER JOIN b ON a.id = b.a_id</div>
-        </div>
-      </div>
-      <div class="box">
-        <h3>💡 Na prática</h3>
-        <p>O <strong>INNER JOIN</strong> e o <strong>LEFT JOIN</strong> são os mais usados no dia a dia. O RIGHT JOIN é equivalente ao LEFT JOIN com as tabelas invertidas. O FULL OUTER JOIN é raro mas útil para auditorias de dados.</p>
       </div>
     </div>
   </div>
 
-  <!-- ====== SLIDE 5: INNER JOIN ====== -->
+  <!-- ╔══════════════════════ 06 — INNER JOIN ═══════════════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh green"><div class="st">INNER JOIN na Prática</div><div class="ss">Buscando pedidos com os dados completos do usuário</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:280px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">inner_join.sql</div></div>
-          <div class="term-body">
-            <div class="tl" id="ij0"></div><div class="tl" id="ij1"></div><div class="tl" id="ij2"></div>
-            <div class="tl" id="ij3"></div><div class="tl" id="ij4"></div><div class="tl" id="ij5"></div>
-            <div class="tl" id="ij6"></div><div class="tl" id="ij7"></div><div class="tl" id="ij8"></div>
-            <div class="tl" id="ij9"></div><div class="tl" id="ij10"></div>
-          </div>
+      <div class="sh green"><h2 class="st">INNER JOIN · só quem está nos dois lados</h2><p class="ss">A interseção dos conjuntos — o caso mais restritivo, e o default.</p></div>
+      <div class="g2">
+        <div>
+          <svg class="venn-svg" viewBox="0 0 280 200">
+            <defs>
+              <clipPath id="clip-inner"><circle cx="105" cy="100" r="60"/></clipPath>
+            </defs>
+            <circle class="c-a" cx="105" cy="100" r="60"/>
+            <circle class="c-b" cx="175" cy="100" r="60"/>
+            <circle class="venn-fill" cx="175" cy="100" r="60" clip-path="url(#clip-inner)"/>
+            <text class="label" x="78" y="100">capataz</text>
+            <text class="label" x="202" y="100">evento</text>
+          </svg>
+          <p class="venn-caption"><strong>Resultado:</strong> apenas linhas com correspondência em <em>ambos</em> os lados.</p>
         </div>
         <div>
-          <div class="box grn" style="margin-bottom:10px;">
-            <h3>📊 Resultado (3 linhas)</h3>
-          </div>
-          <div class="term" style="height:200px;">
-            <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">result set</div></div>
-            <div class="term-body" style="padding:8px 10px;">
-              <table class="rtbl" id="rt-inner">
-                <thead><tr><th>nome</th><th>pedido_id</th><th>total</th><th>status</th></tr></thead>
-                <tbody>
-                  <tr id="rr0"><td>Ana Lima</td><td>10</td><td>249.90</td><td>aprovado</td></tr>
-                  <tr id="rr1"><td>Ana Lima</td><td>11</td><td>89.00</td><td>aprovado</td></tr>
-                  <tr id="rr2"><td>Bruno Costa</td><td>12</td><td>510.50</td><td>aprovado</td></tr>
-                </tbody>
-              </table>
-            </div>
-          </div>
+<pre class="codeblock"><span class="hl-cmt">-- Quantos eventos cada capataz registrou?</span>
+<span class="hl-kw">SELECT</span> c.nome, <span class="hl-fn">COUNT</span>(e.id) <span class="hl-kw">AS</span> eventos
+<span class="hl-kw">FROM</span> capataz c
+<span class="hl-kw">INNER JOIN</span> evento_zootecnico e
+  <span class="hl-kw">ON</span> e.capataz_id = c.id
+<span class="hl-kw">GROUP BY</span> c.id
+<span class="hl-kw">ORDER BY</span> eventos <span class="hl-kw">DESC</span>;</pre>
+          <table class="rstbl">
+            <tr><th>nome</th><th style="text-align:right;">eventos</th></tr>
+            <tr><td>Pedro Almeida</td><td style="text-align:right;">20</td></tr>
+            <tr><td>João Pereira</td><td style="text-align:right;">17</td></tr>
+            <tr><td>Mateus Ferreira</td><td style="text-align:right;">10</td></tr>
+            <tr><td>Antônio Souza</td><td style="text-align:right;">7</td></tr>
+            <tr><td>Carlos Ribeiro</td><td style="text-align:right;">6</td></tr>
+          </table>
+          <p class="hint" style="margin-top:8px;"><strong>Atenção:</strong> Vitor Gomes (capataz recém-contratado) <em>não aparece</em> — INNER esconde quem ainda não tem evento. Isso é problema ou feature? Depende da pergunta.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== SLIDE 6: LEFT JOIN ====== -->
+  <!-- ╔══════════════════════ 07 — LEFT JOIN ═══════════════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh blue"><div class="st">LEFT JOIN — Incluindo Nulos</div><div class="ss">Todos os usuários, mesmo sem pedidos</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:260px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">left_join.sql</div></div>
-          <div class="term-body">
-            <div class="tl" id="lj0"></div><div class="tl" id="lj1"></div><div class="tl" id="lj2"></div>
-            <div class="tl" id="lj3"></div><div class="tl" id="lj4"></div><div class="tl" id="lj5"></div>
-            <div class="tl" id="lj6"></div><div class="tl" id="lj7"></div><div class="tl" id="lj8"></div>
-            <div class="tl" id="lj9"></div>
-          </div>
+      <div class="sh blue"><h2 class="st">LEFT JOIN · todos da esquerda, com ou sem par</h2><p class="ss">Inclui as linhas órfãs — quem fica de fora vira <code>NULL</code> do lado direito.</p></div>
+      <div class="g2">
+        <div>
+          <svg class="venn-svg" viewBox="0 0 280 200">
+            <defs>
+              <clipPath id="clip-left"><circle cx="105" cy="100" r="60"/></clipPath>
+            </defs>
+            <circle class="c-a" cx="105" cy="100" r="60"/>
+            <circle class="c-b" cx="175" cy="100" r="60"/>
+            <circle class="venn-fill" cx="105" cy="100" r="60"/>
+            <circle class="venn-fill" cx="175" cy="100" r="60" clip-path="url(#clip-left)"/>
+            <text class="label" x="78" y="100">capataz</text>
+            <text class="label" x="202" y="100">evento</text>
+          </svg>
+          <p class="venn-caption"><strong>Resultado:</strong> todas as linhas de <em>capataz</em>, mesmo as sem evento (vêm com <code>NULL</code>).</p>
         </div>
         <div>
-          <div class="box acc" style="margin-bottom:10px;">
-            <h3>⚠️ NULL no resultado</h3>
-            <p>LEFT JOIN retorna <strong>NULL</strong> para colunas da tabela direita quando não há correspondência. Use <code>COALESCE(coluna, 0)</code> para substituir NULL por zero.</p>
-          </div>
+<pre class="codeblock"><span class="hl-cmt">-- Quantos eventos cada capataz registrou (incluindo zero)?</span>
+<span class="hl-kw">SELECT</span> c.nome, <span class="hl-fn">COUNT</span>(e.id) <span class="hl-kw">AS</span> eventos
+<span class="hl-kw">FROM</span> capataz c
+<span class="hl-kw">LEFT JOIN</span> evento_zootecnico e
+  <span class="hl-kw">ON</span> e.capataz_id = c.id
+<span class="hl-kw">GROUP BY</span> c.id
+<span class="hl-kw">ORDER BY</span> eventos <span class="hl-kw">DESC</span>;</pre>
+          <table class="rstbl">
+            <tr><th>nome</th><th style="text-align:right;">eventos</th></tr>
+            <tr><td>Pedro Almeida</td><td style="text-align:right;">20</td></tr>
+            <tr><td>João Pereira</td><td style="text-align:right;">17</td></tr>
+            <tr><td>Mateus Ferreira</td><td style="text-align:right;">10</td></tr>
+            <tr><td>Antônio Souza</td><td style="text-align:right;">7</td></tr>
+            <tr><td>Carlos Ribeiro</td><td style="text-align:right;">6</td></tr>
+            <tr class="dim"><td>Vitor Gomes</td><td style="text-align:right;">0</td></tr>
+          </table>
+          <p class="hint" style="margin-top:8px;"><strong>Pegadinha clássica:</strong> <code>COUNT(*)</code> contaria a linha do Vitor como 1. Use <code>COUNT(e.id)</code> para contar só onde tem evento real.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 08 — RIGHT / FULL ═══════════════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh amber"><h2 class="st">RIGHT e FULL JOIN · espelhos do LEFT</h2><p class="ss">Existem, mas você raramente precisa.</p></div>
+      <div style="display:grid; grid-template-columns:1fr 1fr; gap:14px; align-items:start;">
+        <div>
+          <svg class="venn-svg" viewBox="0 0 280 200">
+            <defs>
+              <clipPath id="clip-right"><circle cx="175" cy="100" r="60"/></clipPath>
+            </defs>
+            <circle class="c-a" cx="105" cy="100" r="60"/>
+            <circle class="c-b" cx="175" cy="100" r="60"/>
+            <circle class="venn-fill" cx="175" cy="100" r="60"/>
+            <circle class="venn-fill" cx="105" cy="100" r="60" clip-path="url(#clip-right)"/>
+            <text class="label" x="78" y="100">A</text>
+            <text class="label" x="202" y="100">B</text>
+          </svg>
+          <p class="venn-caption"><strong>RIGHT JOIN ·</strong> tudo da direita</p>
+        </div>
+        <div>
+          <svg class="venn-svg" viewBox="0 0 280 200">
+            <circle class="c-a" cx="105" cy="100" r="60"/>
+            <circle class="c-b" cx="175" cy="100" r="60"/>
+            <circle class="venn-fill" cx="105" cy="100" r="60"/>
+            <circle class="venn-fill" cx="175" cy="100" r="60"/>
+            <text class="label" x="78" y="100">A</text>
+            <text class="label" x="202" y="100">B</text>
+          </svg>
+          <p class="venn-caption"><strong>FULL OUTER JOIN ·</strong> união completa</p>
+        </div>
+      </div>
+      <div class="g2" style="margin-top:6px;">
+        <div class="box amr">
+          <h3>RIGHT JOIN é só LEFT invertido</h3>
+          <p><code>A RIGHT JOIN B</code> ≡ <code>B LEFT JOIN A</code>. Por <em>convenção</em>, escrevemos sempre LEFT — fica mais fácil de ler.</p>
+        </div>
+        <div class="box dkb">
+          <h3>FULL OUTER JOIN é quase nunca</h3>
+          <p>Útil em reconciliação ("o que tem em A <em>ou</em> em B, junto com o que falta"). <strong>SQLite 3.39+</strong> suporta. Em PostgreSQL e SQL Server, sempre suportou.</p>
+        </div>
+      </div>
+      <p class="hint"><strong>Regra de bolso:</strong> 95% das suas queries serão <code>INNER</code> ou <code>LEFT</code>. Se precisar de <code>RIGHT</code>, vire a ordem das tabelas e use <code>LEFT</code>. Se precisar de <code>FULL</code>, pare 30 segundos e veja se a pergunta não pode ser duas queries com <code>UNION</code>.</p>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 09 — SELF JOIN ═══════════════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh pasture"><h2 class="st">SELF JOIN · a tabela conversa com ela mesma</h2><p class="ss">Quando uma entidade aponta para outra do mesmo tipo (mãe/filho, gerente/funcionário, parte/peça).</p></div>
+      <div class="g2">
+        <div class="box grn">
+          <h3>O caso BrPec: bezerro × mãe</h3>
+<pre class="codeblock"><span class="hl-cmt">-- 10 bezerros e suas mães (matriz)</span>
+<span class="hl-kw">SELECT</span>
+  f.brinco <span class="hl-kw">AS</span> bezerro,
+  m.brinco <span class="hl-kw">AS</span> mae,
+  f.nascimento
+<span class="hl-kw">FROM</span> bovino f
+<span class="hl-kw">INNER JOIN</span> bovino m
+  <span class="hl-kw">ON</span> m.id = f.mae_id
+<span class="hl-kw">ORDER BY</span> f.nascimento <span class="hl-kw">DESC</span>;</pre>
+          <p><strong>Truque:</strong> dois apelidos da <em>mesma</em> tabela. Aqui, <code>f</code> = filho, <code>m</code> = mãe.</p>
+        </div>
+        <div>
+          <table class="rstbl">
+            <tr><th>bezerro</th><th>mae</th><th>nascimento</th></tr>
+            <tr><td>BR0029</td><td>BR0009</td><td>2026-04-14</td></tr>
+            <tr><td>BR0027</td><td>BR0007</td><td>2026-03-09</td></tr>
+            <tr><td>BR0026</td><td>BR0006</td><td>2026-02-25</td></tr>
+            <tr><td>BR0025</td><td>BR0005</td><td>2026-01-18</td></tr>
+            <tr><td>BR0028</td><td>BR0008</td><td>2025-12-30</td></tr>
+            <tr><td>BR0024</td><td>BR0004</td><td>2025-11-02</td></tr>
+            <tr><td>BR0030</td><td>BR0010</td><td>2025-09-20</td></tr>
+            <tr><td>BR0023</td><td>BR0003</td><td>2025-08-15</td></tr>
+            <tr><td>BR0022</td><td>BR0002</td><td>2025-06-22</td></tr>
+            <tr><td>BR0021</td><td>BR0001</td><td>2025-04-10</td></tr>
+          </table>
+          <p class="hint" style="margin-top:8px;"><strong>Sem alias</strong> o SQL ficaria ambíguo — quem é <code>id</code>? quem é <code>mae_id</code>? Aliases não são luxo no SELF JOIN, são <em>obrigatórios</em>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 10 — N:N + junção ═══════════════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><h2 class="st">Relação N:N · a tabela de junção</h2><p class="ss">Um capataz pode atuar em vários retiros. Um retiro tem vários capatazes. Solução: tabela ponte.</p></div>
+      <div class="g2">
+        <div class="box dkb">
+          <h3>Modelo</h3>
+          <p class="mono" style="font-size:.86rem;">capataz · 1 ── N · <strong>capataz_retiro</strong> · N ── 1 · retiro</p>
+          <p><code>capataz_retiro</code> tem <code>capataz_id</code> + <code>retiro_id</code> (FK) e geralmente atributos próprios da <em>ligação</em> (data de início, ativo, função).</p>
+          <p><strong>Anti-padrão a evitar:</strong> guardar <code>retiros</code> como string CSV em <code>capataz</code> (ex.: <code>"1,2,4"</code>). Vira impossível filtrar, juntar e índice não funciona.</p>
+        </div>
+        <div>
+<pre class="codeblock"><span class="hl-cmt">-- Capataz × retiros (lista de presença)</span>
+<span class="hl-kw">SELECT</span>
+  c.nome,
+  <span class="hl-fn">GROUP_CONCAT</span>(r.nome, <span class="hl-str">', '</span>) <span class="hl-kw">AS</span> retiros
+<span class="hl-kw">FROM</span> capataz c
+<span class="hl-kw">LEFT JOIN</span> capataz_retiro cr
+  <span class="hl-kw">ON</span> cr.capataz_id = c.id <span class="hl-kw">AND</span> cr.ativo = <span class="hl-num">1</span>
+<span class="hl-kw">LEFT JOIN</span> retiro r
+  <span class="hl-kw">ON</span> r.id = cr.retiro_id
+<span class="hl-kw">GROUP BY</span> c.id;</pre>
+          <table class="rstbl">
+            <tr><th>nome</th><th>retiros</th></tr>
+            <tr><td>João Pereira</td><td>Cabeceira, Mata-Burro</td></tr>
+            <tr><td>Pedro Almeida</td><td>Vargem do Sucuri, Faxinal</td></tr>
+            <tr><td>Mateus Ferreira</td><td>Faxinal, Cocho Novo</td></tr>
+            <tr class="dim"><td>Vitor Gomes</td><td><em>NULL</em></td></tr>
+          </table>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 11 — GROUP BY + agregações ═════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><h2 class="st">GROUP BY · agregando o que JOIN espalhou</h2><p class="ss">Funções de agregação: <code>COUNT</code>, <code>SUM</code>, <code>AVG</code>, <code>MIN</code>, <code>MAX</code>, <code>GROUP_CONCAT</code>.</p></div>
+      <div class="g2">
+        <div>
+<pre class="codeblock"><span class="hl-cmt">-- Eventos por tipo, por retiro, em jan/2026</span>
+<span class="hl-kw">SELECT</span>
+  r.nome <span class="hl-kw">AS</span> retiro,
+  e.tipo,
+  <span class="hl-fn">COUNT</span>(*) <span class="hl-kw">AS</span> qtd
+<span class="hl-kw">FROM</span> evento_zootecnico e
+<span class="hl-kw">INNER JOIN</span> retiro r <span class="hl-kw">ON</span> r.id = e.retiro_id
+<span class="hl-kw">WHERE</span> e.data <span class="hl-kw">LIKE</span> <span class="hl-str">'2026-01-%'</span>
+<span class="hl-kw">GROUP BY</span> r.id, e.tipo
+<span class="hl-kw">ORDER BY</span> retiro, qtd <span class="hl-kw">DESC</span>;</pre>
+        </div>
+        <div>
           <div class="box grn">
-            <h3>💡 Quando usar LEFT JOIN?</h3>
-            <ul>
-              <li>Relatório de <strong>todos os clientes</strong> (com ou sem pedidos)</li>
-              <li>Verificar registros <strong>órfãos</strong> (sem par)</li>
-              <li>Dados <strong>opcionais</strong> — endereços, fotos de perfil</li>
-            </ul>
+            <h3>Anatomia mental</h3>
+            <ol>
+              <li><code>FROM</code> + <code>JOIN</code> → monta a tabelona "espelho"</li>
+              <li><code>WHERE</code> → filtra linhas antes de agrupar</li>
+              <li><code>GROUP BY</code> → empilha por chave de agrupamento</li>
+              <li>função de agregação → reduz cada pilha em <em>uma</em> linha</li>
+              <li><code>HAVING</code> → filtra grupos depois</li>
+              <li><code>ORDER BY</code> → ordena o que sobrou</li>
+            </ol>
+            <p class="hint" style="margin-top:8px;"><strong>Mantra:</strong> "as colunas no <code>SELECT</code> ou estão no <code>GROUP BY</code> ou são agregações". O SQLite é permissivo, o PostgreSQL não.</p>
           </div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== SLIDE 7: GROUP BY ====== -->
+  <!-- ╔══════════════════════ 12 — WHERE vs HAVING ═════════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh dark"><div class="st">GROUP BY e Funções de Agregação</div><div class="ss">Agrupando linhas e calculando estatísticas</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:300px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">group_by.sql</div></div>
-          <div class="term-body">
-            <div class="tl" id="gb0"></div><div class="tl" id="gb1"></div><div class="tl" id="gb2"></div>
-            <div class="tl" id="gb3"></div><div class="tl" id="gb4"></div><div class="tl" id="gb5"></div>
-            <div class="tl" id="gb6"></div><div class="tl" id="gb7"></div><div class="tl" id="gb8"></div>
-            <div class="tl" id="gb9"></div>
-          </div>
+      <div class="sh red"><h2 class="st">WHERE vs HAVING · a pegadinha</h2><p class="ss">Errar isto é mais comum do que confundir <code>SELECT</code> com <code>UPDATE</code>.</p></div>
+      <div class="g2">
+        <div class="box red">
+          <h3>❌ Errado</h3>
+<pre class="codeblock"><span class="hl-kw">SELECT</span> bovino_id, <span class="hl-fn">COUNT</span>(*) <span class="hl-kw">AS</span> n
+<span class="hl-kw">FROM</span> evento_zootecnico
+<span class="hl-kw">WHERE</span> <span class="hl-fn">COUNT</span>(*) &gt; <span class="hl-num">5</span>   <span class="hl-cmt">-- erro!</span>
+<span class="hl-kw">GROUP BY</span> bovino_id;</pre>
+          <p><code>WHERE</code> roda <em>linha a linha</em>, antes de qualquer agregação. <code>COUNT(*)</code> ainda não existe ali. SQLite reclama: "<code>misuse of aggregate</code>".</p>
         </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div class="mc" id="ag0" style="--mc:#4b5563;"><div class="mb">COUNT</div><div class="mt">Contar linhas</div><div class="mex">COUNT(p.id) → 5</div></div>
-          <div class="mc" id="ag1" style="--mc:#0d9488;"><div class="mb">SUM</div><div class="mt">Somar valores</div><div class="mex">SUM(p.total) → 1349.40</div></div>
-          <div class="mc" id="ag2" style="--mc:#d97706;"><div class="mb">AVG</div><div class="mt">Média aritmética</div><div class="mex">AVG(p.total) → 269.88</div></div>
-          <div class="mc" id="ag3" style="--mc:#6b7280;"><div class="mb">MAX</div><div class="mt">Maior valor</div><div class="mex">MAX(p.total) → 510.50</div></div>
-          <div class="mc" id="ag4" style="--mc:#dc2626;"><div class="mb">MIN</div><div class="mt">Menor valor</div><div class="mex">MIN(p.total) → 49.90</div></div>
+        <div class="box grn">
+          <h3>✅ Certo</h3>
+<pre class="codeblock"><span class="hl-kw">SELECT</span> bovino_id, <span class="hl-fn">COUNT</span>(*) <span class="hl-kw">AS</span> n
+<span class="hl-kw">FROM</span> evento_zootecnico
+<span class="hl-kw">GROUP BY</span> bovino_id
+<span class="hl-kw">HAVING</span> <span class="hl-fn">COUNT</span>(*) &gt; <span class="hl-num">5</span>;</pre>
+          <p><code>HAVING</code> roda <em>sobre os grupos</em>, depois do <code>GROUP BY</code>. É o filtro "<em>de pilhas</em>".</p>
+        </div>
+      </div>
+      <blockquote><strong>Mnemônico:</strong> "WHERE filtra <em>linhas</em>. HAVING filtra <em>grupos</em>."</blockquote>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 13 — Subconsultas ═════════════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><h2 class="st">Subconsultas · onde elas vivem</h2><p class="ss">Três cantos da query, três propósitos diferentes.</p></div>
+      <div class="g3">
+        <div class="box blu">
+          <h3>1. No <code>WHERE</code></h3>
+          <p>"bovinos com mais eventos que a média":</p>
+<pre class="codeblock" style="font-size:.74rem;"><span class="hl-kw">SELECT</span> b.brinco, <span class="hl-fn">COUNT</span>(e.id)
+<span class="hl-kw">FROM</span> bovino b
+<span class="hl-kw">LEFT JOIN</span> evento_zootecnico e
+  <span class="hl-kw">ON</span> e.bovino_id = b.id
+<span class="hl-kw">GROUP BY</span> b.id
+<span class="hl-kw">HAVING</span> <span class="hl-fn">COUNT</span>(e.id) &gt; (
+  <span class="hl-kw">SELECT</span> <span class="hl-fn">AVG</span>(qtd) <span class="hl-kw">FROM</span> (
+    <span class="hl-kw">SELECT</span> <span class="hl-fn">COUNT</span>(*) qtd
+    <span class="hl-kw">FROM</span> evento_zootecnico
+    <span class="hl-kw">GROUP BY</span> bovino_id
+  )
+);</pre>
+        </div>
+        <div class="box blu">
+          <h3>2. No <code>FROM</code></h3>
+          <p>"derivada" = tabela temporária na própria query:</p>
+<pre class="codeblock" style="font-size:.74rem;"><span class="hl-kw">SELECT</span> <span class="hl-fn">AVG</span>(qtd) <span class="hl-kw">AS</span> media_eventos
+<span class="hl-kw">FROM</span> (
+  <span class="hl-kw">SELECT</span> bovino_id,
+         <span class="hl-fn">COUNT</span>(*) <span class="hl-kw">AS</span> qtd
+  <span class="hl-kw">FROM</span> evento_zootecnico
+  <span class="hl-kw">GROUP BY</span> bovino_id
+);</pre>
+          <p>Ótimo para "calculo uma estatística, depois agrego de novo em cima".</p>
+        </div>
+        <div class="box blu">
+          <h3>3. No <code>SELECT</code> (escalar)</h3>
+          <p>retorna 1 valor por linha:</p>
+<pre class="codeblock" style="font-size:.74rem;"><span class="hl-kw">SELECT</span> b.brinco,
+  (<span class="hl-kw">SELECT</span> <span class="hl-fn">COUNT</span>(*)
+   <span class="hl-kw">FROM</span> evento_zootecnico e
+   <span class="hl-kw">WHERE</span> e.bovino_id = b.id)
+    <span class="hl-kw">AS</span> n_eventos
+<span class="hl-kw">FROM</span> bovino b;</pre>
+          <p class="hint" style="margin-top:6px;font-size:.78rem;"><strong>Cuidado:</strong> roda 1 query por linha. Lento se <em>b</em> tiver milhões. Hoje, no BrPec, ok.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== SLIDE 8: HAVING ====== -->
+  <!-- ╔══════════════════════ 14 — EXPLAIN ═════════════════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh green"><div class="st">HAVING — Filtrando Grupos</div><div class="ss">WHERE filtra linhas · HAVING filtra grupos (após GROUP BY)</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:300px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">having.sql</div></div>
-          <div class="term-body">
-            <div class="tl" id="hv0"></div><div class="tl" id="hv1"></div><div class="tl" id="hv2"></div>
-            <div class="tl" id="hv3"></div><div class="tl" id="hv4"></div><div class="tl" id="hv5"></div>
-            <div class="tl" id="hv6"></div><div class="tl" id="hv7"></div><div class="tl" id="hv8"></div>
-            <div class="tl" id="hv9"></div>
-          </div>
-        </div>
+      <div class="sh amber"><h2 class="st">EXPLAIN QUERY PLAN · ver o que o SQLite faz</h2><p class="ss">O motor mostra <em>como</em> vai executar antes de executar.</p></div>
+      <div class="g2">
         <div>
-          <div class="box amr" style="margin-bottom:10px;">
-            <h3>⚡ WHERE vs HAVING</h3>
-            <ul>
-              <li><strong>WHERE</strong> — filtra <em>linhas individuais</em> <strong>antes</strong> do agrupamento</li>
-              <li><strong>HAVING</strong> — filtra <em>grupos</em> <strong>após</strong> o GROUP BY</li>
-              <li>Você pode usar ambos na mesma query!</li>
-            </ul>
-          </div>
-          <div class="box grn">
-            <h3>📌 Exemplo mental</h3>
-            <p>"Mostre clientes que compraram <strong>mais de 5 vezes</strong> e <strong>gastaram mais de R$ 1.000</strong>" — isso é um HAVING, não um WHERE, pois os valores são calculados por grupo.</p>
-          </div>
+<pre class="codeblock"><span class="hl-kw">EXPLAIN QUERY PLAN</span>
+<span class="hl-kw">SELECT</span> * <span class="hl-kw">FROM</span> evento_zootecnico
+<span class="hl-kw">WHERE</span> bovino_id = <span class="hl-num">1</span>
+  <span class="hl-kw">AND</span> data &gt;= <span class="hl-str">'2025-01-01'</span>;
+
+<span class="hl-cmt">-- saída esperada:</span>
+<span class="hl-cmt">-- SEARCH evento_zootecnico</span>
+<span class="hl-cmt">--   USING INDEX idx_evento_bovino (bovino_id=?)</span></pre>
+        </div>
+        <div class="box amr">
+          <h3>O que ler em primeiro lugar</h3>
+          <ul>
+            <li><strong>SCAN</strong> = lê tabela inteira. Lento se a tabela for grande.</li>
+            <li><strong>SEARCH … USING INDEX</strong> = pulou direto via índice. Rápido.</li>
+            <li><strong>USE TEMP B-TREE FOR ORDER BY</strong> = ordenou em memória — pode ser ok ou alerta.</li>
+          </ul>
+          <p class="hint"><strong>Regra:</strong> se sua query roda <code>SCAN</code> numa tabela &gt; 100k linhas + tem <code>WHERE col = ?</code>, falta um índice em <code>col</code>.</p>
+          <p><strong>No BrPec:</strong> já criamos <code>idx_evento_bovino</code>, <code>idx_evento_data</code> e <code>idx_evento_tipo</code> no <code>brpec.sql</code>.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== SLIDE 9: N:N ====== -->
+  <!-- ╔══════════════════════ 15 — sql.js no browser ═══════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh blue"><div class="st">Relações N:N — Tabela de Junção</div><div class="ss">Um pedido pode ter vários produtos; um produto pode estar em vários pedidos</div></div>
-      <div id="er0" class="er-wrap">
-        <div class="er-box">
-          <h4>📦 pedidos</h4>
-          <div class="er-pk">🔑 id (PK)</div>
-          <div class="er-col">usuario_id (FK)</div>
-          <div class="er-col">status</div>
-          <div class="er-col">criado_em</div>
-        </div>
-        <div class="er-arrow">↔️</div>
-        <div class="er-box" style="border-color:#fab387;">
-          <h4 style="color:#fab387;">🔗 pedido_itens</h4>
-          <div class="er-fk">🔑 pedido_id (FK)</div>
-          <div class="er-fk">🔑 produto_id (FK)</div>
-          <div class="er-col">quantidade</div>
-          <div class="er-col">preco_unitario</div>
-        </div>
-        <div class="er-arrow">↔️</div>
-        <div class="er-box" style="border-color:#a6e3a1;">
-          <h4 style="color:#a6e3a1;">🛒 produtos</h4>
-          <div class="er-pk">🔑 id (PK)</div>
-          <div class="er-col">nome</div>
-          <div class="er-col">preco</div>
-          <div class="er-col">estoque</div>
-        </div>
-      </div>
-      <div class="term" style="height:190px;margin-top:10px;" id="er1" style="opacity:0;">
-        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">nn_join.sql — 3 tabelas</div></div>
-        <div class="term-body">
-          <div class="tl" id="nn0"></div><div class="tl" id="nn1"></div><div class="tl" id="nn2"></div>
-          <div class="tl" id="nn3"></div><div class="tl" id="nn4"></div><div class="tl" id="nn5"></div>
-          <div class="tl" id="nn6"></div><div class="tl" id="nn7"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 10: SUBCONSULTAS ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh dark"><div class="st">Subconsultas (Subqueries)</div><div class="ss">Queries dentro de queries para filtros e transformações complexas</div></div>
-      <div class="term" style="height:360px;">
-        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">subqueries.sql</div></div>
-        <div class="term-body">
-          <div class="tl" id="sq0"></div><div class="tl" id="sq1"></div><div class="tl" id="sq2"></div>
-          <div class="tl" id="sq3"></div><div class="tl" id="sq4"></div><div class="tl" id="sq5"></div>
-          <div class="tl" id="sq6"></div><div class="tl" id="sq7"></div><div class="tl" id="sq8"></div>
-          <div class="tl" id="sq9"></div><div class="tl" id="sq10"></div><div class="tl" id="sq11"></div>
-          <div class="tl" id="sq12"></div><div class="tl" id="sq13"></div><div class="tl" id="sq14"></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 11: EXPLAIN ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh green"><div class="st">EXPLAIN — Entendendo Performance</div><div class="ss">O PostgreSQL revela como vai executar sua query antes de rodar</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:250px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">explain_analyze.sql</div></div>
-          <div class="term-body">
-            <div class="tl" id="ex0"></div><div class="tl" id="ex1"></div><div class="tl" id="ex2"></div>
-            <div class="tl" id="ex3"></div><div class="tl" id="ex4"></div><div class="tl" id="ex5"></div>
-            <div class="tl" id="ex6"></div><div class="tl" id="ex7"></div><div class="tl" id="ex8"></div>
-          </div>
-        </div>
-        <div style="display:flex;flex-direction:column;gap:8px;">
-          <div class="mc" id="sc0" style="--mc:#dc2626;">
-            <div class="mb">Seq Scan</div>
-            <div class="mt">Leitura sequencial — lento</div>
-            <div class="md">Percorre <strong>todas as linhas</strong> da tabela. Aceitável para tabelas pequenas, péssimo para tabelas grandes.</div>
-          </div>
-          <div class="mc" id="sc1" style="--mc:#0d9488;">
-            <div class="mb">Index Scan</div>
-            <div class="mt">Leitura por índice — rápido</div>
-            <div class="md">Usa o índice B-tree para encontrar diretamente as linhas. Ideal para <code>WHERE id = ?</code>.</div>
-          </div>
-          <div class="mc" id="sc2" style="--mc:#4b5563;">
-            <div class="mb">Bitmap Scan</div>
-            <div class="mt">Scan combinado — eficiente</div>
-            <div class="md">Combina vários índices. Bom para queries com múltiplos filtros ou ranges (<code>BETWEEN</code>).</div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 12: RM-ODP — AS 5 VISÕES ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh blue"><div class="st">RM-ODP — As 5 Visões do Sistema</div><div class="ss">ISO/IEC 10746 · Como diferentes stakeholders enxergam o sistema</div></div>
-      <div class="pipe" style="flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0;">
-        <div class="alayer" id="odp0" style="background:linear-gradient(135deg,#2e2640,#4b5563);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>🏢 Enterprise</strong><br><small>Propósito, regras de negócio</small></div>
-        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="oa0">→</div>
-        <div class="alayer" id="odp1" style="background:linear-gradient(135deg,#0d9488,#10b981);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>📋 Information</strong><br><small>Dados, entidades, relações</small></div>
-        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="oa1">→</div>
-        <div class="alayer" id="odp2" style="background:linear-gradient(135deg,#4b5563,#6b7280);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>⚙️ Computational</strong><br><small>Componentes, interfaces</small></div>
-        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="oa2">→</div>
-        <div class="alayer" id="odp3" style="background:linear-gradient(135deg,#d97706,#f59e0b);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>🔧 Engineering</strong><br><small>Distribuição, canais, nós</small></div>
-        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="oa3">→</div>
-        <div class="alayer" id="odp4" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>💻 Technology</strong><br><small>Plataformas, padrões</small></div>
-      </div>
-      <div class="box acc" style="margin-top:8px;"><p><strong>Esta aula:</strong> Visão <strong>Information</strong> — modelamos como dados de múltiplas tabelas se relacionam e como consultá-los com eficiência via JOINs.</p></div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 13: ESTA AULA NO RM-ODP ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh green"><div class="st">Esta Aula: Information</div><div class="ss">RM-ODP · RF, RNF e Artefato desta aula</div></div>
-      <div class="g2" style="gap:12px;">
-        <div>
-          <div class="box grn" style="margin-bottom:10px;"><h3>📌 Requisito Funcional</h3><p>Consultar dados compostos necessários às funcionalidades do sistema — JOINs entre tabelas relacionadas.</p></div>
-          <div class="box" style="border-left-color:var(--am);"><h3>📦 Artefato</h3><ul>
-            <li id="art0" style="opacity:0;transition:all .4s ease;">🔗 <strong>Consultas com JOINs</strong> do projeto</li>
-            <li id="art1" style="opacity:0;transition:all .4s ease;">📚 <strong>Catálogo de consultas</strong> reutilizáveis</li>
-            <li id="art2" style="opacity:0;transition:all .4s ease;">📊 <strong>EXPLAIN ANALYZE</strong> de queries críticas</li>
-          </ul></div>
-        </div>
-        <div>
-          <div class="box acc"><h3>⚖️ RNF — 8 Eixos ISO/IEC 25010</h3>
-            <table class="stbl" id="rnf-tbl" style="border-spacing:0 3px;width:100%;">
-              <tr><td class="scc" data-s="0" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>DES</strong> Desempenho</td><td class="scc" data-s="1" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#dcfce7;font-size:.8rem;">✅ Índices + EXPLAIN</td></tr>
-              <tr><td class="scc" data-s="2" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>CONF</strong> Confiabilidade</td><td class="scc" data-s="3" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#dcfce7;font-size:.8rem;">✅ FK + integridade</td></tr>
-              <tr><td class="scc" data-s="4" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>USAB</strong> Usabilidade</td><td class="scc" data-s="5" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f9f9f9;font-size:.8rem;">— N/A</td></tr>
-              <tr><td class="scc" data-s="6" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>SUP</strong> Suportabilidade</td><td class="scc" data-s="7" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f9f9f9;font-size:.8rem;">→ Consultas documentadas</td></tr>
-              <tr><td class="scc" data-s="8" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>SEG</strong> Segurança</td><td class="scc" data-s="9" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f9f9f9;font-size:.8rem;">→ Acesso controlado ao DB</td></tr>
+      <div class="sh dark"><h2 class="st">Tudo isso · rodando no celular do capataz</h2><p class="ss">SQLite compilado para WebAssembly + carregado pela página = banco offline, no navegador.</p></div>
+      <div class="sandbox-tease">
+        <h3>🐄 BrPec Sandbox</h3>
+        <p>Página HTML standalone com o banco <code>brpec.db</code> carregado via <code>sql.js</code>. Você escreve SQL, ele responde — <strong>sem servidor</strong>, sem internet (depois do primeiro fetch).</p>
+        <div class="demo-row">
+          <pre><span class="hl-kw">SELECT</span> r.nome, <span class="hl-fn">COUNT</span>(b.id) <span class="hl-kw">AS</span> bovinos
+<span class="hl-kw">FROM</span> retiro r
+<span class="hl-kw">LEFT JOIN</span> bovino b
+  <span class="hl-kw">ON</span> b.retiro_atual_id = r.id
+<span class="hl-kw">GROUP BY</span> r.id
+<span class="hl-kw">ORDER BY</span> bovinos <span class="hl-kw">DESC</span>;</pre>
+          <div class="out-mini">
+            <table>
+              <tr><th>RETIRO</th><th>BOVINOS</th></tr>
+              <tr><td>Mata-Burro</td><td>6</td></tr>
+              <tr><td>Vargem do Sucuri</td><td>6</td></tr>
+              <tr><td>Cocho Novo</td><td>6</td></tr>
+              <tr><td>Cabeceira</td><td>5</td></tr>
+              <tr><td>Faxinal</td><td>5</td></tr>
             </table>
           </div>
         </div>
+        <a class="link-btn" href="../assets/brpec/sandbox-sqljs.html" target="_blank">▶ Abrir sandbox em nova aba</a>
       </div>
+      <p class="hint" style="margin-top:10px;"><strong>Por que isso importa:</strong> na aula 5 vamos transformar essa página em uma <em>PWA instalável</em>, com banco persistente e sync com o servidor Node. Hoje é o ensaio.</p>
     </div>
   </div>
 
-  <!-- ====== SLIDE 14: CHECKLIST ====== -->
+  <!-- ╔══════════════════════ 16 — Pergunta 1 ═════════════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh dark"><div class="st">Checklist da Aula</div><div class="ss">O que você aprendeu hoje — e o que vem a seguir</div></div>
-      <div class="g2" style="gap:6px;">
-        <div>
-          <div class="ri cur" id="cl0"><div class="rn" style="background:linear-gradient(135deg,#0d9488,#10b981);">✅</div><div><div class="rtl">INNER, LEFT, RIGHT JOIN</div><div class="rds">Cruzar dados entre tabelas relacionadas</div></div></div>
-          <div class="ri cur" id="cl1"><div class="rn" style="background:linear-gradient(135deg,#0d9488,#10b981);">✅</div><div><div class="rtl">GROUP BY e funções de agregação</div><div class="rds">COUNT, SUM, AVG, MAX, MIN</div></div></div>
-          <div class="ri cur" id="cl2"><div class="rn" style="background:linear-gradient(135deg,#0d9488,#10b981);">✅</div><div><div class="rtl">HAVING para filtrar grupos</div><div class="rds">Filtragem após agrupamento</div></div></div>
-          <div class="ri cur" id="cl3"><div class="rn" style="background:linear-gradient(135deg,#0d9488,#10b981);">✅</div><div><div class="rtl">Relações N:N com tabela de junção</div><div class="rds">pedido_itens ligando pedidos e produtos</div></div></div>
-        </div>
-        <div>
-          <div class="ri cur" id="cl4"><div class="rn" style="background:linear-gradient(135deg,#0d9488,#10b981);">✅</div><div><div class="rtl">Subconsultas</div><div class="rds">WHERE IN, FROM subquery</div></div></div>
-          <div class="ri cur" id="cl5"><div class="rn" style="background:linear-gradient(135deg,#0d9488,#10b981);">✅</div><div><div class="rtl">Performance básica com EXPLAIN</div><div class="rds">Seq Scan, Index Scan, Bitmap Scan</div></div></div>
-          <div class="ri" id="cl6" style="border-color:var(--hi);">
-            <div class="rn" style="background:linear-gradient(135deg,var(--hi),#a78bfa);">➡️</div>
-            <div><div class="rtl">Próxima aula: Back-End com Node.js</div><div class="rds">Aula 5 — Models, Controllers e Express.js</div></div>
-          </div>
+      <div class="quiz-stage">
+        <div class="quiz-num">Pergunta 1 de 3 · álgebra & SQL</div>
+        <h2 class="quiz-q">Por que dizemos que JOIN é "álgebra relacional"? O nome importa, ou é só jargão acadêmico?</h2>
+        <p class="quiz-tag">⏱ 30 segundos de silêncio · 2-3 voluntários respondem · só então o professor revela</p>
+        <button class="quiz-btn" id="qb1" onclick="revealQuiz(1)">Revelar resposta-âncora ▾</button>
+        <div class="quiz-reveal" id="qr1">
+          <h4>Resposta-âncora</h4>
+          <p>Codd (1970) descreveu o banco como um conjunto de <strong>relações</strong> (tabelas) sobre as quais se aplicam <strong>operações</strong>: seleção (<code>WHERE</code>), projeção (<code>SELECT col</code>), junção (<code>JOIN</code>), união (<code>UNION</code>), agregação. Importam três coisas:</p>
+          <p>① Toda operação <strong>recebe relações e devolve relações</strong> — isso permite encadear (subconsulta no <code>FROM</code>, por ex.).<br>② As operações têm <strong>propriedades algébricas</strong> conhecidas (comutatividade, associatividade) — é por isso que o otimizador pode <em>reescrever</em> a query sem mudar o resultado.<br>③ O nome é fiel: você está fazendo <strong>matemática sobre conjuntos</strong>. JOIN é um produto cartesiano filtrado pela condição.</p>
+          <p><strong>BrPec:</strong> a query "eventos por capataz" <em>é</em> o produto <code>capataz × evento</code> filtrado por <code>capataz.id = evento.capataz_id</code>. O motor não precisa fazer 6 × 60 = 360 combinações: usa o índice em <code>capataz_id</code> e vai direto.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== SLIDE 13: ENCERRAMENTO ====== -->
-  <div class="slide cover-bg" style="background:linear-gradient(135deg,#12082c 0%,#0d9488 55%,#10b981 100%)!important;">
-    <div class="sc" style="text-align:center;">
-      <div style="font-size:2.8rem;margin-bottom:12px;">🔗</div>
-      <div style="font-size:2.2rem;font-weight:800;color:white;margin-bottom:10px;">Dados conectados!</div>
-      <div style="font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:28px;max-width:580px;margin-left:auto;margin-right:auto;">
-        Agora você sabe cruzar tabelas, agregar dados e entender a performance das suas queries. Na próxima aula, o banco ganha vida com <strong>Node.js + Express</strong>.
+  <!-- ╔══════════════════════ 17 — Pergunta 2 ═════════════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="quiz-stage">
+        <div class="quiz-num">Pergunta 2 de 3 · tabela de junção</div>
+        <h2 class="quiz-q">A tabela <code>capataz_retiro</code> guarda só dois ids. Não é "duplicação"? Por que não colocar os capatazes em uma string CSV dentro de <code>retiro</code>?</h2>
+        <p class="quiz-tag">⏱ 30 segundos de silêncio · 2-3 voluntários respondem</p>
+        <button class="quiz-btn" id="qb2" onclick="revealQuiz(2)">Revelar resposta-âncora ▾</button>
+        <div class="quiz-reveal" id="qr2">
+          <h4>Resposta-âncora</h4>
+          <p>Em uma tabela bem-modelada, <strong>uma célula = um fato atômico</strong> (1FN da aula 3). Guardar <code>"1,3,4"</code> em uma célula viola isso por <em>quatro</em> razões:</p>
+          <p>① <strong>Você perde índice</strong> — não dá pra fazer <code>WHERE retiro_id = 3</code>; vira <code>LIKE '%3%'</code> que casa com 13, 33, 103.<br>② <strong>Você perde FK</strong> — o banco não sabe garantir que "3" existe em <code>retiro</code>.<br>③ <strong>Você perde atributos da ligação</strong> — quando começou? está ativo? Não cabe na string.<br>④ <strong>Você perde JOIN</strong> — toda agregação vira string-split na aplicação, lento e bugado.</p>
+          <p>A tabela de junção <em>não</em> é duplicação; ela é a <strong>materialização</strong> da relação N:N. Cada linha é um fato: "capataz X está vinculado ao retiro Y desde Z". Esse fato precisa de uma linha própria.</p>
+          <p><strong>No BrPec:</strong> Vitor Gomes existe em <code>capataz</code> mas <em>não tem</em> linha em <code>capataz_retiro</code>. Isso é informação — ele está sem retiro. Em CSV essa informação seria uma string vazia, confundível com "todos" ou "nenhum".</p>
+        </div>
       </div>
-      <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:24px;">
-        <div class="cv-tag" id="rt0">✅ INNER JOIN</div>
-        <div class="cv-tag" id="rt1">✅ LEFT JOIN</div>
-        <div class="cv-tag" id="rt2">✅ GROUP BY</div>
-        <div class="cv-tag" id="rt3">✅ HAVING</div>
-        <div class="cv-tag" id="rt4">✅ Relações N:N</div>
-        <div class="cv-tag" id="rt5">✅ Subconsultas</div>
-        <div class="cv-tag" id="rt6">✅ EXPLAIN</div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 18 — Pergunta 3 ═════════════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="quiz-stage">
+        <div class="quiz-num">Pergunta 3 de 3 · INNER vs LEFT</div>
+        <h2 class="quiz-q">"Quantos eventos cada capataz registrou?" Se você escolher o JOIN errado, em qual sentido sua resposta <em>mente</em> sobre a operação da fazenda?</h2>
+        <p class="quiz-tag">⏱ 30 segundos · pense no Vitor Gomes</p>
+        <button class="quiz-btn" id="qb3" onclick="revealQuiz(3)">Revelar resposta-âncora ▾</button>
+        <div class="quiz-reveal" id="qr3">
+          <h4>Resposta-âncora</h4>
+          <p><strong>INNER JOIN</strong> traz <em>só</em> capatazes que registraram pelo menos um evento. O coordenador olha o relatório e pensa: "ótimo, todos os capatazes estão ativos". <strong>Vitor sumiu</strong> — recém-contratado, ainda em treinamento, e o relatório o esconde. Se a pergunta era "quem está performando?", a resposta é técnica e correta. Se a pergunta era "quem é minha equipe?", a resposta é <em>incorreta</em> e cria um furo no acompanhamento.</p>
+          <p><strong>LEFT JOIN</strong> mostra todos os capatazes, incluindo Vitor com 0. Aí o coordenador vê: "Vitor entrou há 2 semanas, esperado". Ou: "Vitor entrou há 3 meses e zero eventos — vamos conversar".</p>
+          <p><strong>Princípio geral:</strong> o JOIN não é só sintaxe — ele <em>codifica a pergunta de negócio</em>. INNER pergunta "quem participou?". LEFT pergunta "quem está na lista, participou ou não?". Trocá-los troca a pergunta sem você perceber.</p>
+          <p class="mono" style="font-size:.84rem;color:#94a3b8;margin-top:8px;">E <code>COUNT(*)</code> num LEFT JOIN <strong>sempre</strong> dá pelo menos 1. Use <code>COUNT(e.id)</code> pra contar só os pares reais.</p>
+        </div>
       </div>
-      <div style="font-size:.84rem;color:rgba(255,255,255,.6);">Módulo 2 · Ciclo Comum · Aula 4 de 11</div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 19 — Lab em grupos ═════════════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><h2 class="st">Lab em grupos · 5 perguntas no sandbox</h2><p class="ss">20 minutos · 5 grupos da turma · sandbox <code>brpec.db</code> aberto · 1 representante apresenta no final.</p></div>
+      <div class="g3">
+        <div class="lab-card"><h4>Grupo 1 · Cabeceira</h4><p>Quais bovinos hoje estão no retiro <strong>Cabeceira</strong> e foram pesados em 2025? Retorne <em>brinco</em>, <em>data da última pesagem</em> e <em>peso</em>.</p></div>
+        <div class="lab-card"><h4>Grupo 2 · Mata-Burro</h4><p>Liste os capatazes que registraram pelo menos um evento em <strong>Mata-Burro</strong> nos últimos 12 meses, com o total de eventos por capataz.</p></div>
+        <div class="lab-card"><h4>Grupo 3 · Vargem do Sucuri</h4><p>Quais bovinos do retiro <strong>Vargem do Sucuri</strong> <em>não</em> receberam vacinação contra aftosa? (use LEFT JOIN + IS NULL)</p></div>
+        <div class="lab-card"><h4>Grupo 4 · Faxinal</h4><p>Para cada matriz (bovino fêmea adulto com filhotes), liste a <strong>quantidade de filhotes</strong> nascidos e o último mês de nascimento. (SELF JOIN + GROUP BY)</p></div>
+        <div class="lab-card"><h4>Grupo 5 · Cocho Novo</h4><p>Quais capatazes atuam em <strong>mais de um retiro</strong>? Liste com a quantidade. (capataz_retiro + HAVING COUNT &gt; 1)</p></div>
+        <div class="lab-card" style="border-left-color:var(--am);"><h4 style="color:var(--am);">🏆 Bônus para qualquer grupo</h4><p>Rode <code>EXPLAIN QUERY PLAN</code> na sua query e relate se ela usou <code>INDEX</code> ou <code>SCAN</code>. Hipotetize por quê.</p></div>
+      </div>
+      <div class="timer-bar">
+        <div>
+          <div class="timer-label">Cronômetro · Lab</div>
+          <div class="timer-display" id="t-lab-disp">20:00</div>
+        </div>
+        <div class="timer-controls">
+          <button class="timer-btn start" onclick="Timer.start('lab')">▶ Iniciar</button>
+          <button class="timer-btn pause" onclick="Timer.pause('lab')">⏸ Pausar</button>
+          <button class="timer-btn reset" onclick="Timer.reset('lab')">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 20 — Ponderada ═════════════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh red"><h2 class="st">Ponderada em sala · entrega individual</h2><p class="ss">30 minutos · arquivo <code>aula4-ponderada-NOME.sql</code> · cinco queries</p></div>
+      <div class="g2">
+        <div class="box red">
+          <h3>Regras</h3>
+          <ol>
+            <li>Cada aluno entrega <strong>1 arquivo .sql</strong> com 5 queries numeradas.</li>
+            <li>Cada query resolve <em>uma</em> das perguntas abaixo, usando o sandbox para validar.</li>
+            <li>Sem cópia entre alunos — pode comparar nos primeiros 5 min, depois individual.</li>
+            <li>Comentar cada query com a pergunta resolvida em <code>-- Q1: …</code></li>
+            <li>Entrega via Teams (canal da disciplina) <strong>antes</strong> do timer zerar.</li>
+          </ol>
+          <p class="hint"><strong>Critério mínimo de aprovação:</strong> 3 das 5 queries rodando sem erro no sandbox.</p>
+        </div>
+        <div class="box dkb">
+          <h3>As 5 perguntas</h3>
+          <ol style="font-size:.92rem;">
+            <li><strong>Q1</strong> · Top 3 bovinos com mais eventos registrados, com o brinco e o total.</li>
+            <li><strong>Q2</strong> · Para cada retiro, a média de eventos por mês em 2025 (use <code>substr(data, 1, 7)</code>).</li>
+            <li><strong>Q3</strong> · Capatazes que <em>nunca</em> registraram um evento de <code>tratamento</code> (LEFT + IS NULL ou NOT IN).</li>
+            <li><strong>Q4</strong> · Bezerros nascidos em 2026, com brinco da mãe e o capataz que registrou o nascimento.</li>
+            <li><strong>Q5</strong> · Para cada par <em>(retiro, mês)</em>, contagem de cada tipo de evento, com HAVING qtd ≥ 3.</li>
+          </ol>
+        </div>
+      </div>
+      <div class="timer-hero">
+        <div class="timer-label">Ponderada · 30 minutos</div>
+        <div class="timer-display" id="t-pond-disp">30:00</div>
+        <div class="timer-controls">
+          <button class="timer-btn start" onclick="Timer.start('pond')">▶ Iniciar</button>
+          <button class="timer-btn pause" onclick="Timer.pause('pond')">⏸ Pausar</button>
+          <button class="timer-btn reset" onclick="Timer.reset('pond')">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 21 — Próxima aula ═════════════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh pasture"><h2 class="st">Síntese · e na quinta?</h2><p class="ss">Hoje rodamos SQL no navegador. Na próxima aula, viramos isso em <em>app instalável no celular do capataz</em>.</p></div>
+      <div class="g2">
+        <div class="box grn">
+          <h3>O que levamos da aula 4</h3>
+          <ul>
+            <li><strong>INNER, LEFT, SELF</strong> + <strong>tabela de junção</strong> respondem 95% das perguntas de negócio.</li>
+            <li><code>WHERE</code> filtra linhas; <code>HAVING</code> filtra grupos.</li>
+            <li>Subconsulta vive em 3 lugares — escolha o que casa com a pergunta.</li>
+            <li><code>EXPLAIN QUERY PLAN</code> antes de criar índice — meça primeiro.</li>
+            <li>O motor SQLite cabe num <code>.wasm</code> de 1MB — o banco vai pro celular.</li>
+          </ul>
+        </div>
+        <div class="box blu">
+          <h3>O que vem na aula 5 (14/05)</h3>
+          <ul>
+            <li><strong>PWA</strong> — manifest + service worker + ícone instalável</li>
+            <li><strong>sqlite-wasm com OPFS</strong> — banco persiste entre sessões</li>
+            <li><strong>Estratégia de sync</strong> — capataz registra evento offline; depois sincroniza</li>
+            <li><strong>Servidor Node</strong> como camada de sync (não CRUD genérico)</li>
+            <li><strong>Lighthouse PWA score</strong> como meta da ponderada</li>
+          </ul>
+          <p class="hint"><strong>Pré-aula da 5:</strong> instalar Node.js LTS, abrir o sandbox de hoje no celular e tentar registrar um <code>INSERT</code> (vai funcionar até o reload — vamos resolver isso na quinta).</p>
+        </div>
+      </div>
+      <blockquote>O capataz no retiro não tem WiFi. Hoje você provou que isso não é mais desculpa para sair do SQL. Quinta, vamos um passo além: o app fica instalado, o banco persiste, e o sync acontece quando o sinal volta.</blockquote>
     </div>
   </div>
 
 </div><!-- /slide-container -->
 
-<!-- ====== FOOTER ====== -->
+<!-- ============= FOOTER ============= -->
 <div class="slide-footer">
   <div class="footer-links">
     <a href="../../index.html" class="back-home">🏠 Home</a>
     <a href="../materials/lesson-4-material.html" class="back-home material">📖 Material</a>
+    <a href="../assets/brpec/sandbox-sqljs.html" class="back-home sandbox" target="_blank">🐄 Sandbox</a>
   </div>
   <div class="nav-wrapper">
     <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
-    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">13</span></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">21</span></div>
     <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
   </div>
   <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>
 </div>
 
-<script src="../js/human-type.js"></script>
 <script>
-// ── DAILY TIMER ───────────────────────────────────────────────────────────
-var dailyInterval = null;
-var dailySeconds = 900;
-var dailyRunning = false;
-function updateDailyDisplay() {
-  var m = Math.floor(dailySeconds / 60);
-  var s = dailySeconds % 60;
-  var el = document.getElementById('daily-timer');
-  if (el) el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-}
-function startDaily() {
-  if (dailyRunning) { clearInterval(dailyInterval); dailyRunning = false; document.getElementById('daily-start-btn').textContent = '▶ Continuar'; return; }
-  dailyRunning = true;
-  document.getElementById('daily-start-btn').textContent = '⏸ Pausar';
-  dailyInterval = setInterval(function() {
-    if (dailySeconds <= 0) { clearInterval(dailyInterval); dailyRunning = false; document.getElementById('daily-start-btn').textContent = '✅ Fim!'; return; }
-    dailySeconds--;
-    updateDailyDisplay();
-  }, 1000);
-}
-function resetDaily() {
-  clearInterval(dailyInterval);
-  dailyRunning = false;
-  dailySeconds = 900;
-  updateDailyDisplay();
-  document.getElementById('daily-start-btn').textContent = '▶ Iniciar';
-}
-
-// ── NAVIGATION ──────────────────────────────────────────────────────────────
 var currentSlide = 0;
 var slides = document.querySelectorAll('.slide');
 var totalSlides = slides.length;
 document.getElementById('total-slides').textContent = totalSlides;
-
 function showSlide(i) {
   document.querySelectorAll('.slide.active').forEach(function(s){ s.classList.remove('active'); });
   slides[i].classList.add('active');
@@ -715,282 +884,73 @@ function showSlide(i) {
   document.getElementById('current-slide').textContent = i + 1;
   document.getElementById('prev-btn').disabled = i === 0;
   document.getElementById('next-btn').disabled = i === totalSlides - 1;
-  runAnim(i);
 }
 function nextSlide()     { if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1); }
 function previousSlide() { if (currentSlide > 0) showSlide(currentSlide - 1); }
 function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+  var tag = (e.target && e.target.tagName) || '';
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { nextSlide(); e.preventDefault(); }
   else if (e.key === 'ArrowLeft') previousSlide();
   else if (e.key.toLowerCase() === 'f') toggleFullScreen();
 });
 
-// ── TIMER SYSTEM ──────────────────────────────────────────────────────────
-var _ts = [], _run = false;
-function clearT() { _run = false; _ts.forEach(clearTimeout); _ts = []; }
-function T(fn, d)  { _ts.push(setTimeout(fn, d)); }
-function escH(s)   { return s.replace(/&/g,'&amp;').replace(/</g,'&lt;').replace(/>/g,'&gt;'); }
-function mkHtml(tokens) { return tokens.map(function(t){ return '<span class="'+t.c+'">'+escH(t.v)+'</span>'; }).join(''); }
+function revealQuiz(n) {
+  var btn = document.getElementById('qb' + n);
+  var rev = document.getElementById('qr' + n);
+  if (rev) rev.classList.add('show');
+  if (btn) btn.classList.add('hide');
+}
 
-function showLine(id, tokens, delay) {
-  T(function() {
-    if (!_run) return;
-    var el = document.getElementById(id);
+// ── Timers (daily 15 min · lab 20 min · ponderada 30 min) ───────
+var Timer = (function() {
+  var timers = {
+    daily: { total: 15 * 60, left: 15 * 60, intv: null, disp: 't-daily-disp' },
+    lab:   { total: 20 * 60, left: 20 * 60, intv: null, disp: 't-lab-disp'   },
+    pond:  { total: 30 * 60, left: 30 * 60, intv: null, disp: 't-pond-disp'  }
+  };
+  function fmt(s) {
+    var m = Math.floor(s / 60), r = s % 60;
+    return (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r;
+  }
+  function render(key) {
+    var t = timers[key];
+    var el = document.getElementById(t.disp);
     if (!el) return;
-    el.innerHTML = mkHtml(tokens);
-    el.classList.add('vis');
-  }, delay);
-}
-function resetLines(ids) {
-  ids.forEach(function(id) { var el=document.getElementById(id); if(el){ el.innerHTML=''; el.classList.remove('vis'); } });
-}
-
-// ── SLIDE 1: Cover ────────────────────────────────────────────────────────
-function animAgenda() {
-  ['ag0','ag1','ag2','ag3'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.style.opacity='0'; el.style.transform='translateY(18px)'; } });
-  ['ag0','ag1','ag2','ag3'].forEach(function(id,i){
-    T(function(){ var el=document.getElementById(id); if(el){ el.style.opacity='1'; el.style.transform='translateY(0)'; } }, i*160);
-  });
-}
-
-function animCover() {
-  ['ct0','ct1','ct2','ct3','ct4','ct5'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
-  ['ct0','ct1','ct2','ct3','ct4','ct5'].forEach(function(id,i){
-    T(function(){ var el=document.getElementById(id); if(el&&_run) el.classList.add('vis'); }, 200+i*160);
-  });
-}
-
-// ── SLIDE 2: Daily ────────────────────────────────────────────────────────
-function animDaily() {
-  ['d0','d1','d2'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.style.opacity='0'; el.style.transform='translateX(-14px)'; } });
-  ['d0','d1','d2'].forEach(function(id,i){
-    T(function(lid){ var el=document.getElementById(lid); if(el&&_run){ el.style.opacity='1'; el.style.transform='translateX(0)'; el.style.transition='all .4s ease'; } }.bind(null,id), 150+i*250);
-  });
-}
-
-// ── SLIDE 3: Por que JOINs? ───────────────────────────────────────────────
-function animWhyJoin() {
-  var tu = document.getElementById('tbl-usuarios');
-  var tp = document.getElementById('tbl-pedidos');
-  var ta = document.getElementById('tbl-arrow');
-  var tb = document.getElementById('tbl-box');
-  if(tu){ tu.style.opacity='0'; tu.style.transform='translateY(16px)'; }
-  if(tp){ tp.style.opacity='0'; tp.style.transform='translateY(16px)'; }
-  if(ta){ ta.style.opacity='0'; }
-  if(tb){ tb.style.opacity='0'; tb.style.transform='translateY(12px)'; }
-  T(function(){ if(!_run) return; if(tu){ tu.style.opacity='1'; tu.style.transform='translateY(0)'; } }, 200);
-  T(function(){ if(!_run) return; if(tp){ tp.style.opacity='1'; tp.style.transform='translateY(0)'; } }, 500);
-  T(function(){ if(!_run) return; if(ta){ ta.style.opacity='1'; } }, 900);
-  T(function(){ if(!_run) return; if(tb){ tb.style.opacity='1'; tb.style.transform='translateY(0)'; } }, 1200);
-}
-
-// ── SLIDE 4: Tipos de JOIN ────────────────────────────────────────────────
-function animJoinTypes() {
-  ['jt0','jt1','jt2','jt3'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
-  ['jt0','jt1','jt2','jt3'].forEach(function(id,i){
-    T(function(lid){ var el=document.getElementById(lid); if(el&&_run) el.classList.add('vis'); }.bind(null,id), 150+i*280);
-  });
-}
-
-// ── SLIDE 5: INNER JOIN ───────────────────────────────────────────────────
-function animInnerJoin() {
-  var ijIds=['ij0','ij1','ij2','ij3','ij4','ij5','ij6','ij7','ij8','ij9','ij10'];
-  resetLines(ijIds);
-  ['rr0','rr1','rr2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
-  var d=0, G=40;
-  d = typeLine('ij0',[{c:'cmt',v:'-- Buscar pedidos com dados do usuário'}],d)+G;
-  d = typeLine('ij1',[{c:'kw',v:'SELECT'},{c:'txt',v:' u.nome,'}],d)+G;
-  d = typeLine('ij2',[{c:'txt',v:'       u.email,'}],d)+G;
-  d = typeLine('ij3',[{c:'txt',v:'       p.id      '},{c:'kw',v:'AS'},{c:'txt',v:' pedido_id,'}],d)+G;
-  d = typeLine('ij4',[{c:'txt',v:'       p.total,'}],d)+G;
-  d = typeLine('ij5',[{c:'txt',v:'       p.status'}],d)+G;
-  d = typeLine('ij6',[{c:'kw',v:'FROM'},{c:'txt',v:'   usuarios u'}],d)+G;
-  d = typeLine('ij7',[{c:'kw',v:'INNER'},{c:'txt',v:'  '},{c:'kw',v:'JOIN'},{c:'txt',v:' pedidos p'}],d)+G;
-  d = typeLine('ij8',[{c:'txt',v:'  '},{c:'kw',v:'ON'},{c:'txt',v:'   p.usuario_id = u.id'}],d)+G;
-  d = typeLine('ij9',[{c:'kw',v:'WHERE'},{c:'txt',v:'  p.status = '},{c:'js',v:"'aprovado'"}],d)+G;
-  d = typeLine('ij10',[{c:'kw',v:'ORDER'},{c:'txt',v:'  '},{c:'kw',v:'BY'},{c:'txt',v:' p.criado_em '},{c:'kw',v:'DESC'},{c:'txt',v:';'}],d);
-  T(function(){
-    if(!_run) return;
-    ['rr0','rr1','rr2'].forEach(function(id,i){
-      T(function(rid){ var el=document.getElementById(rid); if(el&&_run) el.classList.add('vis'); }.bind(null,id), i*200);
-    });
-  }, d+300);
-}
-
-// ── SLIDE 6: LEFT JOIN ────────────────────────────────────────────────────
-function animLeftJoin() {
-  var ljIds=['lj0','lj1','lj2','lj3','lj4','lj5','lj6','lj7','lj8','lj9'];
-  resetLines(ljIds);
-  var d=0, G=40;
-  d = typeLine('lj0',[{c:'cmt',v:'-- Todos os usuários, mesmo sem pedidos'}],d)+G;
-  d = typeLine('lj1',[{c:'kw',v:'SELECT'},{c:'txt',v:' u.nome,'}],d)+G;
-  d = typeLine('lj2',[{c:'txt',v:'       '},{c:'kw',v:'COUNT'},{c:'txt',v:'(p.id) '},{c:'kw',v:'AS'},{c:'txt',v:' total_pedidos,'}],d)+G;
-  d = typeLine('lj3',[{c:'txt',v:'       '},{c:'kw',v:'COALESCE'},{c:'txt',v:'('},{c:'kw',v:'SUM'},{c:'txt',v:'(p.total), '},{c:'jn',v:'0'},{c:'txt',v:') '},{c:'kw',v:'AS'},{c:'txt',v:' valor_total'}],d)+G;
-  d = typeLine('lj4',[{c:'kw',v:'FROM'},{c:'txt',v:'   usuarios u'}],d)+G;
-  d = typeLine('lj5',[{c:'kw',v:'LEFT'},{c:'txt',v:'   '},{c:'kw',v:'JOIN'},{c:'txt',v:' pedidos p '},{c:'kw',v:'ON'},{c:'txt',v:' p.usuario_id = u.id'}],d)+G;
-  d = typeLine('lj6',[{c:'kw',v:'GROUP'},{c:'txt',v:'  '},{c:'kw',v:'BY'},{c:'txt',v:' u.id, u.nome'}],d)+G;
-  d = typeLine('lj7',[{c:'kw',v:'ORDER'},{c:'txt',v:'  '},{c:'kw',v:'BY'},{c:'txt',v:' total_pedidos '},{c:'kw',v:'DESC'},{c:'txt',v:';'}],d);
-}
-
-// ── SLIDE 7: GROUP BY ─────────────────────────────────────────────────────
-function animGroupBy() {
-  var gbIds=['gb0','gb1','gb2','gb3','gb4','gb5','gb6','gb7','gb8','gb9'];
-  resetLines(gbIds);
-  ['ag0','ag1','ag2','ag3','ag4'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
-  var d=0, G=40;
-  d = typeLine('gb0',[{c:'cmt',v:'-- Resumo de pedidos por usuário'}],d)+G;
-  d = typeLine('gb1',[{c:'kw',v:'SELECT'},{c:'txt',v:' u.nome,'}],d)+G;
-  d = typeLine('gb2',[{c:'txt',v:'       '},{c:'kw',v:'COUNT'},{c:'txt',v:'(p.id)        '},{c:'kw',v:'AS'},{c:'txt',v:' qtd,'}],d)+G;
-  d = typeLine('gb3',[{c:'txt',v:'       '},{c:'kw',v:'SUM'},{c:'txt',v:'(p.total)      '},{c:'kw',v:'AS'},{c:'txt',v:' total,'}],d)+G;
-  d = typeLine('gb4',[{c:'txt',v:'       '},{c:'kw',v:'AVG'},{c:'txt',v:'(p.total)      '},{c:'kw',v:'AS'},{c:'txt',v:' media,'}],d)+G;
-  d = typeLine('gb5',[{c:'txt',v:'       '},{c:'kw',v:'MAX'},{c:'txt',v:'(p.total)      '},{c:'kw',v:'AS'},{c:'txt',v:' maior,'}],d)+G;
-  d = typeLine('gb6',[{c:'txt',v:'       '},{c:'kw',v:'MIN'},{c:'txt',v:'(p.total)      '},{c:'kw',v:'AS'},{c:'txt',v:' menor'}],d)+G;
-  d = typeLine('gb7',[{c:'kw',v:'FROM'},{c:'txt',v:'   usuarios u'}],d)+G;
-  d = typeLine('gb8',[{c:'kw',v:'JOIN'},{c:'txt',v:'   pedidos p '},{c:'kw',v:'ON'},{c:'txt',v:' p.usuario_id = u.id'}],d)+G;
-  d = typeLine('gb9',[{c:'kw',v:'GROUP'},{c:'txt',v:'  '},{c:'kw',v:'BY'},{c:'txt',v:' u.id, u.nome;'}],d);
-  T(function(){
-    if(!_run) return;
-    ['ag0','ag1','ag2','ag3','ag4'].forEach(function(id,i){
-      T(function(aid){ var el=document.getElementById(aid); if(el&&_run) el.classList.add('vis'); }.bind(null,id), i*200);
-    });
-  }, d+200);
-}
-
-// ── SLIDE 8: HAVING ───────────────────────────────────────────────────────
-function animHaving() {
-  var hvIds=['hv0','hv1','hv2','hv3','hv4','hv5','hv6','hv7','hv8','hv9'];
-  resetLines(hvIds);
-  var d=0, G=40;
-  d = typeLine('hv0',[{c:'cmt',v:'-- Usuários com mais de 5 pedidos'}],d)+G;
-  d = typeLine('hv1',[{c:'kw',v:'SELECT'},{c:'txt',v:' u.nome,'}],d)+G;
-  d = typeLine('hv2',[{c:'txt',v:'       '},{c:'kw',v:'COUNT'},{c:'txt',v:'(p.id) '},{c:'kw',v:'AS'},{c:'txt',v:' total_pedidos,'}],d)+G;
-  d = typeLine('hv3',[{c:'txt',v:'       '},{c:'kw',v:'SUM'},{c:'txt',v:'(p.total) '},{c:'kw',v:'AS'},{c:'txt',v:' valor_gasto'}],d)+G;
-  d = typeLine('hv4',[{c:'kw',v:'FROM'},{c:'txt',v:'   usuarios u'}],d)+G;
-  d = typeLine('hv5',[{c:'kw',v:'INNER'},{c:'txt',v:'  '},{c:'kw',v:'JOIN'},{c:'txt',v:' pedidos p '},{c:'kw',v:'ON'},{c:'txt',v:' p.usuario_id = u.id'}],d)+G;
-  d = typeLine('hv6',[{c:'kw',v:'GROUP'},{c:'txt',v:'  '},{c:'kw',v:'BY'},{c:'txt',v:' u.id, u.nome'}],d)+G;
-  d = typeLine('hv7',[{c:'kw',v:'HAVING'},{c:'txt',v:' '},{c:'kw',v:'COUNT'},{c:'txt',v:'(p.id) > '},{c:'jn',v:'5'}],d)+G;
-  d = typeLine('hv8',[{c:'kw',v:'ORDER'},{c:'txt',v:'  '},{c:'kw',v:'BY'},{c:'txt',v:' valor_gasto '},{c:'kw',v:'DESC'},{c:'txt',v:';'}],d);
-}
-
-// ── SLIDE 9: N:N ──────────────────────────────────────────────────────────
-function animNN() {
-  var ew = document.getElementById('er0');
-  if(ew){ ew.style.opacity='0'; ew.style.transform='translateY(12px)'; ew.style.transition='all .6s cubic-bezier(.34,1.3,.64,1)'; }
-  T(function(){ if(!_run) return; if(ew){ ew.style.opacity='1'; ew.style.transform='translateY(0)'; } }, 200);
-  var nnIds=['nn0','nn1','nn2','nn3','nn4','nn5','nn6','nn7'];
-  resetLines(nnIds);
-  var d=700, G=40;
-  d = typeLine('nn0',[{c:'cmt',v:'-- Itens de um pedido com dados dos produtos'}],d)+G;
-  d = typeLine('nn1',[{c:'kw',v:'SELECT'},{c:'txt',v:' p.id '},{c:'kw',v:'AS'},{c:'txt',v:' pedido,'}],d)+G;
-  d = typeLine('nn2',[{c:'txt',v:'       pr.nome '},{c:'kw',v:'AS'},{c:'txt',v:' produto,'}],d)+G;
-  d = typeLine('nn3',[{c:'txt',v:'       pi.quantidade, pi.preco_unitario'}],d)+G;
-  d = typeLine('nn4',[{c:'kw',v:'FROM'},{c:'txt',v:'   pedidos p'}],d)+G;
-  d = typeLine('nn5',[{c:'kw',v:'JOIN'},{c:'txt',v:'   pedido_itens pi '},{c:'kw',v:'ON'},{c:'txt',v:' pi.pedido_id = p.id'}],d)+G;
-  d = typeLine('nn6',[{c:'kw',v:'JOIN'},{c:'txt',v:'   produtos pr '},{c:'kw',v:'ON'},{c:'txt',v:' pr.id = pi.produto_id'}],d)+G;
-  d = typeLine('nn7',[{c:'kw',v:'WHERE'},{c:'txt',v:'  p.id = '},{c:'jn',v:'10'},{c:'txt',v:';'}],d);
-}
-
-// ── SLIDE 10: Subqueries ──────────────────────────────────────────────────
-function animSubqueries() {
-  var sqIds=['sq0','sq1','sq2','sq3','sq4','sq5','sq6','sq7','sq8','sq9','sq10','sq11','sq12','sq13','sq14'];
-  resetLines(sqIds);
-  var d=0, G=40;
-  d = typeLine('sq0',[{c:'cmt',v:'-- Subconsulta no WHERE'}],d)+G;
-  d = typeLine('sq1',[{c:'kw',v:'SELECT'},{c:'txt',v:' nome '},{c:'kw',v:'FROM'},{c:'txt',v:' usuarios'}],d)+G;
-  d = typeLine('sq2',[{c:'kw',v:'WHERE'},{c:'txt',v:'  id '},{c:'kw',v:'IN'},{c:'txt',v:' ('}],d)+G;
-  d = typeLine('sq3',[{c:'txt',v:'  '},{c:'kw',v:'SELECT'},{c:'txt',v:' usuario_id '},{c:'kw',v:'FROM'},{c:'txt',v:' pedidos'}],d)+G;
-  d = typeLine('sq4',[{c:'txt',v:'  '},{c:'kw',v:'WHERE'},{c:'txt',v:'  total > '},{c:'jn',v:'500'}],d)+G;
-  d = typeLine('sq5',[{c:'txt',v:');'}],d)+120;
-  d = typeLine('sq6',[{c:'cmt',v:'-- Subconsulta no FROM (derived table)'}],d)+G;
-  d = typeLine('sq7',[{c:'kw',v:'SELECT'},{c:'txt',v:' avg_por_usuario.nome,'}],d)+G;
-  d = typeLine('sq8',[{c:'txt',v:'       avg_por_usuario.media'}],d)+G;
-  d = typeLine('sq9',[{c:'kw',v:'FROM'},{c:'txt',v:' ('}],d)+G;
-  d = typeLine('sq10',[{c:'txt',v:'  '},{c:'kw',v:'SELECT'},{c:'txt',v:' u.nome, '},{c:'kw',v:'AVG'},{c:'txt',v:'(p.total) '},{c:'kw',v:'AS'},{c:'txt',v:' media'}],d)+G;
-  d = typeLine('sq11',[{c:'txt',v:'  '},{c:'kw',v:'FROM'},{c:'txt',v:' usuarios u'}],d)+G;
-  d = typeLine('sq12',[{c:'txt',v:'  '},{c:'kw',v:'JOIN'},{c:'txt',v:' pedidos p '},{c:'kw',v:'ON'},{c:'txt',v:' p.usuario_id = u.id'}],d)+G;
-  d = typeLine('sq13',[{c:'txt',v:'  '},{c:'kw',v:'GROUP'},{c:'txt',v:' '},{c:'kw',v:'BY'},{c:'txt',v:' u.id, u.nome'}],d)+G;
-  d = typeLine('sq14',[{c:'txt',v:') '},{c:'kw',v:'AS'},{c:'txt',v:' avg_por_usuario '},{c:'kw',v:'WHERE'},{c:'txt',v:' media > '},{c:'jn',v:'200'},{c:'txt',v:';'}],d);
-}
-
-// ── SLIDE 11: EXPLAIN ─────────────────────────────────────────────────────
-function animExplain() {
-  var exIds=['ex0','ex1','ex2','ex3','ex4','ex5','ex6','ex7','ex8'];
-  resetLines(exIds);
-  ['sc0','sc1','sc2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
-  var d=0, G=40;
-  d = typeLine('ex0',[{c:'cmt',v:'-- Ver plano de execução'}],d)+G;
-  d = typeLine('ex1',[{c:'kw',v:'EXPLAIN ANALYZE'}],d)+G;
-  d = typeLine('ex2',[{c:'kw',v:'SELECT'},{c:'txt',v:' u.nome, '},{c:'kw',v:'COUNT'},{c:'txt',v:'(p.id)'}],d)+G;
-  d = typeLine('ex3',[{c:'kw',v:'FROM'},{c:'txt',v:'   usuarios u'}],d)+G;
-  d = typeLine('ex4',[{c:'kw',v:'JOIN'},{c:'txt',v:'   pedidos p '},{c:'kw',v:'ON'},{c:'txt',v:' p.usuario_id = u.id'}],d)+G;
-  d = typeLine('ex5',[{c:'kw',v:'GROUP'},{c:'txt',v:'  '},{c:'kw',v:'BY'},{c:'txt',v:' u.id;'}],d)+120;
-  d = typeLine('ex6',[{c:'cmt',v:'-- Output (simplificado):'}],d)+G;
-  d = typeLine('ex7',[{c:'ver',v:'Hash Join  (cost=12.50..28.80 rows=150 width=42)'}],d)+G;
-  d = typeLine('ex8',[{c:'pth',v:'  -> Seq Scan on usuarios  (cost=0..5.00 rows=100)'}],d);
-  T(function(){
-    if(!_run) return;
-    ['sc0','sc1','sc2'].forEach(function(id,i){
-      T(function(sid){ var el=document.getElementById(sid); if(el&&_run) el.classList.add('vis'); }.bind(null,id), i*280);
-    });
-  }, d+300);
-}
-
-// ── SLIDE 12: RM-ODP Viewpoints ──────────────────────────────────────────
-function animRmOdp() {
-  ['odp0','oa0','odp1','oa1','odp2','oa2','odp3','oa3','odp4'].forEach(function(id){
-    var el=document.getElementById(id); if(el){ el.style.opacity='0'; el.style.transform='translateY(16px)'; }
-  });
-  ['odp0','oa0','odp1','oa1','odp2','oa2','odp3','oa3','odp4'].forEach(function(id,i){
-    T(function(lid){ var el=document.getElementById(lid); if(el&&_run){ el.style.opacity='1'; el.style.transform='translateY(0)'; } }.bind(null,id), 120+i*320);
-  });
-}
-
-// ── SLIDE 13: RF + RNF + Artefato ─────────────────────────────────────────
-function animRfRnf() {
-  var cells=document.querySelectorAll('#rnf-tbl .scc');
-  cells.forEach(function(el){ el.style.opacity='0'; });
-  ['art0','art1','art2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.opacity='0'; });
-  cells.forEach(function(el){
-    var step=parseInt(el.getAttribute('data-s'),10);
-    T(function(c){ if(_run) c.style.opacity='1'; }.bind(null,el), 100+step*160);
-  });
-  ['art0','art1','art2'].forEach(function(id,i){
-    T(function(lid){ var el=document.getElementById(lid); if(el&&_run) el.style.opacity='1'; }.bind(null,id), 200+i*200);
-  });
-}
-
-// ── SLIDE 14: Checklist ───────────────────────────────────────────────────
-function animChecklist() {
-  for(var i=0;i<7;i++){var el=document.getElementById('cl'+i);if(el){ el.style.opacity='0'; el.style.transform='translateX(-14px)'; }}
-  for(var j=0;j<7;j++){
-    (function(idx){ T(function(){ var el=document.getElementById('cl'+idx); if(el&&_run){ el.style.opacity='1'; el.style.transform='translateX(0)'; el.style.transition='all .4s ease'; } }, 100+idx*180); })(j);
+    el.textContent = fmt(t.left);
+    el.classList.remove('warn', 'crit');
+    var pct = t.left / t.total;
+    if (pct <= 0.1) el.classList.add('crit');
+    else if (pct <= 0.33) el.classList.add('warn');
   }
-}
+  return {
+    start: function(key) {
+      var t = timers[key]; if (!t || t.intv) return;
+      t.intv = setInterval(function() {
+        if (t.left > 0) { t.left--; render(key); }
+        else { clearInterval(t.intv); t.intv = null; }
+      }, 1000);
+    },
+    pause: function(key) { var t = timers[key]; if (t && t.intv) { clearInterval(t.intv); t.intv = null; } },
+    reset: function(key) {
+      var t = timers[key]; if (!t) return;
+      if (t.intv) { clearInterval(t.intv); t.intv = null; }
+      t.left = t.total; render(key);
+    },
+    init: function() { Object.keys(timers).forEach(render); }
+  };
+})();
 
-// ── SLIDE 15: Recap ───────────────────────────────────────────────────────
-function animRecap() {
-  for(var i=0;i<7;i++){var el=document.getElementById('rt'+i);if(el)el.classList.remove('vis');}
-  for(var j=0;j<7;j++){
-    (function(idx){ T(function(){ var el=document.getElementById('rt'+idx); if(el&&_run) el.classList.add('vis'); }, 160+idx*150); })(j);
-  }
-}
+var hashMatch = location.hash.match(/^#slide-(\d+)/);
+var initialIdx = hashMatch ? Math.max(0, Math.min(parseInt(hashMatch[1], 10) - 1, totalSlides - 1)) : 0;
+showSlide(initialIdx);
+window.addEventListener('hashchange', function() {
+  var m = location.hash.match(/^#slide-(\d+)/);
+  if (m) showSlide(Math.max(0, Math.min(parseInt(m[1], 10) - 1, totalSlides - 1)));
+});
 
-// ── DISPATCH ─────────────────────────────────────────────────────────────
-var animMap = [
-  animCover, animDaily, animAgenda, animWhyJoin, animJoinTypes, animInnerJoin,
-  animLeftJoin, animGroupBy, animHaving, animNN, animSubqueries,
-  animExplain, animRmOdp, animRfRnf, animChecklist, animRecap
-];
-
-function runAnim(idx) {
-  clearT();
-  _run = true;
-  var fn = animMap[idx];
-  if (fn) T(fn, 150);
-}
-
-showSlide(0);
+Timer.init();
 </script>
 </body>
 </html>

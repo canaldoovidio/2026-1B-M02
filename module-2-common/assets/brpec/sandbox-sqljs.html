@@ -1,0 +1,254 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>BrPec Sandbox · SQL no navegador (sql.js) — Aula 4</title>
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🐄</text></svg>">
+  <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
+  <style>
+    :root { --ac:#0d9488; --dk:#2e2640; --bg:#0f172a; --panel:#1e293b; --border:#334155; --muted:#94a3b8; --good:#22c55e; --bad:#ef4444; --warn:#f59e0b; }
+    *,*::before,*::after { box-sizing:border-box; }
+    body { margin:0; font-family:'Manrope',sans-serif; background:var(--bg); color:#e2e8f0; min-height:100vh; }
+    .topbar { background:linear-gradient(135deg,#0b1d3a 0%,#2e2640 100%); padding:12px 22px; display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:10px; border-bottom:1px solid var(--border); }
+    .topbar h1 { font-size:1.08rem; font-weight:800; margin:0; color:white; }
+    .topbar .sub { font-size:.78rem; color:#cbd5e1; margin-top:1px; }
+    .pill { background:rgba(13,148,136,.18); border:1px solid var(--ac); color:#5eead4; padding:3px 12px; border-radius:999px; font-size:.72rem; font-weight:700; letter-spacing:.04em; text-transform:uppercase; }
+    .pill.loading { background:rgba(245,158,11,.18); border-color:var(--warn); color:#fbbf24; }
+    .pill.error { background:rgba(239,68,68,.18); border-color:var(--bad); color:#fca5a5; }
+    .layout { display:grid; grid-template-columns:280px 1fr; gap:18px; padding:18px; max-width:1500px; margin:0 auto; }
+    @media (max-width:900px) { .layout { grid-template-columns:1fr; } }
+    .sidebar { background:var(--panel); border:1px solid var(--border); border-radius:12px; padding:14px; max-height:calc(100vh - 110px); overflow-y:auto; }
+    .sidebar h3 { font-size:.78rem; text-transform:uppercase; letter-spacing:.08em; color:#94a3b8; margin:0 0 10px; font-weight:800; }
+    .schema-box { font-family:'JetBrains Mono',monospace; font-size:.72rem; line-height:1.55; color:#cbd5e1; background:#0b1322; border-radius:8px; padding:10px 12px; border:1px solid var(--border); margin-bottom:14px; white-space:pre; overflow-x:auto; }
+    .schema-box .tn { color:#5eead4; font-weight:700; }
+    .schema-box .col { color:#cbd5e1; }
+    .schema-box .pk { color:#fbbf24; }
+    .schema-box .fk { color:#a5b4fc; }
+    .schema-box .nn { color:#94a3b8; font-style:italic; }
+    .preset-btn { display:block; width:100%; text-align:left; background:#0f172a; border:1px solid var(--border); color:#e2e8f0; padding:8px 10px; border-radius:7px; margin-bottom:6px; font-size:.78rem; cursor:pointer; transition:all .15s; }
+    .preset-btn:hover { border-color:var(--ac); color:#5eead4; transform:translateX(2px); }
+    .preset-btn .pn { font-family:'JetBrains Mono',monospace; font-size:.68rem; color:#5eead4; display:block; margin-bottom:2px; }
+    .main { display:flex; flex-direction:column; gap:14px; min-width:0; }
+    .editor-wrap { background:var(--panel); border:1px solid var(--border); border-radius:12px; overflow:hidden; }
+    .editor-head { background:#0b1322; padding:8px 12px; display:flex; align-items:center; justify-content:space-between; border-bottom:1px solid var(--border); flex-wrap:wrap; gap:8px; }
+    .editor-head .ttl { font-family:'JetBrains Mono',monospace; font-size:.74rem; color:#94a3b8; font-weight:700; letter-spacing:.04em; }
+    .editor-head .actions { display:flex; gap:8px; flex-wrap:wrap; }
+    .btn-run { background:var(--ac); color:white; border:none; padding:5px 16px; border-radius:7px; font-weight:700; font-size:.82rem; cursor:pointer; transition:transform .1s; font-family:'Manrope',sans-serif; }
+    .btn-run:hover { transform:translateY(-1px); background:#14b8a6; }
+    .btn-run:disabled { opacity:.5; cursor:not-allowed; transform:none; }
+    .btn-clear { background:transparent; color:#94a3b8; border:1px solid var(--border); padding:5px 14px; border-radius:7px; font-weight:700; font-size:.82rem; cursor:pointer; font-family:'Manrope',sans-serif; }
+    .btn-clear:hover { color:white; border-color:#94a3b8; }
+    textarea#sql { width:100%; min-height:160px; background:#0b1322; color:#e2e8f0; border:none; padding:14px 16px; font-family:'JetBrains Mono',monospace; font-size:.88rem; line-height:1.6; resize:vertical; outline:none; }
+    textarea#sql:focus { background:#091025; }
+    .result-wrap { background:var(--panel); border:1px solid var(--border); border-radius:12px; overflow:hidden; min-height:200px; }
+    .result-head { background:#0b1322; padding:8px 12px; border-bottom:1px solid var(--border); display:flex; align-items:center; justify-content:space-between; flex-wrap:wrap; gap:8px; }
+    .result-head .ttl { font-family:'JetBrains Mono',monospace; font-size:.74rem; color:#94a3b8; font-weight:700; letter-spacing:.04em; }
+    .result-meta { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:#5eead4; }
+    .result-meta.err { color:#fca5a5; }
+    .result-body { padding:0; overflow-x:auto; max-height:calc(100vh - 360px); overflow-y:auto; }
+    .result-table { width:100%; border-collapse:collapse; font-size:.84rem; }
+    .result-table thead th { background:#0f172a; color:#5eead4; padding:8px 14px; text-align:left; font-weight:700; font-family:'JetBrains Mono',monospace; font-size:.74rem; text-transform:uppercase; letter-spacing:.04em; border-bottom:1px solid var(--border); position:sticky; top:0; }
+    .result-table tbody td { padding:7px 14px; border-bottom:1px solid #1e293b; color:#e2e8f0; font-family:'JetBrains Mono',monospace; font-size:.84rem; }
+    .result-table tbody tr:hover { background:#0f172a; }
+    .null-val { color:#64748b; font-style:italic; }
+    .empty-state { padding:42px 20px; text-align:center; color:#64748b; font-size:.9rem; }
+    .error-state { padding:18px 22px; color:#fca5a5; font-family:'JetBrains Mono',monospace; font-size:.84rem; line-height:1.6; white-space:pre-wrap; background:rgba(239,68,68,.06); border-left:3px solid var(--bad); }
+    .footer-note { padding:10px 16px; font-size:.72rem; color:#64748b; text-align:center; border-top:1px solid var(--border); }
+    .footer-note code { background:#0b1322; padding:1px 6px; border-radius:4px; color:#5eead4; font-size:.85em; }
+    .back-link { color:#5eead4; text-decoration:none; font-weight:700; font-size:.82rem; }
+    .back-link:hover { color:#a7f3d0; }
+  </style>
+</head>
+<body>
+  <div class="topbar">
+    <div>
+      <h1>🐄 BrPec Sandbox — SQL no navegador</h1>
+      <div class="sub">Aula 4 · banco SQLite carregado via <code>sql.js</code> (WebAssembly) · offline-friendly</div>
+    </div>
+    <div class="d-flex align-items-center gap-3">
+      <span id="status-pill" class="pill loading">carregando…</span>
+      <a class="back-link" href="../../../index.html">← Módulo</a>
+    </div>
+  </div>
+
+  <div class="layout">
+    <aside class="sidebar">
+      <h3>Schema</h3>
+      <div class="schema-box"><span class="tn">gerente</span>
+  <span class="pk">id</span> <span class="col">PK</span>
+  <span class="col">nome</span>
+
+<span class="tn">capataz</span>
+  <span class="pk">id</span> <span class="col">PK</span>
+  <span class="col">nome, cpf</span>
+  <span class="fk">gerente_id</span> <span class="nn">→ gerente</span>
+
+<span class="tn">retiro</span>
+  <span class="pk">id</span> <span class="col">PK</span>
+  <span class="col">nome, area_ha</span>
+
+<span class="tn">capataz_retiro</span>
+  <span class="pk">id</span> <span class="col">PK</span>
+  <span class="fk">capataz_id</span> <span class="nn">→ capataz</span>
+  <span class="fk">retiro_id</span> <span class="nn">→ retiro</span>
+  <span class="col">ativo</span>
+
+<span class="tn">bovino</span>
+  <span class="pk">id</span> <span class="col">PK</span>
+  <span class="col">brinco, sexo, nascimento</span>
+  <span class="fk">mae_id</span> <span class="nn">→ bovino (self)</span>
+  <span class="fk">retiro_atual_id</span> <span class="nn">→ retiro</span>
+
+<span class="tn">evento_zootecnico</span>
+  <span class="pk">id</span> <span class="col">PK</span>
+  <span class="col">tipo, data, observacao</span>
+  <span class="fk">capataz_id</span> <span class="nn">→ capataz</span>
+  <span class="fk">retiro_id</span>  <span class="nn">→ retiro</span>
+  <span class="fk">bovino_id</span>  <span class="nn">→ bovino</span></div>
+
+      <h3 style="margin-top:18px;">Consultas-modelo</h3>
+      <button class="preset-btn" data-q="-- 1) Quantos bovinos por retiro?&#10;SELECT r.nome, COUNT(b.id) AS bovinos&#10;FROM retiro r&#10;LEFT JOIN bovino b ON b.retiro_atual_id = r.id&#10;GROUP BY r.id&#10;ORDER BY bovinos DESC;"><span class="pn">P01</span>Bovinos por retiro (LEFT JOIN + GROUP BY)</button>
+      <button class="preset-btn" data-q="-- 2) Eventos registrados por capataz&#10;SELECT c.nome, COUNT(e.id) AS eventos&#10;FROM capataz c&#10;LEFT JOIN evento_zootecnico e ON e.capataz_id = c.id&#10;GROUP BY c.id&#10;ORDER BY eventos DESC;"><span class="pn">P02</span>Eventos por capataz (Vitor aparece zerado)</button>
+      <button class="preset-btn" data-q="-- 3) Bovinos sem nenhum evento (precisam de atenção)&#10;SELECT b.brinco, b.sexo, b.nascimento&#10;FROM bovino b&#10;LEFT JOIN evento_zootecnico e ON e.bovino_id = b.id&#10;WHERE e.id IS NULL&#10;ORDER BY b.brinco;"><span class="pn">P03</span>Bovinos sem evento (LEFT + IS NULL)</button>
+      <button class="preset-btn" data-q="-- 4) Eventos de aftosa por retiro&#10;SELECT r.nome AS retiro, COUNT(*) AS vacinacoes&#10;FROM evento_zootecnico e&#10;INNER JOIN retiro r ON r.id = e.retiro_id&#10;WHERE e.tipo = 'vacinacao'&#10;GROUP BY r.id;"><span class="pn">P04</span>Vacinas por retiro (INNER + WHERE)</button>
+      <button class="preset-btn" data-q="-- 5) SELF JOIN: bezerros e suas mães&#10;SELECT f.brinco AS bezerro, m.brinco AS mae, f.nascimento&#10;FROM bovino f&#10;INNER JOIN bovino m ON m.id = f.mae_id&#10;ORDER BY f.nascimento DESC;"><span class="pn">P05</span>Bezerros × mães (SELF JOIN)</button>
+      <button class="preset-btn" data-q="-- 6) Triplo JOIN: tipo × retiro × mês&#10;SELECT&#10;  substr(e.data, 1, 7) AS mes,&#10;  r.nome AS retiro,&#10;  e.tipo,&#10;  COUNT(*) AS qtd&#10;FROM evento_zootecnico e&#10;INNER JOIN retiro r ON r.id = e.retiro_id&#10;GROUP BY mes, retiro, e.tipo&#10;HAVING qtd >= 2&#10;ORDER BY mes, retiro;"><span class="pn">P06</span>Tipo × retiro × mês (GROUP BY + HAVING)</button>
+      <button class="preset-btn" data-q="-- 7) Capatazes e em quantos retiros atuam (N:N)&#10;SELECT c.nome, GROUP_CONCAT(r.nome, ', ') AS retiros, COUNT(r.id) AS qtd&#10;FROM capataz c&#10;LEFT JOIN capataz_retiro cr ON cr.capataz_id = c.id AND cr.ativo = 1&#10;LEFT JOIN retiro r ON r.id = cr.retiro_id&#10;GROUP BY c.id;"><span class="pn">P07</span>Capataz × retiro (N:N via tabela junção)</button>
+      <button class="preset-btn" data-q="-- 8) Subquery: bovinos com mais eventos que a média&#10;SELECT b.brinco, COUNT(e.id) AS eventos&#10;FROM bovino b&#10;LEFT JOIN evento_zootecnico e ON e.bovino_id = b.id&#10;GROUP BY b.id&#10;HAVING eventos > (&#10;  SELECT AVG(qtd) FROM (&#10;    SELECT COUNT(*) AS qtd FROM evento_zootecnico GROUP BY bovino_id&#10;  )&#10;)&#10;ORDER BY eventos DESC;"><span class="pn">P08</span>Subconsulta: acima da média (HAVING + subquery)</button>
+      <button class="preset-btn" data-q="-- 9) EXPLAIN QUERY PLAN — entender índices&#10;EXPLAIN QUERY PLAN&#10;SELECT * FROM evento_zootecnico&#10;WHERE bovino_id = 1 AND data >= '2025-01-01';"><span class="pn">P09</span>EXPLAIN QUERY PLAN (índices)</button>
+    </aside>
+
+    <main class="main">
+      <div class="editor-wrap">
+        <div class="editor-head">
+          <span class="ttl">▸ SQL — edite e rode (Ctrl+Enter / Cmd+Enter)</span>
+          <div class="actions">
+            <button class="btn-clear" id="btn-clear">limpar</button>
+            <button class="btn-run" id="btn-run" disabled>▶ executar</button>
+          </div>
+        </div>
+        <textarea id="sql" spellcheck="false" placeholder="-- escreva SQL aqui…&#10;SELECT * FROM retiro;">-- bem-vinda(o) ao BrPec Sandbox
+-- escolha uma consulta-modelo à esquerda ou escreva a sua.
+-- atalho: Ctrl+Enter (Win/Linux) ou Cmd+Enter (Mac)
+
+SELECT r.nome AS retiro, COUNT(b.id) AS bovinos
+FROM retiro r
+LEFT JOIN bovino b ON b.retiro_atual_id = r.id
+GROUP BY r.id
+ORDER BY bovinos DESC;</textarea>
+      </div>
+
+      <div class="result-wrap">
+        <div class="result-head">
+          <span class="ttl">▸ Resultado</span>
+          <span class="result-meta" id="result-meta">—</span>
+        </div>
+        <div class="result-body" id="result-body">
+          <div class="empty-state">Aguardando a primeira consulta. Clique em <strong>executar</strong>.</div>
+        </div>
+        <div class="footer-note">
+          Banco: <code>brpec.db</code> · engine: <code>sql.js</code> 1.13 (WebAssembly) · escopo: somente leitura no cliente (alterações não persistem após reload)
+        </div>
+      </div>
+    </main>
+  </div>
+
+  <script src="https://cdn.jsdelivr.net/npm/sql.js@1.13.0/dist/sql-wasm.js"></script>
+  <script>
+    const statusPill = document.getElementById('status-pill');
+    const btnRun     = document.getElementById('btn-run');
+    const btnClear   = document.getElementById('btn-clear');
+    const sqlInput   = document.getElementById('sql');
+    const resultMeta = document.getElementById('result-meta');
+    const resultBody = document.getElementById('result-body');
+    let db = null;
+
+    function setStatus(text, cls) {
+      statusPill.textContent = text;
+      statusPill.className = 'pill ' + (cls || '');
+    }
+
+    async function boot() {
+      try {
+        setStatus('carregando engine…', 'loading');
+        const SQL = await initSqlJs({ locateFile: f => `https://cdn.jsdelivr.net/npm/sql.js@1.13.0/dist/${f}` });
+        setStatus('baixando brpec.db…', 'loading');
+        const resp = await fetch('brpec.db');
+        if (!resp.ok) throw new Error(`HTTP ${resp.status} — brpec.db não encontrado. Sirva via servidor (não file://).`);
+        const buf = await resp.arrayBuffer();
+        db = new SQL.Database(new Uint8Array(buf));
+        setStatus('pronto', '');
+        btnRun.disabled = false;
+      } catch (err) {
+        setStatus('erro', 'error');
+        renderError(err.message + '\n\nDica: rode `python3 -m http.server 8000` nesta pasta e abra http://localhost:8000/sandbox-sqljs.html');
+      }
+    }
+
+    function renderError(msg) {
+      resultMeta.textContent = 'erro';
+      resultMeta.classList.add('err');
+      resultBody.innerHTML = `<div class="error-state">${msg.replace(/</g,'&lt;')}</div>`;
+    }
+
+    function renderResult(stmts) {
+      resultMeta.classList.remove('err');
+      if (!stmts.length) {
+        resultMeta.textContent = '0 linhas';
+        resultBody.innerHTML = '<div class="empty-state">Consulta executada sem retorno (ex.: DDL ou WHERE sem matches).</div>';
+        return;
+      }
+      const last = stmts[stmts.length - 1];
+      const cols = last.columns;
+      const rows = last.values;
+      resultMeta.textContent = `${rows.length} linha${rows.length === 1 ? '' : 's'} · ${cols.length} coluna${cols.length === 1 ? '' : 's'}`;
+      let html = '<table class="result-table"><thead><tr>';
+      cols.forEach(c => html += `<th>${c}</th>`);
+      html += '</tr></thead><tbody>';
+      rows.forEach(r => {
+        html += '<tr>';
+        r.forEach(v => {
+          const cell = (v === null || v === undefined) ? '<span class="null-val">NULL</span>' : String(v).replace(/</g, '&lt;');
+          html += `<td>${cell}</td>`;
+        });
+        html += '</tr>';
+      });
+      html += '</tbody></table>';
+      resultBody.innerHTML = html;
+    }
+
+    function run() {
+      if (!db) return;
+      const sql = sqlInput.value.trim();
+      if (!sql) return;
+      const t0 = performance.now();
+      try {
+        const stmts = db.exec(sql);
+        const t1 = performance.now();
+        renderResult(stmts);
+        const baseMeta = resultMeta.textContent;
+        resultMeta.textContent = `${baseMeta} · ${(t1 - t0).toFixed(1)} ms`;
+      } catch (err) {
+        renderError(err.message);
+      }
+    }
+
+    btnRun.addEventListener('click', run);
+    btnClear.addEventListener('click', () => { sqlInput.value = ''; sqlInput.focus(); });
+    sqlInput.addEventListener('keydown', (e) => {
+      if ((e.ctrlKey || e.metaKey) && e.key === 'Enter') { e.preventDefault(); run(); }
+    });
+    document.querySelectorAll('.preset-btn').forEach(btn => {
+      btn.addEventListener('click', () => {
+        sqlInput.value = btn.dataset.q;
+        sqlInput.focus();
+        run();
+      });
+    });
+
+    boot();
+  </script>
+</body>
+</html>
