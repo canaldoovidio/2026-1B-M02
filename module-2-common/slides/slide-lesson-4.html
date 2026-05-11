@@ -179,6 +179,47 @@
 
     /* Highlight stripe — visual pop on cover transitions */
     .stripe { display:inline-block; background:#fde047; color:#422006; padding:1px 10px; border-radius:6px; font-weight:800; font-size:.86em; }
+
+    /* ── Conjuntos: 4 mini-cards com Venn + exemplo BrPec ─── */
+    .conjs-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:12px; margin:8px 0 14px; }
+    .conj-card { background:white; border:1px solid #dfe5ec; border-radius:12px; padding:14px 14px 12px; box-shadow:0 4px 14px rgba(46,38,64,.06); display:flex; flex-direction:column; align-items:center; text-align:center; }
+    .conj-card.acc-uni  { border-top:4px solid #8b5cf6; }
+    .conj-card.acc-int  { border-top:4px solid #0d9488; }
+    .conj-card.acc-dif  { border-top:4px solid #dc2626; }
+    .conj-card.acc-cmp  { border-top:4px solid #d97706; }
+    .conj-card svg.venn-mini { width:140px; height:88px; margin-bottom:6px; }
+    .conj-card svg.venn-mini circle { stroke-width:2; fill-opacity:.15; }
+    .conj-card svg.venn-mini .c-a { fill:#3b82f6; stroke:#1d4ed8; }
+    .conj-card svg.venn-mini .c-b { fill:#ef4444; stroke:#b91c1c; }
+    .conj-card svg.venn-mini .fill { fill:#22c55e; fill-opacity:.65; }
+    .conj-card .conj-sym { font-family:'JetBrains Mono',monospace; font-size:1.3rem; font-weight:800; margin:0 0 2px; }
+    .conj-card.acc-uni .conj-sym { color:#7c3aed; }
+    .conj-card.acc-int .conj-sym { color:#0d9488; }
+    .conj-card.acc-dif .conj-sym { color:#b91c1c; }
+    .conj-card.acc-cmp .conj-sym { color:#b45309; }
+    .conj-card .conj-name { font-size:.86rem; font-weight:800; color:var(--dk); margin:0 0 4px; }
+    .conj-card .conj-formula { font-family:'JetBrains Mono',monospace; font-size:.74rem; color:var(--ac); margin:0 0 6px; }
+    .conj-card .conj-ex { font-size:.74rem; color:#475569; line-height:1.4; background:#f8fafc; border-radius:6px; padding:6px 8px; width:100%; }
+    .conj-card .conj-ex strong { color:var(--dk); }
+
+    /* Map table: conjunto → JOIN */
+    .map-table { width:100%; border-collapse:separate; border-spacing:0; border-radius:14px; overflow:hidden; box-shadow:0 8px 24px rgba(46,38,64,.1); margin:6px 0 12px; font-size:.92rem; background:white; }
+    .map-table th { background:linear-gradient(135deg,#1f2937,var(--dk)); color:white; padding:12px 16px; text-align:left; font-size:.78rem; font-weight:800; text-transform:uppercase; letter-spacing:.04em; }
+    .map-table td { padding:12px 16px; border-top:1px solid #e5e7eb; vertical-align:middle; line-height:1.5; }
+    .map-table tr:first-child td { border-top:none; }
+    .map-table tr:hover td { background:#fafbfd; }
+    .map-table .op-sym { font-family:'JetBrains Mono',monospace; font-size:1.15rem; font-weight:800; }
+    .map-table .op-sym.uni { color:#7c3aed; }
+    .map-table .op-sym.int { color:#0d9488; }
+    .map-table .op-sym.dif { color:#b91c1c; }
+    .map-table .op-sym.cmp { color:#b45309; }
+    .map-table .join-code { font-family:'JetBrains Mono',monospace; font-weight:700; color:var(--dk); background:#f1f5f9; padding:2px 8px; border-radius:6px; font-size:.86em; }
+    .map-table .note { font-size:.76rem; color:var(--ac); font-style:italic; }
+    .map-table tr.dim td { opacity:.7; }
+    .crossref { background:#eef2ff; border:1px solid #c7d2fe; border-radius:10px; padding:10px 14px; font-size:.86rem; color:#3730a3; display:flex; align-items:center; gap:10px; }
+    .crossref strong { color:#1e1b4b; }
+    .crossref .ico { font-size:1.15rem; }
+    .crossref a { color:#1e1b4b; font-weight:800; text-decoration:underline; }
   </style>
 </head>
 <body>
@@ -300,7 +341,117 @@
     </div>
   </div>
 
-  <!-- ╔══════════════════════ 05 — JOIN: anatomia ═════════════╗ -->
+  <!-- ╔══════════════════════ 05 — Recap conjuntos ════════════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><h2 class="st">Antes do JOIN · um recap relâmpago</h2><p class="ss">Em Teoria de Conjuntos (Mód. 1, Prof. Ovidio) vocês viram 4 operações. Cada uma vai virar um JOIN agora.</p></div>
+      <div class="conjs-grid">
+        <div class="conj-card acc-uni">
+          <svg class="venn-mini" viewBox="0 0 140 88">
+            <circle class="fill" cx="55" cy="44" r="32"/>
+            <circle class="fill" cx="85" cy="44" r="32"/>
+            <circle class="c-a" cx="55" cy="44" r="32"/>
+            <circle class="c-b" cx="85" cy="44" r="32"/>
+          </svg>
+          <p class="conj-sym">A ∪ B</p>
+          <p class="conj-name">União</p>
+          <p class="conj-formula">tudo que está em A ou em B</p>
+          <p class="conj-ex"><strong>BrPec:</strong> capatazes ∪ retiros — qualquer vínculo registrado.</p>
+        </div>
+        <div class="conj-card acc-int">
+          <svg class="venn-mini" viewBox="0 0 140 88">
+            <defs><clipPath id="clip-mini-int"><circle cx="55" cy="44" r="32"/></clipPath></defs>
+            <circle class="c-a" cx="55" cy="44" r="32"/>
+            <circle class="c-b" cx="85" cy="44" r="32"/>
+            <circle class="fill" cx="85" cy="44" r="32" clip-path="url(#clip-mini-int)"/>
+          </svg>
+          <p class="conj-sym">A ∩ B</p>
+          <p class="conj-name">Interseção</p>
+          <p class="conj-formula">só o que está em A e em B</p>
+          <p class="conj-ex"><strong>BrPec:</strong> capatazes que registraram evento (sem o Vitor).</p>
+        </div>
+        <div class="conj-card acc-dif">
+          <svg class="venn-mini" viewBox="0 0 140 88">
+            <defs><mask id="mask-mini-dif"><rect width="140" height="88" fill="white"/><circle cx="85" cy="44" r="32" fill="black"/></mask></defs>
+            <circle class="c-a" cx="55" cy="44" r="32"/>
+            <circle class="c-b" cx="85" cy="44" r="32"/>
+            <circle class="fill" cx="55" cy="44" r="32" mask="url(#mask-mini-dif)"/>
+          </svg>
+          <p class="conj-sym">A − B</p>
+          <p class="conj-name">Diferença</p>
+          <p class="conj-formula">em A mas <em>não</em> em B</p>
+          <p class="conj-ex"><strong>BrPec:</strong> bovinos sem nenhum evento (BR0012, BR0015…).</p>
+        </div>
+        <div class="conj-card acc-cmp">
+          <svg class="venn-mini" viewBox="0 0 140 88">
+            <defs><mask id="mask-mini-cmp"><rect width="140" height="88" fill="white"/><circle cx="70" cy="44" r="32" fill="black"/></mask></defs>
+            <rect class="fill" width="140" height="88" mask="url(#mask-mini-cmp)"/>
+            <circle class="c-a" cx="70" cy="44" r="32"/>
+          </svg>
+          <p class="conj-sym">Aᶜ</p>
+          <p class="conj-name">Complemento</p>
+          <p class="conj-formula">tudo do universo que não é A</p>
+          <p class="conj-ex"><strong>BrPec:</strong> capatazes que <em>não</em> atuam em nenhum retiro.</p>
+        </div>
+      </div>
+      <div class="crossref">
+        <span class="ico">🔗</span>
+        <span>Se quiser reforçar a base antes do bloco seguinte, releia os slides 8–12 da <a href="https://canaldoovidio.github.io/2026-1A-teoria-conjuntos/aula01.html" target="_blank"><strong>Aula 01 · Teoria de Conjuntos</strong> (Prof. Ovidio)</a>.</span>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 06 — Mapeamento conjunto→JOIN ═══╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><h2 class="st">Cada operação vira um JOIN</h2><p class="ss">A mesma coisa, agora <em>materializada</em> em SQL sobre tabelas relacionais.</p></div>
+      <table class="map-table">
+        <thead>
+          <tr>
+            <th style="width:18%;">Operação</th>
+            <th style="width:14%;">Símbolo</th>
+            <th style="width:28%;">JOIN equivalente</th>
+            <th style="width:40%;">Como ler no BrPec</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td><strong>Interseção</strong></td>
+            <td><span class="op-sym int">A ∩ B</span></td>
+            <td><span class="join-code">INNER JOIN</span></td>
+            <td>"Capatazes <em>que registraram</em> evento" — esconde o Vitor.</td>
+          </tr>
+          <tr>
+            <td><strong>Conjunto A</strong></td>
+            <td><span class="op-sym int">A</span></td>
+            <td><span class="join-code">LEFT JOIN</span></td>
+            <td>"<em>Todos</em> os capatazes, com evento ou não" — Vitor aparece com 0.</td>
+          </tr>
+          <tr>
+            <td><strong>União</strong></td>
+            <td><span class="op-sym uni">A ∪ B</span></td>
+            <td><span class="join-code">FULL OUTER JOIN</span></td>
+            <td>"Qualquer linha que existe em qualquer um dos lados" — reconciliação. <span class="note">SQLite 3.39+.</span></td>
+          </tr>
+          <tr>
+            <td><strong>Diferença</strong></td>
+            <td><span class="op-sym dif">A − B</span></td>
+            <td><span class="join-code">EXCEPT</span> ou <span class="join-code">LEFT JOIN + IS NULL</span></td>
+            <td>"Bovinos <em>sem</em> evento" — quem está em A mas não tem par em B.</td>
+          </tr>
+          <tr>
+            <td><strong>Complemento</strong></td>
+            <td><span class="op-sym cmp">Aᶜ</span></td>
+            <td><span class="join-code">NOT IN</span> / <span class="join-code">NOT EXISTS</span></td>
+            <td>"Capatazes que <em>não</em> estão em <code>capataz_retiro</code>" — quem é, por exclusão, de fora.</td>
+          </tr>
+        </tbody>
+      </table>
+      <blockquote>JOIN <strong>não é só sintaxe</strong>. Cada tipo codifica uma <em>operação algébrica</em> sobre conjuntos. Saber qual operação é a sua pergunta de negócio — esse é o salto da aula.</blockquote>
+    </div>
+  </div>
+
+  <!-- ╔══════════════════════ 07 — JOIN: anatomia ═════════════╗ -->
   <div class="slide">
     <div class="sc">
       <div class="sh dark"><h2 class="st">JOIN, sem mistério</h2><p class="ss">Sintaxe genérica e leitura "da esquerda para a direita".</p></div>
@@ -866,7 +1017,7 @@
   </div>
   <div class="nav-wrapper">
     <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
-    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">21</span></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">23</span></div>
     <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
   </div>
   <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>

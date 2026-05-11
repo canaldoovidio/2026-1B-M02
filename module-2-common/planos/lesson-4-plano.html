@@ -172,9 +172,10 @@
 
       <section class="mat-section" id="sec-pre">
         <h2>Pré-requisitos &amp; autoestudo</h2>
-        <p><strong>Pré-requisitos:</strong> aulas 1–3 concluídas (introdução à web, modelagem relacional formal, CRUD em SQLite com o esquema do BrPec).</p>
+        <p><strong>Pré-requisitos:</strong> aulas 1–3 concluídas (introdução à web, modelagem relacional formal, CRUD em SQLite com o esquema do BrPec) <strong>+ Aula 01 de Teoria de Conjuntos</strong> (Mód. 1, Prof. Ovidio) — base conceitual para JOIN como operação algébrica.</p>
         <h3>O que fazer antes da aula (autoestudo)</h3>
         <ul>
+          <li>Releia os slides <strong>8–12 e 20–23</strong> da <a href="https://canaldoovidio.github.io/2026-1A-teoria-conjuntos/aula01.html" target="_blank">Aula 01 · Teoria de Conjuntos (Prof. Ovidio)</a> — operações União, Interseção, Diferença, Complemento + o mapeamento conjunto → JOIN. Esse material foi a base de todo o bloco 3 desta aula.</li>
           <li>Leitura completa do <a href="../materials/lesson-4-material.html">Material da Aula 4</a> (JOINs, agregação, subconsultas, EXPLAIN, sql.js).</li>
           <li>Abrir o <a href="../assets/brpec/sandbox-sqljs.html" target="_blank">BrPec Sandbox</a> e rodar 2 das consultas-modelo (P01–P09) — registrar dúvida no caderno de bordo.</li>
           <li>Listar 1 pergunta de negócio do BrPec (em <em>linguagem natural</em>) que exija pelo menos 1 <code>JOIN</code> para ser respondida — trazer para a daily.</li>
@@ -194,23 +195,23 @@
             <p>Cada aluno traz 1 minuto: pergunta de negócio + qual tipo de junção acha que ela exige. O professor mapeia padrões no quadro e amarra com o Bloco 2. <strong>Cronômetro no slide.</strong></p>
           </div>
           <div class="day-block recap">
-            <div class="blk-head"><h3 class="blk-title">Bloco 2 · Recap do DER + anatomia do JOIN</h3><span class="blk-time">10:15 — 10:25 · 10 min</span></div>
-            <p>Recap relâmpago do DER do BrPec (aula 3) — por que tabelas separadas, onde mora a FK. Forma geral da sintaxe <code>JOIN ... ON ...</code> e "5 perguntas mentais" antes de cada query.</p>
+            <div class="blk-head"><h3 class="blk-title">Bloco 2 · Recap DER + teoria de conjuntos + anatomia do JOIN</h3><span class="blk-time">10:15 — 10:30 · 15 min</span></div>
+            <p>(a) Recap relâmpago do DER do BrPec (aula 3); (b) <strong>recap das 4 operações de conjunto do Mód. 1 do Ovidio</strong> (União, Interseção, Diferença, Complemento) com mini-Venn diagrams; (c) tabela explícita mapeando cada operação ao JOIN equivalente em SQL; (d) anatomia genérica do <code>JOIN ... ON ...</code> + "5 perguntas mentais" antes de cada query. <em>Bloco curto, mas é onde o salto conceitual acontece.</em></p>
           </div>
           <div class="day-block theory">
-            <div class="blk-head"><h3 class="blk-title">Bloco 3 · Tipos de JOIN com Venn animado</h3><span class="blk-time">10:25 — 10:45 · 20 min</span></div>
-            <p>Para cada tipo: diagrama de Venn → SQL no BrPec → tabela de resultado.</p>
+            <div class="blk-head"><h3 class="blk-title">Bloco 3 · Tipos de JOIN com Venn animado</h3><span class="blk-time">10:30 — 10:50 · 20 min</span></div>
+            <p>Para cada tipo: diagrama de Venn → SQL no BrPec → tabela de resultado. <strong>Amarrar cada tipo à operação de conjunto correspondente</strong> (mostrada no slide 6).</p>
             <ul>
-              <li><strong>INNER</strong> — capataz × evento (Vitor sumido).</li>
-              <li><strong>LEFT</strong> — capataz × evento (Vitor aparece com 0).</li>
-              <li><strong>RIGHT / FULL</strong> — espelhos do LEFT; nota sobre SQLite 3.39+.</li>
+              <li><strong>INNER</strong> (= A ∩ B) — capataz × evento (Vitor sumido).</li>
+              <li><strong>LEFT</strong> (= A completo) — capataz × evento (Vitor aparece com 0).</li>
+              <li><strong>RIGHT / FULL</strong> (= A ∪ B) — espelhos do LEFT; nota sobre SQLite 3.39+.</li>
               <li><strong>SELF</strong> — bovino × bovino (bezerro/mãe).</li>
               <li><strong>N:N + tabela de junção</strong> — capataz_retiro.</li>
             </ul>
           </div>
           <div class="day-block agg">
-            <div class="blk-head"><h3 class="blk-title">Bloco 4 · Agregação + subconsultas</h3><span class="blk-time">10:45 — 11:05 · 20 min</span></div>
-            <p><code>GROUP BY</code>, funções de agregação, pegadinha <code>WHERE</code> vs <code>HAVING</code>, e os 3 lugares onde subqueries vivem (<code>WHERE</code>, <code>FROM</code>, <code>SELECT</code>).</p>
+            <div class="blk-head"><h3 class="blk-title">Bloco 4 · Agregação + subconsultas</h3><span class="blk-time">10:50 — 11:05 · 15 min</span></div>
+            <p><code>GROUP BY</code>, funções de agregação, pegadinha <code>WHERE</code> vs <code>HAVING</code>, e os 3 lugares onde subqueries vivem (<code>WHERE</code>, <code>FROM</code>, <code>SELECT</code>). <em>Apertado — priorizar agregação + HAVING; subqueries ficam para o material.</em></p>
           </div>
           <div class="day-block demo">
             <div class="blk-head"><h3 class="blk-title">Bloco 5 · EXPLAIN + sql.js no navegador</h3><span class="blk-time">11:05 — 11:15 · 10 min</span></div>
@@ -239,20 +240,22 @@
           <li>No fim, o professor identifica padrões repetidos e calibra o foco do Bloco 2.</li>
         </ul>
 
-        <h3>10:15 — 10:25 · Recap + anatomia</h3>
+        <h3>10:15 — 10:30 · Recap DER + conjuntos + anatomia</h3>
         <ul>
           <li>Slide 4 — recap DER: capataz, retiro, bovino, evento — quem aponta para quem.</li>
-          <li>Slide 5 — sintaxe <code>FROM a JOIN b ON b.fk = a.id</code> + as 5 perguntas mentais.</li>
+          <li><strong>Slide 5 · novo</strong> — recap das 4 operações de conjunto da aula do Ovidio (Mód. 1): União, Interseção, Diferença, Complemento — com mini-Venn diagrams e exemplos BrPec. <em>"Vocês já viram isso. Hoje, isso vira SQL."</em></li>
+          <li><strong>Slide 6 · novo</strong> — tabela explícita: cada operação de conjunto vira um JOIN específico. INNER ↔ Interseção, LEFT ↔ A completo, FULL ↔ União, EXCEPT/LEFT+IS NULL ↔ Diferença, NOT IN ↔ Complemento. <em>"JOIN não é sintaxe, é álgebra materializada."</em></li>
+          <li>Slide 7 — sintaxe <code>FROM a JOIN b ON b.fk = a.id</code> + as 5 perguntas mentais.</li>
           <li>O professor lê em voz alta: <em>"a tabela esquerda é a matriz da pergunta. A direita, o satélite. A escolha de a/b determina quem fica de fora em LEFT vs INNER."</em></li>
         </ul>
 
-        <h3>10:25 — 10:45 · Venn animado · 5 tipos</h3>
+        <h3>10:30 — 10:50 · Venn animado · 5 tipos</h3>
         <ul>
-          <li><strong>INNER</strong> (slide 6) — predição antes da execução: "quem vocês acham que vai sumir?". Revela: Vitor Gomes.</li>
-          <li><strong>LEFT</strong> (slide 7) — mesma query, mesma tabela esquerda, troca <code>INNER</code> por <code>LEFT</code>. Vitor aparece com 0 eventos. <strong>Discussão crítica:</strong> <code>COUNT(*)</code> vs <code>COUNT(e.id)</code>.</li>
-          <li><strong>RIGHT/FULL</strong> (slide 8) — passar rápido. Reforçar "convenção do time" (sempre LEFT).</li>
-          <li><strong>SELF</strong> (slide 9) — exemplo bezerro-mãe. Reforçar uso obrigatório de alias.</li>
-          <li><strong>N:N + junção</strong> (slide 10) — capataz_retiro com <code>GROUP_CONCAT</code>. Vitor aparece com NULL (não tem retiro vinculado).</li>
+          <li><strong>INNER</strong> (slide 8) — predição antes da execução: "quem vocês acham que vai sumir?". Revela: Vitor Gomes. <em>Amarrar com slide 5: "esse é o A ∩ B do Ovidio."</em></li>
+          <li><strong>LEFT</strong> (slide 9) — mesma query, mesma tabela esquerda, troca <code>INNER</code> por <code>LEFT</code>. Vitor aparece com 0 eventos. <strong>Discussão crítica:</strong> <code>COUNT(*)</code> vs <code>COUNT(e.id)</code>.</li>
+          <li><strong>RIGHT/FULL</strong> (slide 10) — passar rápido. Reforçar "convenção do time" (sempre LEFT). FULL = União dos conjuntos.</li>
+          <li><strong>SELF</strong> (slide 11) — exemplo bezerro-mãe. Reforçar uso obrigatório de alias.</li>
+          <li><strong>N:N + junção</strong> (slide 12) — capataz_retiro com <code>GROUP_CONCAT</code>. Vitor aparece com NULL (não tem retiro vinculado).</li>
         </ul>
 
         <h3>10:45 — 11:05 · Agregação + subqueries</h3>

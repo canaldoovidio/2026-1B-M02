@@ -1,6 +1,6 @@
 # Aula 4 — Perguntas socráticas (cola do professor)
 
-> **Slides 16, 17 e 18 da aula 4 · 3 perguntas · ~2 min cada**
+> **Slides 18, 19 e 20 da aula 4 · 3 perguntas · ~2 min cada**
 > Formato: pergunta projetada · alunos pensam 30 s · 2–3 voluntários respondem · você revela a resposta-âncora e amarra com o autoestudo.
 > **Não é prova.** É diagnóstico de leitura e amarração para a ponderada do final da aula.
 
