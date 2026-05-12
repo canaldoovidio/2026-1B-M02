@@ -1,769 +1,835 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📲</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aula 5 — Back-End I — TDD top-down — Inteli</title>
+  <title>Aula 5 — PWA + Sync Offline-First — BrPec — Inteli</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
   <link href="../../css/inteli-styles.css" rel="stylesheet">
   <style>
-    :root { --ac:#4b5563; --hi:#b2b6bf; --dk:#2e2640; --gr:#0d9488; --re:#dc2626; --am:#d97706; --bl:#1863dc; --ts:#3178c6; }
-    body { margin:0; padding:0; overflow:hidden; font-family:'Manrope',sans-serif; background:#f5f7fb; color:var(--dk); }
+    :root {
+      --ac:#4b5563; --hi:#b2b6bf; --dk:#0b1d3a; --gr:#0d9488; --re:#dc2626; --am:#d97706;
+      --bg:#f5f7fb; --teal:#0d9488; --teal-l:#5eead4; --indigo:#4338ca; --pri:#1d4ed8;
+    }
+    body { margin:0; padding:0; overflow:hidden; font-family:'Manrope',sans-serif; background:var(--bg); color:var(--dk); }
     .slide-container { width:100vw; height:100vh; position:relative; overflow:hidden; }
-    .slide { width:100%; height:100%; display:none; padding:44px 52px 88px; box-sizing:border-box; position:absolute; }
-    .slide.active { display:flex; flex-direction:column; justify-content:center; animation:slideIn 0.35s ease-in-out; }
+    .slide { width:100%; height:100%; display:none; padding:42px 56px 92px; box-sizing:border-box; position:absolute; }
+    .slide.active { display:flex; flex-direction:column; justify-content:center; animation:slideIn .35s ease-in-out; }
     @keyframes slideIn { from{opacity:0;transform:translateX(36px)} to{opacity:1;transform:translateX(0)} }
-    .sc { width:min(1140px,100%); margin:0 auto; font-size:1.05rem; line-height:1.55; }
+    .sc { width:min(1180px,100%); margin:0 auto; font-size:1.05rem; line-height:1.6; }
 
-    .sh { color:white; padding:16px 22px; border-radius:14px; margin-bottom:14px; }
-    .sh.blue  { background:linear-gradient(135deg,#374151,#b2b6bf); }
-    .sh.dark  { background:linear-gradient(135deg,var(--dk),#4a3d6b); }
-    .sh.green { background:linear-gradient(135deg,var(--gr),#10b981); }
-    .sh.red   { background:linear-gradient(135deg,#dc2626,#f87171); }
-    .sh.amber { background:linear-gradient(135deg,#d97706,#f59e0b); }
-    .sh.ts    { background:linear-gradient(135deg,#3178c6,#1e40af); }
-    .st { font-size:1.9rem; font-weight:800; margin:0 0 4px; line-height:1.15; }
-    .ss { font-size:0.95rem; opacity:.9; margin:0; }
+    .sh { color:white; padding:16px 24px; border-radius:14px; margin-bottom:18px; }
+    .sh.dark   { background:linear-gradient(135deg,var(--dk),#1e3a8a); }
+    .sh.teal   { background:linear-gradient(135deg,#065f46,var(--teal)); }
+    .sh.indigo { background:linear-gradient(135deg,#312e81,var(--indigo)); }
+    .sh.amber  { background:linear-gradient(135deg,#b45309,var(--am)); }
+    .sh.red    { background:linear-gradient(135deg,#7f1d1d,var(--re)); }
+    .st { font-size:1.85rem; font-weight:800; margin:0 0 4px; line-height:1.15; }
+    .ss { font-size:.96rem; opacity:.92; margin:0; }
 
-    .box { background:white; border:1px solid #dfe5ec; border-left:5px solid var(--hi); border-radius:12px; padding:14px 18px; box-shadow:0 4px 14px rgba(46,38,64,.06); }
-    .box h3 { font-size:1rem; font-weight:700; margin:0 0 6px; color:var(--dk); }
-    .box p  { margin:0 0 5px; font-size:.88rem; line-height:1.5; color:#374151; }
-    .box ul { margin:3px 0; padding-left:1.1rem; }
-    .box li { font-size:.87rem; margin-bottom:3px; line-height:1.4; color:#374151; }
-    .box.acc { border-left-color:var(--ac); }
-    .box.grn { border-left-color:var(--gr); }
+    .box { background:white; border:1px solid #dfe5ec; border-left:5px solid var(--hi); border-radius:12px; padding:16px 20px; box-shadow:0 4px 14px rgba(11,29,58,.06); }
+    .box h3 { font-size:1.05rem; font-weight:800; margin:0 0 8px; color:var(--dk); }
+    .box p  { margin:0 0 8px; font-size:.95rem; line-height:1.6; color:#374151; }
+    .box ul { margin:6px 0; padding-left:1.2rem; }
+    .box li { font-size:.93rem; margin-bottom:6px; line-height:1.55; color:#374151; }
+    .box.tea { border-left-color:var(--teal); }
+    .box.ind { border-left-color:var(--indigo); }
     .box.amr { border-left-color:var(--am); }
+    .box.dkb { border-left-color:var(--dk); }
     .box.red { border-left-color:var(--re); }
-    .box.blu { border-left-color:var(--bl); }
-    .box.ts  { border-left-color:var(--ts); }
-    code { background:#f1f5f9; color:var(--dk); padding:1px 6px; border-radius:5px; font-size:.86em; font-family:'Courier New',monospace; }
+    .box.grn { border-left-color:#22c55e; }
 
-    .g2 { display:grid; grid-template-columns:1fr 1fr; gap:12px; }
-    .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:10px; }
-    .g4 { display:grid; grid-template-columns:1fr 1fr 1fr 1fr; gap:10px; }
+    code, .mono { font-family:'JetBrains Mono',monospace; }
+    code { background:#f1f5f9; color:var(--dk); padding:1px 6px; border-radius:5px; font-size:.86em; }
+    blockquote { border-left:4px solid var(--am); background:#fffbeb; padding:10px 16px; margin:14px 0; border-radius:0 10px 10px 0; color:#78350f; font-size:.94rem; line-height:1.55; }
 
-    /* COVER */
-    .cover-bg { background:linear-gradient(135deg,#0b1d3a 0%,#3178c6 50%,#5fa9e8 100%) !important; }
-    .cv-badge { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); color:white; padding:5px 16px; border-radius:999px; font-size:.82rem; font-weight:600; display:inline-block; margin-bottom:18px; }
-    .cv-title { font-size:3rem; font-weight:800; color:white; line-height:1.15; margin:0 0 14px; }
-    .cv-sub   { font-size:1.1rem; color:rgba(255,255,255,.86); margin:0 0 28px; }
-    .cv-tags  { display:flex; flex-wrap:wrap; gap:8px; }
-    .cv-tag { background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.28); backdrop-filter:blur(8px); color:white; padding:7px 16px; border-radius:10px; font-weight:700; font-size:.84rem; opacity:0; transform:translateY(18px); transition:all .5s cubic-bezier(.34,1.3,.64,1); }
-    .cv-tag.vis { opacity:1; transform:translateY(0); }
+    .g2 { display:grid; grid-template-columns:1fr 1fr; gap:14px; }
+    .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
 
-    /* TERMINAL */
-    .term { background:#1e1e2e; border-radius:14px; overflow:hidden; box-shadow:0 8px 32px rgba(0,0,0,.3); display:flex; flex-direction:column; }
-    .term-bar { background:#313244; padding:7px 12px; display:flex; align-items:center; gap:6px; }
-    .dot { width:10px; height:10px; border-radius:50%; }
-    .dot.r{background:#f38ba8;} .dot.y{background:#f9e2af;} .dot.g{background:#a6e3a1;}
-    .term-ttl { color:#6c7086; font-size:.7rem; font-weight:600; margin-left:7px; font-family:monospace; }
-    .term-body { padding:12px 14px; font-family:'Courier New',monospace; font-size:.78rem; line-height:1.6; flex:1; overflow:hidden; }
-    .tl { white-space:pre; min-height:1.6em; opacity:0; transform:translateY(3px); transition:opacity .25s ease,transform .25s ease; }
-    .tl.vis { opacity:1; transform:translateY(0); }
-    .kw{color:#cba6f7;font-weight:700;} .typ{color:#89b4fa;font-weight:600;} .fn{color:#f9e2af;}
-    .str{color:#a6e3a1;} .num{color:#fab387;} .cmt{color:#6c7086;font-style:italic;}
-    .txt{color:#cdd6f4;} .red{color:#f38ba8;font-weight:700;} .grn{color:#a6e3a1;font-weight:700;}
+    /* Cover */
+    .cover-bg { background:linear-gradient(135deg,#0b1d3a 0%,#1e3a8a 55%,#0d9488 100%) !important; position:relative; overflow:hidden; }
+    .cover-bg::before { content:""; position:absolute; inset:0; background-image:radial-gradient(circle at 10% 80%, rgba(94,234,212,.15), transparent 35%), radial-gradient(circle at 90% 18%, rgba(255,255,255,.08), transparent 30%); pointer-events:none; }
+    .cv-badge { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); color:white; padding:5px 16px; border-radius:999px; font-size:.82rem; font-weight:600; display:inline-block; margin-bottom:14px; }
+    .cv-title { font-size:2.85rem; font-weight:800; color:white; line-height:1.12; margin:0 0 10px; }
+    .cv-sub   { font-size:1.06rem; color:rgba(255,255,255,.9); margin:0 0 18px; max-width:820px; }
+    .cv-tags  { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
+    .cv-tag   { background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.28); backdrop-filter:blur(8px); color:white; padding:6px 14px; border-radius:10px; font-weight:700; font-size:.82rem; }
+    .agenda-card { background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.22); border-radius:14px; padding:16px 20px; backdrop-filter:blur(10px); }
+    .agenda-card h4 { color:white; font-weight:800; font-size:.98rem; margin:0 0 10px; }
+    .agenda-grid { display:grid; grid-template-columns:repeat(4,1fr); gap:8px; }
+    .daily-tag { background:rgba(255,255,255,.16); border:1px solid rgba(255,255,255,.32); padding:8px 11px; border-radius:9px; font-weight:700; font-size:.74rem; color:white; line-height:1.3; }
+    .daily-tag .step { display:block; font-size:.62rem; opacity:.78; font-weight:600; margin-bottom:3px; letter-spacing:.06em; text-transform:uppercase; }
+    .daily-tag .when { display:block; font-size:.66rem; opacity:.7; font-weight:600; margin-top:4px; font-family:'JetBrains Mono',monospace; }
 
-    /* ROADMAP ITEMS */
-    .ri { display:flex; align-items:flex-start; gap:10px; padding:8px 12px; border-radius:10px; background:white; border:1px solid #e2e8f0; opacity:0; transform:translateX(-14px); transition:all .4s ease; margin-bottom:5px; }
-    .ri.vis { opacity:1; transform:translateX(0); }
-    .ri.cur { background:linear-gradient(135deg,rgba(49,120,198,.12),rgba(95,169,232,.12)); border-color:var(--ts); }
-    .rn { width:26px; height:26px; border-radius:50%; background:var(--dk); color:white; display:flex; align-items:center; justify-content:center; font-weight:800; font-size:.78rem; flex-shrink:0; margin-top:1px; }
-    .ri.cur .rn { background:linear-gradient(135deg,#3178c6,#1e40af); }
-    .rtl { font-size:.86rem; font-weight:700; color:var(--dk); margin-bottom:1px; }
-    .rds { font-size:.76rem; color:#64748b; }
+    .pill-row { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 12px; }
+    .pill { display:inline-block; padding:5px 12px; border-radius:999px; font-size:.78rem; font-weight:700; background:#eef2ff; color:#4338ca; border:1px solid #c7d2fe; }
 
-    /* CYCLE TDD */
-    .tdd-cycle { display:flex; align-items:stretch; justify-content:center; gap:18px; margin:14px 0; }
-    .tdd-step { flex:1; padding:14px 16px; border-radius:14px; color:white; text-align:center; opacity:0; transform:translateY(14px) scale(.92); transition:all .5s cubic-bezier(.34,1.3,.64,1); }
-    .tdd-step.vis { opacity:1; transform:translateY(0) scale(1); }
-    .tdd-step.red { background:linear-gradient(135deg,#dc2626,#f87171); }
-    .tdd-step.green { background:linear-gradient(135deg,#0d9488,#10b981); }
-    .tdd-step.refac { background:linear-gradient(135deg,#1863dc,#3b82f6); }
-    .tdd-emoji { font-size:1.8rem; }
-    .tdd-name { font-size:1rem; font-weight:800; margin-top:4px; }
-    .tdd-desc { font-size:.78rem; opacity:.92; margin-top:4px; line-height:1.4; }
+    pre.codeblock { background:#1e1e2e; color:#cdd6f4; padding:14px 16px; margin:8px 0; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:.78rem; line-height:1.65; overflow:auto; box-shadow:0 4px 14px rgba(0,0,0,.18); max-height:340px; }
+    .hl-kw  { color:#89b4fa; font-weight:600; }
+    .hl-str { color:#a6e3a1; }
+    .hl-num { color:#fab387; }
+    .hl-cmt { color:#6c7086; font-style:italic; }
+    .hl-fn  { color:#f9e2af; }
 
-    /* LAYERS (6 camadas MVC) */
-    .lstack { display:flex; flex-direction:column; gap:6px; margin:8px 0; }
-    .alayer { border-radius:10px; padding:10px 16px; display:flex; align-items:center; gap:14px; opacity:0; transform:translateX(-28px) scale(.95); transition:all .55s cubic-bezier(.34,1.3,.64,1); color:white; }
-    .alayer.vis { opacity:1; transform:translateX(0) scale(1); }
-    .li { font-size:1.4rem; flex-shrink:0; }
-    .ln { font-size:.92rem; font-weight:800; margin-bottom:1px; }
-    .lt { font-size:.74rem; opacity:.9; }
+    .rstbl { width:100%; border-collapse:separate; border-spacing:0; border-radius:12px; overflow:hidden; box-shadow:0 4px 14px rgba(11,29,58,.08); margin:8px 0; font-size:.86rem; background:white; }
+    .rstbl th { background:var(--dk); color:white; padding:9px 12px; text-align:left; font-size:.76rem; font-weight:700; text-transform:uppercase; letter-spacing:.04em; }
+    .rstbl td { padding:9px 12px; border-bottom:1px solid #e5e7eb; vertical-align:top; line-height:1.5; }
+    .rstbl tr:last-child td { border-bottom:none; }
 
-    /* FOOTER */
-    .slide-footer { position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.97); border-top:1px solid #dfe5ec; padding:10px 24px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 -2px 10px rgba(46,38,64,.06); z-index:100; gap:12px; }
+    .slide-footer { position:fixed; bottom:0; left:0; right:0; background:rgba(255,255,255,.97); border-top:1px solid #dfe5ec; padding:9px 22px; display:flex; justify-content:space-between; align-items:center; box-shadow:0 -2px 10px rgba(11,29,58,.06); z-index:100; gap:12px; }
     .footer-links { display:flex; gap:10px; }
-    .back-home { color:var(--dk); text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:5px; padding:8px 14px; border-radius:10px; background:#f1f4f8; font-size:.9rem; }
+    .back-home { color:var(--dk); text-decoration:none; font-weight:700; display:inline-flex; align-items:center; gap:5px; padding:7px 13px; border-radius:10px; background:#f1f4f8; font-size:.86rem; }
     .back-home:hover { background:#e2e8f0; }
-    .back-home.material { background: #2f8f78 !important; color: white !important; }
-    .back-home.material:hover { background:#267562 !important; color:white !important; }
+    .back-home.material { background:#2f8f78 !important; color:white !important; }
+    .back-home.pwa { background:var(--teal) !important; color:white !important; }
+    .back-home.pwa:hover { background:#14b8a6 !important; }
     .nav-wrapper { display:flex; align-items:center; gap:14px; background:#f1f4f8; padding:7px 18px; border-radius:30px; }
-    .nav-buttons button { background:var(--dk); color:white; border:none; padding:8px 16px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; }
+    .nav-buttons button { background:var(--dk); color:white; border:none; padding:7px 14px; border-radius:8px; font-weight:700; cursor:pointer; font-family:'Manrope',sans-serif; font-size:.86rem; }
     .nav-buttons button:disabled { background:#caced6; cursor:not-allowed; }
-    .slide-counter { font-weight:700; color:var(--dk); min-width:70px; text-align:center; }
-    .fullscreen-btn { background:#f1f4f8; border:none; font-size:1.1rem; cursor:pointer; padding:8px 12px; border-radius:8px; }
+    .slide-counter { font-weight:700; color:var(--dk); min-width:64px; text-align:center; font-size:.88rem; }
+    .fullscreen-btn { background:#f1f4f8; border:none; font-size:1.05rem; cursor:pointer; padding:7px 11px; border-radius:8px; }
 
-    /* Tree (folders) */
-    .tree { background:#1e1e2e; border-radius:12px; padding:14px 18px; font-family:'Courier New',monospace; font-size:.78rem; color:#cdd6f4; line-height:1.6; box-shadow:0 6px 20px rgba(0,0,0,.18); white-space:pre; }
-    .tree .dir { color:#89b4fa; font-weight:700; }
-    .tree .file { color:#cdd6f4; }
-    .tree .spec { color:#a6e3a1; font-weight:700; }
-    .tree .cm { color:#6c7086; font-style:italic; }
+    .timer-bar { background:linear-gradient(135deg,#0f172a,#1e293b); color:white; border-radius:14px; padding:16px 22px; display:flex; align-items:center; justify-content:space-between; margin:14px 0; box-shadow:0 6px 18px rgba(15,23,42,.25); }
+    .timer-display { font-family:'JetBrains Mono',monospace; font-size:2.4rem; font-weight:800; color:#86efac; transition:color .3s; min-width:160px; text-align:center; }
+    .timer-display.warn { color:#fde047; }
+    .timer-display.crit { color:#fca5a5; animation:blink 1s step-end infinite; }
+    @keyframes blink { 50% { opacity:0; } }
+    .timer-controls { display:flex; gap:8px; }
+    .timer-btn { background:rgba(255,255,255,.12); border:1px solid rgba(255,255,255,.25); color:white; padding:8px 16px; border-radius:8px; font-family:'Manrope',sans-serif; font-weight:700; font-size:.86rem; cursor:pointer; }
+    .timer-btn:hover { background:rgba(255,255,255,.22); }
+    .timer-btn.start { background:#22c55e; border-color:#22c55e; color:#052e16; }
+    .timer-btn.pause { background:#eab308; border-color:#eab308; color:#422006; }
+    .timer-btn.reset { background:rgba(239,68,68,.18); border-color:rgba(239,68,68,.4); }
+    .timer-label { font-size:.78rem; opacity:.7; letter-spacing:.06em; text-transform:uppercase; font-weight:700; margin-bottom:2px; }
+    .timer-hero { background:linear-gradient(135deg,#0f172a,#7c2d12); color:white; border-radius:16px; padding:24px 28px; text-align:center; box-shadow:0 12px 32px rgba(15,23,42,.35); }
+    .timer-hero .timer-label { font-size:.88rem; opacity:.85; }
+    .timer-hero .timer-display { font-size:4.2rem; min-width:auto; margin:8px 0 12px; color:#fbbf24; }
+    .timer-hero .timer-controls { justify-content:center; }
 
-    /* RM-ODP layers */
-    .odp-pipe { display:flex; flex-wrap:wrap; gap:8px; justify-content:center; margin:14px 0; align-items:center; }
-    .odp-card { padding:10px 16px; border-radius:10px; color:white; min-width:130px; text-align:center; opacity:0; transform:translateY(16px); transition:all .5s cubic-bezier(.34,1.3,.64,1); font-size:.78rem; }
-    .odp-card.vis { opacity:1; transform:translateY(0); }
-    .odp-arrow { color:#94a3b8; opacity:0; transition:opacity .3s; align-self:center; font-weight:800; }
-    .odp-arrow.vis { opacity:1; }
+    .quiz-stage { background:linear-gradient(135deg,#0f172a,#1e293b); color:white; border-radius:16px; padding:34px 38px; text-align:center; box-shadow:0 14px 40px rgba(15,23,42,.35); }
+    .quiz-num { display:inline-block; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); padding:4px 14px; border-radius:999px; font-size:.78rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin-bottom:14px; }
+    .quiz-q { font-size:1.55rem; font-weight:700; line-height:1.4; margin:0 0 18px; color:white; max-width:920px; margin-inline:auto; }
+    .quiz-tag { font-size:.82rem; color:#94a3b8; font-style:italic; margin:0 0 22px; }
+    .quiz-reveal { display:none; background:rgba(34,197,94,.12); border:1px solid rgba(34,197,94,.4); border-radius:12px; padding:18px 22px; margin-top:14px; text-align:left; }
+    .quiz-reveal.show { display:block; animation:slideIn .35s ease-out; }
+    .quiz-reveal h4 { color:#86efac; font-size:.9rem; font-weight:800; margin:0 0 8px; text-transform:uppercase; letter-spacing:.06em; }
+    .quiz-reveal p { color:#e2e8f0; font-size:.95rem; line-height:1.65; margin:0 0 8px; }
+    .quiz-reveal p:last-child { margin-bottom:0; }
+    .quiz-reveal strong { color:#fde047; }
+    .quiz-btn { background:#22c55e; color:#052e16; border:none; padding:10px 24px; border-radius:10px; font-family:'Manrope',sans-serif; font-weight:800; font-size:.92rem; cursor:pointer; box-shadow:0 4px 14px rgba(34,197,94,.3); }
+    .quiz-btn:hover { transform:translateY(-2px); }
+    .quiz-btn.hide { display:none; }
 
-    .daily-timer { font-size:3.5rem; font-weight:800; font-family:monospace; background:rgba(255,255,255,.15); border-radius:16px; padding:10px 28px; display:inline-block; margin-bottom:16px; letter-spacing:4px; color:white; }
-    .daily-tag { background:rgba(255,255,255,.18); border:1px solid rgba(255,255,255,.3); padding:6px 16px; border-radius:8px; font-weight:700; font-size:.85rem; color:white; opacity:0; transform:translateY(14px); transition:all .45s cubic-bezier(.34,1.3,.64,1); display:inline-block; margin:4px; }
-    .daily-tag.vis { opacity:1; transform:translateY(0); }
+    .pillars { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:14px 0; }
+    .pillar { background:white; border:1px solid #dfe5ec; border-radius:14px; padding:16px 18px; box-shadow:0 6px 18px rgba(11,29,58,.08); position:relative; overflow:hidden; }
+    .pillar::before { content:""; position:absolute; top:0; left:0; right:0; height:5px; }
+    .pillar.https::before { background:#22c55e; }
+    .pillar.manif::before { background:var(--indigo); }
+    .pillar.sw::before    { background:var(--teal); }
+    .pillar .ico { font-size:1.6rem; margin-bottom:4px; }
+    .pillar h3 { font-size:.96rem; font-weight:800; color:var(--dk); margin:6px 0 4px; }
+    .pillar h3 small { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--ac); }
+    .pillar p { font-size:.84rem; color:#374151; line-height:1.55; margin:0 0 4px; }
+    .pillar ul { padding-left:1rem; margin:6px 0 0; font-size:.8rem; color:#475569; }
 
-    /* Stage badge */
-    .stage { display:inline-block; font-family:monospace; font-size:.72rem; font-weight:800; padding:3px 10px; border-radius:6px; color:white; margin-right:8px; vertical-align:middle; }
-    .stage.red   { background:#dc2626; }
-    .stage.green { background:#0d9488; }
-    .stage.ref   { background:#1863dc; }
+    .sw-flow { display:flex; align-items:center; justify-content:space-between; gap:8px; background:white; border:1px solid #dfe5ec; border-radius:14px; padding:18px 20px; margin:12px 0; box-shadow:0 6px 18px rgba(11,29,58,.08); }
+    .sw-step { flex:1; text-align:center; }
+    .sw-step .sw-num { width:44px; height:44px; border-radius:50%; background:var(--teal); color:white; font-weight:800; font-size:1rem; display:flex; align-items:center; justify-content:center; margin:0 auto 6px; box-shadow:0 4px 14px rgba(13,148,136,.3); }
+    .sw-step h4 { font-size:.86rem; font-weight:800; color:var(--dk); margin:0 0 4px; font-family:'JetBrains Mono',monospace; letter-spacing:-.02em; }
+    .sw-step p  { font-size:.74rem; color:#475569; margin:0; line-height:1.45; }
+    .sw-arrow { font-size:1.4rem; color:var(--teal); }
 
-    .inline-pre { background:#1e1e2e; color:#cdd6f4; border-radius:8px; padding:10px 12px; font-family:'Courier New',monospace; font-size:.75rem; line-height:1.5; margin:0; white-space:pre; }
+    .strat-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:8px 0; }
+    .strat-col { background:white; border:1px solid #dfe5ec; border-radius:14px; padding:14px 18px; box-shadow:0 4px 14px rgba(11,29,58,.06); }
+    .strat-col.shell { border-left:5px solid var(--teal); }
+    .strat-col.sync  { border-left:5px solid var(--indigo); }
+    .strat-col h3 { margin:0 0 8px; }
+    .strat-col.shell h3 { color:var(--teal); }
+    .strat-col.sync  h3 { color:var(--indigo); }
+    .strat-col p { font-size:.88rem; }
+    .strat-col code { font-size:.78em; }
+
+    .arch { display:flex; align-items:center; justify-content:center; gap:18px; margin:14px 0; flex-wrap:wrap; }
+    .arch-node { background:white; border:2px solid var(--dk); border-radius:12px; padding:12px 18px; text-align:center; min-width:180px; box-shadow:0 4px 14px rgba(11,29,58,.1); }
+    .arch-node.client { border-color:var(--teal); }
+    .arch-node.server { border-color:var(--indigo); }
+    .arch-node h4 { margin:0 0 4px; font-size:.96rem; color:var(--dk); font-weight:800; }
+    .arch-node p  { font-size:.78rem; color:#475569; margin:0; font-family:'JetBrains Mono',monospace; }
+    .arch-arrow { font-size:1.6rem; color:var(--ac); display:flex; flex-direction:column; align-items:center; min-width:120px; }
+    .arch-arrow span { font-size:.7rem; color:var(--ac); margin-top:4px; font-family:'JetBrains Mono',monospace; }
+
+    .lab-card { background:white; border:1px solid #dfe5ec; border-left:5px solid var(--indigo); border-radius:12px; padding:14px 16px; }
+    .lab-card h4 { margin:0 0 4px; color:var(--indigo); font-size:.88rem; font-weight:800; }
+    .lab-card p  { margin:0; font-size:.84rem; color:#374151; line-height:1.55; }
+
+    .hint { background:#eef2ff; border:1px solid #c7d2fe; border-radius:10px; padding:10px 14px; color:#3730a3; font-size:.88rem; }
+    .hint strong { color:#1e1b4b; }
+
+    .recap-card { background:linear-gradient(135deg,#ecfeff,#cffafe); border:1px solid #67e8f9; border-radius:14px; padding:16px 20px; box-shadow:0 4px 14px rgba(8,145,178,.1); }
+    .recap-card h3 { color:#0e7490; margin:0 0 8px; font-size:1.05rem; font-weight:800; }
+    .recap-card p  { color:#155e75; font-size:.92rem; margin:0 0 4px; }
   </style>
 </head>
 <body>
 <div class="slide-container">
 
-  <!-- ====== SLIDE 1: COVER ====== -->
-  <div class="slide cover-bg">
-    <div class="sc">
-      <div class="cv-badge">Módulo 2 · Ciclo Comum · IN02 · Aula 5 de 11</div>
-      <div class="cv-title">Back-End I — TDD top-down</div>
-      <div class="cv-sub">Do controller à camada física — escrevemos os testes primeiro, do topo para a base, e implementamos o mínimo para passar.</div>
+  <!-- 01 — Cover -->
+  <div class="slide active cover-bg">
+    <div class="sc" style="color:white;">
+      <div class="cv-badge">Módulo 2 · Aula 5 · Back-End I · 14 / mai / 2026</div>
+      <h1 class="cv-title">PWA + Sync no celular do capataz</h1>
+      <p class="cv-sub">O sandbox da aula 4 ganha persistência, vira app instalável, e se reconcilia com um servidor Node quando o sinal volta. <em>Offline-first, da boleta ao SGBD.</em></p>
       <div class="cv-tags">
-        <div class="cv-tag" id="ct0">🔷 TypeScript</div>
-        <div class="cv-tag" id="ct1">🚂 Express</div>
-        <div class="cv-tag" id="ct2">🧪 Jest+supertest</div>
-        <div class="cv-tag" id="ct3">🔴🟢♻️ TDD</div>
-        <div class="cv-tag" id="ct4">🏗️ MVC 6 camadas</div>
+        <span class="cv-tag">manifest · service worker · cache</span>
+        <span class="cv-tag">sql.js + IndexedDB</span>
+        <span class="cv-tag">UUID v4 no cliente</span>
+        <span class="cv-tag">Node + Express + better-sqlite3</span>
+        <span class="cv-tag">INSERT OR IGNORE · idempotência</span>
       </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 2: DAILY ====== -->
-  <div class="slide cover-bg">
-    <div class="sc" style="text-align:center;">
-      <div style="background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:28px 32px;">
-        <div style="font-size:2rem;font-weight:800;color:white;margin-bottom:6px;">⏱️ Daily — 15 Minutos</div>
-        <div style="font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:18px;">O que você fez? O que vai fazer? Algum impedimento?</div>
-        <div class="daily-timer" id="daily-timer">15:00</div>
-        <div style="margin-bottom:18px;">
-          <button id="daily-start-btn" onclick="startDaily()" style="background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">▶ Iniciar</button>
-          <button onclick="resetDaily()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">↺ Reset</button>
-        </div>
-        <div>
-          <span class="daily-tag" id="dt0">✅ O que fiz</span>
-          <span class="daily-tag" id="dt1">🎯 O que vou fazer</span>
-          <span class="daily-tag" id="dt2">🚧 Impedimentos</span>
-          <span class="daily-tag" id="dt3">📦 Progresso do projeto</span>
+      <div class="agenda-card" style="margin-top:14px;">
+        <h4>Plano de voo · 2 h</h4>
+        <div class="agenda-grid">
+          <div class="daily-tag"><span class="step">Bloco 1</span>Daily · dado offline no campo<span class="when">15 min</span></div>
+          <div class="daily-tag"><span class="step">Bloco 2</span>PWA · 3 pilares<span class="when">15 min</span></div>
+          <div class="daily-tag"><span class="step">Bloco 3</span>Persistência + sync<span class="when">20 min</span></div>
+          <div class="daily-tag"><span class="step">Bloco 4</span>Servidor Node + spec<span class="when">15 min</span></div>
+          <div class="daily-tag" style="grid-column:span 2;"><span class="step">Bloco 5</span>Lab nos 5 grupos · instalar + registrar + sync<span class="when">20 min</span></div>
+          <div class="daily-tag" style="grid-column:span 2; background:rgba(252,165,165,.18); border-color:rgba(252,165,165,.35);"><span class="step">Bloco 6</span>Ponderada em sala · Lighthouse PWA ≥ 80<span class="when">30 min</span></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== SLIDE 2.5: AGENDA ====== -->
+  <!-- 02 — Recap aula 4 -->
   <div class="slide">
     <div class="sc">
-      <div class="sh dark"><div class="st">📋 Agenda da Aula 5</div><div class="ss">Estrutura e objetivos da aula de hoje</div></div>
-      <div class="g2" style="gap:12px;">
-        <div id="ag0" class="box" style="opacity:0;">
-          <h3>🕐 Bloco 1 — Autoestudo (revisão e dúvidas)</h3>
-          <p>Recap dos principais pontos do material lido — TS, Jest, supertest, TDD top-down.</p>
-        </div>
-        <div id="ag1" class="box" style="opacity:0;">
-          <h3>🕑 Bloco 2 — Instrução (Professor)</h3>
-          <p>Setup TS + Jest, RED → GREEN → REFACTOR aplicado a controller, service, repository e helpers.</p>
-        </div>
-        <div id="ag2" class="box" style="opacity:0;">
-          <h3>🕒 Bloco 3 — Almoço</h3>
-          <p>Pausa para descansar a cabeça e recarregar para o desenvolvimento da tarde.</p>
-        </div>
-        <div id="ag3" class="box acc" style="opacity:0;">
-          <h3>🎯 Bloco 4 — Desenvolvimento (Projeto)</h3>
-          <p>Aplicar o ciclo TDD na entidade do projeto até obter a casca verde do back-end.</p>
-        </div>
+      <div class="sh dark"><h2 class="st">De onde paramos · onde vamos</h2><p class="ss">A aula 4 deixou um sandbox SQLite no navegador. Funciona, mas tem 3 limitações concretas.</p></div>
+      <div class="recap-card" style="margin-bottom:14px;">
+        <h3>🐄 BrPec Sandbox · estado atual</h3>
+        <p>Em <code>module-2-common/assets/brpec/sandbox-sqljs.html</code>, o motor SQLite (sql.js / WebAssembly) carrega <code>brpec.db</code> e executa SELECTs no navegador, offline-friendly.</p>
       </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 3: ROADMAP ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh dark"><div class="st">🗺️ Roadmap do Módulo 2 — onde estamos</div><div class="ss">Saímos do banco e entramos no back-end. Hoje a casca; nas próximas, o miolo.</div></div>
-      <div class="g2">
-        <div>
-          <div class="ri" id="rm0"><div class="rn">1</div><div><div class="rtl">Dev Web — Frontend Básico</div><div class="rds">HTML, CSS, primeiras telas</div></div></div>
-          <div class="ri" id="rm1"><div class="rn">2</div><div><div class="rtl">Banco de Dados I</div><div class="rds">Relacional, normalização, DDL</div></div></div>
-          <div class="ri" id="rm2"><div class="rn">3</div><div><div class="rtl">Banco de Dados II</div><div class="rds">CRUD, transações</div></div></div>
-          <div class="ri" id="rm3"><div class="rn">4</div><div><div class="rtl">Banco de Dados III</div><div class="rds">JOINs, agregações, EXPLAIN</div></div></div>
-        </div>
-        <div>
-          <div class="ri cur" id="rm4"><div class="rn">5</div><div><div class="rtl">Back-End I — TDD top-down ◀ você está aqui</div><div class="rds">TS + Jest + supertest, controller → service → repository → helpers</div></div></div>
-          <div class="ri" id="rm5"><div class="rn">6</div><div><div class="rtl">Back-End II</div><div class="rds">CRUD HTTP completo, validações, erros</div></div></div>
-          <div class="ri" id="rm6"><div class="rn">7</div><div><div class="rtl">Front + Back I (SSR EJS)</div><div class="rds">Renderização no servidor</div></div></div>
-          <div class="ri" id="rm7"><div class="rn">8–11</div><div><div class="rtl">Integrações, deploy, encerramento</div><div class="rds">CI, métricas, qualidade</div></div></div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 4: POR QUE TS E TDD TOP-DOWN? ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh ts"><div class="st">Por que sair do SQL puro? Por que TDD top-down?</div><div class="ss">Da query para o servidor — com testes guiando cada linha de código</div></div>
-      <div class="g2">
-        <div class="box ts">
-          <h3>🔷 Por que TypeScript no back-end?</h3>
-          <ul>
-            <li><strong>Tipagem estática</strong> — erros pegos antes de rodar.</li>
-            <li><strong>Modelos como contratos</strong> — <code>interface User</code> é a verdade compartilhada entre camadas.</li>
-            <li><strong>Refactor seguro</strong> — renomear um campo quebra a compilação onde estiver errado.</li>
-            <li><strong>DX</strong> — autocomplete preciso, sem adivinhação.</li>
-          </ul>
+      <div class="g3">
+        <div class="box red">
+          <h3>① Não persiste mudanças</h3>
+          <p>INSERT no sandbox funciona — até o reload. O motor mora em memória. Recarregou, voltou ao estado inicial.</p>
         </div>
         <div class="box red">
-          <h3>🔴 Por que TDD top-down?</h3>
+          <h3>② Não é instalável</h3>
+          <p>É uma aba do navegador. O capataz não vê "BrPec" entre os apps do celular. Sem ícone, sem splash, sem janela própria.</p>
+        </div>
+        <div class="box red">
+          <h3>③ Não fala com servidor</h3>
+          <p>Cada celular tem seu banco. O coordenador não tem uma visão consolidada. Sem caminho de volta para o SGBD da fazenda.</p>
+        </div>
+      </div>
+      <blockquote><strong>Hoje:</strong> resolvemos os três. <code>IndexedDB</code> persiste o banco · <code>manifest</code> + <code>service worker</code> tornam instalável · <code>POST /sync/deltas</code> reconcilia com Node + SQLite no servidor.</blockquote>
+    </div>
+  </div>
+
+  <!-- 03 — Daily -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><h2 class="st">Daily · dado offline no campo</h2><p class="ss">15 minutos · cada aluno 1 minuto · partir do retiro real</p></div>
+      <div class="g2">
+        <div class="box dkb">
+          <h3>A pergunta</h3>
+          <p style="font-size:1.05rem;"><em>"Que dado seu app precisaria no celular do capataz <strong>quando ele não tem internet</strong>?"</em></p>
+          <p>Responda na lógica:</p>
+          <ol>
+            <li>Qual entidade do BrPec ele precisa <em>ler</em>?</li>
+            <li>Qual ele precisa <em>escrever</em>?</li>
+            <li>Quando o sinal voltar, o que precisa subir pro servidor?</li>
+          </ol>
+        </div>
+        <div class="box amr">
+          <h3>Banco de respostas (se faltar inspiração)</h3>
           <ul>
-            <li>Começamos pelo <strong>uso real</strong> (HTTP) e descemos até a base.</li>
-            <li>Cada teste falhando é uma <strong>especificação executável</strong>.</li>
-            <li>Implementamos o <strong>mínimo</strong> para passar — sem invenção.</li>
-            <li>Feedback de segundos com o ciclo <strong>RED → GREEN → REFACTOR</strong>.</li>
+            <li>"Lista de bovinos do meu retiro" — leitura</li>
+            <li>"Pesagem do dia" — escrita pesada</li>
+            <li>"Vacinas pendentes na minha equipe" — leitura derivada</li>
+            <li>"Boleta de movimentação de bovinos" — escrita</li>
+            <li>"Última mudança de retiro do BR0014" — leitura histórica</li>
           </ul>
+          <p class="hint" style="margin-top:8px;"><strong>Padrão a procurar:</strong> a maioria das respostas é <em>ler antigo</em> + <em>escrever novo</em>. Esse é exatamente o shape que a PWA otimiza.</p>
         </div>
       </div>
-      <div class="box acc" style="margin-top:10px;">
-        <h3>🎯 A meta de hoje</h3>
-        <p>Sair do dia com um servidor Express em TypeScript respondendo <code>GET /users/:id</code>, com testes verdes em <strong>todas as camadas</strong> — controller, service, repository, helper.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 5: SETUP DO PROJETO TS ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh blue"><div class="st">⚙️ Setup do projeto TypeScript</div><div class="ss">npm init, deps, tsconfig, scripts — tudo declarativo</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:340px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">terminal — bootstrap</div></div>
-          <div class="term-body">
-            <div class="tl" id="su0"></div><div class="tl" id="su1"></div><div class="tl" id="su2"></div>
-            <div class="tl" id="su3"></div><div class="tl" id="su4"></div><div class="tl" id="su5"></div>
-            <div class="tl" id="su6"></div><div class="tl" id="su7"></div><div class="tl" id="su8"></div>
-            <div class="tl" id="su9"></div><div class="tl" id="su10"></div>
-          </div>
-        </div>
+      <div class="timer-bar">
         <div>
-          <div class="box ts" style="margin-bottom:8px;">
-            <h3>📦 Dependências</h3>
-            <p><strong>Runtime:</strong> <code>express</code>, <code>pg</code>, <code>dotenv</code>.</p>
-            <p><strong>Dev:</strong> <code>typescript</code>, <code>tsx</code>, <code>@types/*</code>, <code>jest</code>, <code>ts-jest</code>, <code>supertest</code>.</p>
-          </div>
-          <div class="box acc">
-            <h3>🧾 Scripts npm</h3>
-            <ul>
-              <li><code>dev</code> — <code>tsx watch src/server.ts</code></li>
-              <li><code>build</code> — <code>tsc</code></li>
-              <li><code>start</code> — <code>node dist/server.js</code></li>
-              <li><code>test</code> — <code>jest</code></li>
-              <li><code>test:watch</code> — <code>jest --watch</code></li>
-            </ul>
-          </div>
+          <div class="timer-label">Cronômetro · Daily</div>
+          <div class="timer-display" id="t-daily-disp">15:00</div>
+        </div>
+        <div class="timer-controls">
+          <button class="timer-btn start" onclick="Timer.start('daily')">▶ Iniciar</button>
+          <button class="timer-btn pause" onclick="Timer.pause('daily')">⏸ Pausar</button>
+          <button class="timer-btn reset" onclick="Timer.reset('daily')">↺ Reset</button>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- ====== SLIDE 6: SETUP JEST + SUPERTEST ====== -->
+  <!-- 04 — O que é PWA -->
   <div class="slide">
     <div class="sc">
-      <div class="sh ts"><div class="st">🧪 Setup Jest + ts-jest + supertest</div><div class="ss">Roda <code style="background:rgba(255,255,255,.18);color:white;">.ts</code> direto, sem build prévio</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:340px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">jest.config.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="je0"></div><div class="tl" id="je1"></div><div class="tl" id="je2"></div>
-            <div class="tl" id="je3"></div><div class="tl" id="je4"></div><div class="tl" id="je5"></div>
-            <div class="tl" id="je6"></div><div class="tl" id="je7"></div><div class="tl" id="je8"></div>
-            <div class="tl" id="je9"></div>
-          </div>
+      <div class="sh teal"><h2 class="st">PWA · três pilares</h2><p class="ss">Uma página web que ganha 3 superpoderes — e vira "quase nativo".</p></div>
+      <div class="pillars">
+        <div class="pillar https">
+          <div class="ico">🔒</div>
+          <h3>HTTPS <small>(ou localhost)</small></h3>
+          <p>Sem HTTPS, navegador bloqueia SW e <code>crypto.subtle</code>. Em produção é obrigatório — GitHub Pages serve via HTTPS, ok.</p>
+          <ul><li>Em dev: <code>localhost</code> é exceção válida.</li></ul>
         </div>
+        <div class="pillar manif">
+          <div class="ico">📄</div>
+          <h3>Manifest <small>(.webmanifest)</small></h3>
+          <p>JSON que descreve o app: nome, ícones, cor de tema, modo de exibição. É o que aparece quando o navegador oferece "Instalar".</p>
+          <ul><li><code>display: standalone</code> esconde a barra do browser.</li></ul>
+        </div>
+        <div class="pillar sw">
+          <div class="ico">⚙️</div>
+          <h3>Service Worker</h3>
+          <p>Script que vive <em>fora</em> da página. Intercepta requisições, cacheia, responde offline. É o coração do offline-first.</p>
+          <ul><li>Roda em thread própria — não bloqueia a UI.</li></ul>
+        </div>
+      </div>
+      <p class="hint"><strong>Lighthouse PWA score</strong> (que vamos avaliar na ponderada) é basicamente: você tem os 3 pilares funcionando + alguns detalhes (ícone 192x192, start_url cacheável, etc).</p>
+    </div>
+  </div>
+
+  <!-- 05 — Manifest -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh indigo"><h2 class="st">Manifest · o cartão de visita do app</h2><p class="ss">Arquivo JSON declarativo. Sem regra de negócio, só metadados.</p></div>
+      <div class="g2">
         <div>
-          <div class="box grn" style="margin-bottom:8px;">
-            <h3>✅ O que esse setup garante</h3>
-            <ul>
-              <li><code>preset: 'ts-jest'</code> — compila TS em memória.</li>
-              <li><code>testEnvironment: 'node'</code> — sem JSDOM.</li>
-              <li><code>testMatch</code> aponta para <code>*.spec.ts</code> ao lado de cada arquivo.</li>
-              <li><code>supertest</code> dispara HTTP no app sem subir porta.</li>
-            </ul>
-          </div>
-          <div class="box amr">
-            <h3>🤔 AAA — Arrange / Act / Assert</h3>
-            <p>Todo teste tem três blocos: <strong>preparar</strong> entrada, <strong>executar</strong> a ação, <strong>verificar</strong> o resultado. Esse padrão deixa o teste lido como uma especificação.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 7: SPEC CONTROLLER (RED) ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh red"><div class="st"><span class="stage red">RED · 1</span>Spec do Controller via supertest</div><div class="ss">Começamos pelo topo: o uso real via HTTP</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:360px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/controllers/userController.spec.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="cs0"></div><div class="tl" id="cs1"></div><div class="tl" id="cs2"></div>
-            <div class="tl" id="cs3"></div><div class="tl" id="cs4"></div><div class="tl" id="cs5"></div>
-            <div class="tl" id="cs6"></div><div class="tl" id="cs7"></div><div class="tl" id="cs8"></div>
-            <div class="tl" id="cs9"></div><div class="tl" id="cs10"></div><div class="tl" id="cs11"></div>
-            <div class="tl" id="cs12"></div><div class="tl" id="cs13"></div>
-          </div>
-        </div>
-        <div>
-          <div class="box red" style="margin-bottom:8px;">
-            <h3>🔴 Resultado esperado</h3>
-            <p>Falha. Não existe <code>app</code> ainda, nem rota, nem controller. <strong>Isso é certo.</strong></p>
-          </div>
-          <div class="box acc">
-            <h3>🧠 Por que começar por aqui?</h3>
-            <p>Esse spec descreve como o sistema é <em>realmente usado</em>: uma chamada HTTP. Quando ele passar, sabemos que o caminho controller → service → repository está fechado.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 8: SPEC SERVICE (RED) ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh red"><div class="st"><span class="stage red">RED · 2</span>Spec do Service mockando o Repository</div><div class="ss">Isolamos a regra de negócio — sem tocar no banco</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:360px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/services/userService.spec.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="ss0"></div><div class="tl" id="ss1"></div><div class="tl" id="ss2"></div>
-            <div class="tl" id="ss3"></div><div class="tl" id="ss4"></div><div class="tl" id="ss5"></div>
-            <div class="tl" id="ss6"></div><div class="tl" id="ss7"></div><div class="tl" id="ss8"></div>
-            <div class="tl" id="ss9"></div><div class="tl" id="ss10"></div><div class="tl" id="ss11"></div>
-            <div class="tl" id="ss12"></div>
-          </div>
-        </div>
-        <div>
-          <div class="box amr" style="margin-bottom:8px;">
-            <h3>🎭 Test doubles</h3>
-            <ul>
-              <li><strong>mock</strong> — função fake controlada por nós.</li>
-              <li><code>jest.fn()</code> — cria a função.</li>
-              <li><code>mockResolvedValue()</code> — define o que a Promise resolve.</li>
-            </ul>
-          </div>
-          <div class="box red">
-            <h3>🔴 O que cobrimos aqui</h3>
-            <ul>
-              <li>Caminho feliz: repo retorna user → service devolve.</li>
-              <li>Caminho infeliz: repo retorna <code>null</code> → service lança <code>NotFoundError</code>.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 9: SPEC REPOSITORY (RED) ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh red"><div class="st"><span class="stage red">RED · 3</span>Spec do Repository — SQL parametrizado</div><div class="ss">Aqui o teste mostra que a query é <strong>parametrizada</strong> e atinge o pool</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:340px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/repositories/userRepository.spec.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="rs0"></div><div class="tl" id="rs1"></div><div class="tl" id="rs2"></div>
-            <div class="tl" id="rs3"></div><div class="tl" id="rs4"></div><div class="tl" id="rs5"></div>
-            <div class="tl" id="rs6"></div><div class="tl" id="rs7"></div><div class="tl" id="rs8"></div>
-            <div class="tl" id="rs9"></div><div class="tl" id="rs10"></div>
-          </div>
-        </div>
-        <div>
-          <div class="box amr" style="margin-bottom:8px;">
-            <h3>💾 Banco efêmero — uma nota</h3>
-            <p>Aqui mockamos o <code>pool.query</code>. Quando precisarmos de um banco real (próximas aulas), usaremos um <strong>banco efêmero</strong> — Postgres em container, criado e derrubado a cada suíte.</p>
-          </div>
-          <div class="box red">
-            <h3>🔴 O que provamos</h3>
-            <ul>
-              <li>Que a query usa placeholder <code>$1</code> (anti-injeção).</li>
-              <li>Que o pool é chamado com o <code>id</code> recebido.</li>
-              <li>Que retornamos <code>null</code> quando não há linhas.</li>
-            </ul>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 10: SPEC HELPER (RED) ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh red"><div class="st"><span class="stage red">RED · 4</span>Spec do Helper puro — <code style="background:rgba(255,255,255,.18);color:white;">isValidEmail</code></div><div class="ss">Função pura: entrada → saída, sem efeitos colaterais</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:300px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/helpers/email.spec.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="hs0"></div><div class="tl" id="hs1"></div><div class="tl" id="hs2"></div>
-            <div class="tl" id="hs3"></div><div class="tl" id="hs4"></div><div class="tl" id="hs5"></div>
-            <div class="tl" id="hs6"></div><div class="tl" id="hs7"></div><div class="tl" id="hs8"></div>
-          </div>
-        </div>
-        <div>
-          <div class="box grn" style="margin-bottom:8px;">
-            <h3>🎯 Matchers comuns</h3>
-            <ul>
-              <li><code>toBe</code> — igualdade estrita (<code>===</code>).</li>
-              <li><code>toEqual</code> — igualdade profunda de objetos/arrays.</li>
-              <li><code>toMatchObject</code> — subset de propriedades.</li>
-              <li><code>rejects.toThrow</code> — Promise rejeitada.</li>
-            </ul>
-          </div>
-          <div class="box acc">
-            <h3>♻️ Função pura</h3>
-            <p>Helpers puros são o caso mais simples de testar — <strong>comece por eles para aquecer</strong> e termine por eles para refatorar com segurança.</p>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 11: ESTRUTURA DE PASTAS ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh dark"><div class="st">📁 Estrutura — <code style="background:rgba(255,255,255,.18);color:white;">.spec.ts</code> ao lado de cada arquivo</div><div class="ss">MVC com 6 camadas — cada camada com seu teste vizinho</div></div>
-      <div class="g2" style="gap:14px;align-items:start;">
-        <div class="tree"><span class="dir">src/</span>
-├── <span class="dir">controllers/</span>
-│   ├── <span class="file">userController.ts</span>
-│   └── <span class="spec">userController.spec.ts</span>
-├── <span class="dir">routes/</span>
-│   └── <span class="file">userRoutes.ts</span>
-├── <span class="dir">services/</span>
-│   ├── <span class="file">userService.ts</span>
-│   └── <span class="spec">userService.spec.ts</span>
-├── <span class="dir">repositories/</span>
-│   ├── <span class="file">userRepository.ts</span>
-│   └── <span class="spec">userRepository.spec.ts</span>
-├── <span class="dir">models/</span>
-│   └── <span class="file">user.ts</span>          <span class="cm">// interface User</span>
-├── <span class="dir">helpers/</span>
-│   ├── <span class="file">email.ts</span>
-│   └── <span class="spec">email.spec.ts</span>
-├── <span class="dir">middlewares/</span>
-│   └── <span class="file">errorHandler.ts</span>
-├── <span class="dir">errors/</span>
-│   └── <span class="file">AppError.ts</span>
-├── <span class="dir">db/</span>
-│   └── <span class="file">pool.ts</span>
-├── <span class="file">app.ts</span>
-└── <span class="file">server.ts</span></div>
-        <div>
-          <div class="box ts" style="margin-bottom:8px;">
-            <h3>🏗️ As 6 camadas</h3>
-            <div class="lstack">
-              <div class="alayer" id="ly0" style="background:linear-gradient(135deg,#1e40af,#3b82f6);"><span class="li">🛣️</span><div><div class="ln">routes</div><div class="lt">URL → controller</div></div></div>
-              <div class="alayer" id="ly1" style="background:linear-gradient(135deg,#0284c7,#38bdf8);"><span class="li">🎮</span><div><div class="ln">controllers</div><div class="lt">HTTP in/out, sem regra</div></div></div>
-              <div class="alayer" id="ly2" style="background:linear-gradient(135deg,#0d9488,#10b981);"><span class="li">🧠</span><div><div class="ln">services</div><div class="lt">regras de negócio</div></div></div>
-              <div class="alayer" id="ly3" style="background:linear-gradient(135deg,#d97706,#f59e0b);"><span class="li">🗄️</span><div><div class="ln">repositories</div><div class="lt">SQL e pool</div></div></div>
-              <div class="alayer" id="ly4" style="background:linear-gradient(135deg,#7c3aed,#a855f7);"><span class="li">📐</span><div><div class="ln">models</div><div class="lt">interfaces (contratos)</div></div></div>
-              <div class="alayer" id="ly5" style="background:linear-gradient(135deg,#475569,#64748b);"><span class="li">🛠️</span><div><div class="ln">helpers</div><div class="lt">funções puras</div></div></div>
-            </div>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 12: GREEN — CONTROLLER E ROTAS ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh green"><div class="st"><span class="stage green">GREEN · 1</span>Controller e Rotas — sempre primeiro</div><div class="ss">É a casca: amarra HTTP ao service. Mínimo possível para o teste passar.</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:280px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/controllers/userController.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="gc0"></div><div class="tl" id="gc1"></div><div class="tl" id="gc2"></div>
-            <div class="tl" id="gc3"></div><div class="tl" id="gc4"></div><div class="tl" id="gc5"></div>
-            <div class="tl" id="gc6"></div><div class="tl" id="gc7"></div><div class="tl" id="gc8"></div>
-            <div class="tl" id="gc9"></div>
-          </div>
-        </div>
-        <div class="term" style="height:280px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/routes/userRoutes.ts + app.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="gr0"></div><div class="tl" id="gr1"></div><div class="tl" id="gr2"></div>
-            <div class="tl" id="gr3"></div><div class="tl" id="gr4"></div><div class="tl" id="gr5"></div>
-            <div class="tl" id="gr6"></div><div class="tl" id="gr7"></div><div class="tl" id="gr8"></div>
-            <div class="tl" id="gr9"></div><div class="tl" id="gr10"></div>
-          </div>
-        </div>
-      </div>
-      <div class="box grn" style="margin-top:10px;">
-        <h3>🟢 Casca montada</h3>
-        <p>O teste do controller ainda falha (falta o service), mas a estrutura está pronta. Agora descemos uma camada.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 13: GREEN — SERVICE ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh green"><div class="st"><span class="stage green">GREEN · 2</span>Service — a regra de negócio</div><div class="ss">Pega no repository, decide o que fazer com a resposta</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:340px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/services/userService.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="gs0"></div><div class="tl" id="gs1"></div><div class="tl" id="gs2"></div>
-            <div class="tl" id="gs3"></div><div class="tl" id="gs4"></div><div class="tl" id="gs5"></div>
-            <div class="tl" id="gs6"></div><div class="tl" id="gs7"></div><div class="tl" id="gs8"></div>
-            <div class="tl" id="gs9"></div><div class="tl" id="gs10"></div>
-          </div>
-        </div>
-        <div>
-          <div class="box ts" style="margin-bottom:8px;">
-            <h3>📐 Model — <code>interface User</code></h3>
-            <pre class="inline-pre"><span style="color:#cba6f7;">export interface</span> <span style="color:#89b4fa;">User</span> {
-  id: <span style="color:#89b4fa;">number</span>;
-  name: <span style="color:#89b4fa;">string</span>;
-  email: <span style="color:#89b4fa;">string</span>;
+<pre class="codeblock"><span class="hl-cmt">// manifest.webmanifest</span>
+{
+  <span class="hl-str">"name"</span>:        <span class="hl-str">"BrPec — Coletor de Eventos Zootécnicos"</span>,
+  <span class="hl-str">"short_name"</span>:  <span class="hl-str">"BrPec"</span>,
+  <span class="hl-str">"start_url"</span>:   <span class="hl-str">"./index.html"</span>,
+  <span class="hl-str">"display"</span>:     <span class="hl-str">"standalone"</span>,
+  <span class="hl-str">"orientation"</span>: <span class="hl-str">"portrait"</span>,
+  <span class="hl-str">"background_color"</span>: <span class="hl-str">"#0f172a"</span>,
+  <span class="hl-str">"theme_color"</span>:      <span class="hl-str">"#0d9488"</span>,
+  <span class="hl-str">"lang"</span>: <span class="hl-str">"pt-BR"</span>,
+  <span class="hl-str">"icons"</span>: [
+    {
+      <span class="hl-str">"src"</span>: <span class="hl-str">"./icon.svg"</span>,
+      <span class="hl-str">"sizes"</span>: <span class="hl-str">"any"</span>,
+      <span class="hl-str">"type"</span>: <span class="hl-str">"image/svg+xml"</span>,
+      <span class="hl-str">"purpose"</span>: <span class="hl-str">"any maskable"</span>
+    }
+  ]
 }</pre>
-          </div>
-          <div class="box grn">
-            <h3>🟢 Resultado</h3>
-            <p>Os dois testes do service passam. O do controller ainda depende do repository — vamos lá.</p>
-          </div>
         </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 14: GREEN — REPOSITORY + POOL ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh green"><div class="st"><span class="stage green">GREEN · 3</span>Repository + Pool — SQL parametrizado</div><div class="ss"><code style="background:rgba(255,255,255,.18);color:white;">$1</code> sempre · <strong>nunca</strong> concatenar string com input do usuário</div></div>
-      <div class="g2" style="gap:12px;align-items:start;">
-        <div class="term" style="height:300px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/repositories/userRepository.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="gp0"></div><div class="tl" id="gp1"></div><div class="tl" id="gp2"></div>
-            <div class="tl" id="gp3"></div><div class="tl" id="gp4"></div><div class="tl" id="gp5"></div>
-            <div class="tl" id="gp6"></div><div class="tl" id="gp7"></div><div class="tl" id="gp8"></div>
-          </div>
-        </div>
-        <div class="term" style="height:300px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/db/pool.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="gd0"></div><div class="tl" id="gd1"></div><div class="tl" id="gd2"></div>
-            <div class="tl" id="gd3"></div><div class="tl" id="gd4"></div><div class="tl" id="gd5"></div>
-            <div class="tl" id="gd6"></div><div class="tl" id="gd7"></div>
-          </div>
-        </div>
-      </div>
-      <div class="box red" style="margin-top:10px;">
-        <h3>⚠️ Anti-injeção</h3>
-        <p>Nunca: <code>"SELECT * FROM users WHERE id = " + req.params.id</code>. Sempre: <code>pool.query("... WHERE id = $1", [id])</code>. O driver do <code>pg</code> escapa o valor automaticamente.</p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 15: GREEN — HELPERS + ERRORS ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh green"><div class="st"><span class="stage green">GREEN · 4</span>Helpers + Errors + Middleware</div><div class="ss">Erros de domínio com classe própria — middleware traduz para HTTP</div></div>
-      <div class="g3" style="gap:10px;align-items:start;">
-        <div class="term" style="height:300px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/errors/AppError.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="ge0"></div><div class="tl" id="ge1"></div><div class="tl" id="ge2"></div>
-            <div class="tl" id="ge3"></div><div class="tl" id="ge4"></div><div class="tl" id="ge5"></div>
-            <div class="tl" id="ge6"></div><div class="tl" id="ge7"></div><div class="tl" id="ge8"></div>
-          </div>
-        </div>
-        <div class="term" style="height:300px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/middlewares/errorHandler.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="gm0"></div><div class="tl" id="gm1"></div><div class="tl" id="gm2"></div>
-            <div class="tl" id="gm3"></div><div class="tl" id="gm4"></div><div class="tl" id="gm5"></div>
-            <div class="tl" id="gm6"></div><div class="tl" id="gm7"></div>
-          </div>
-        </div>
-        <div class="term" style="height:300px;">
-          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">src/helpers/email.ts</div></div>
-          <div class="term-body">
-            <div class="tl" id="gh0"></div><div class="tl" id="gh1"></div><div class="tl" id="gh2"></div>
-            <div class="tl" id="gh3"></div><div class="tl" id="gh4"></div><div class="tl" id="gh5"></div>
-          </div>
-        </div>
-      </div>
-      <div class="box grn" style="margin-top:10px;">
-        <h3>✅ Tudo verde</h3>
-        <p>Os 4 specs passam. <code>npm test</code> retorna verde. <strong>Agora podemos refatorar.</strong></p>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 15.5: RM-ODP — AS 5 VISÕES ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh blue"><div class="st">RM-ODP — As 5 Visões do Sistema</div><div class="ss">ISO/IEC 10746 · As 5 visões aplicadas ao MVC do back-end tipado</div></div>
-      <div class="pipe" style="flex-wrap:wrap;gap:8px;justify-content:center;margin:16px 0;">
-        <div class="alayer" id="rmo0" style="background:linear-gradient(135deg,#2e2640,#4b5563);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>🏢 Enterprise</strong><br><small>Propósito, regras de negócio</small></div>
-        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="rma0">→</div>
-        <div class="alayer" id="rmo1" style="background:linear-gradient(135deg,#0d9488,#10b981);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>📋 Information</strong><br><small>Tipos, interfaces, modelos</small></div>
-        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="rma1">→</div>
-        <div class="alayer" id="rmo2" style="background:linear-gradient(135deg,#1863dc,#3b82f6);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>⚙️ Computational</strong><br><small>Controller, service, repo</small></div>
-        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="rma2">→</div>
-        <div class="alayer" id="rmo3" style="background:linear-gradient(135deg,#d97706,#f59e0b);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>🔧 Engineering</strong><br><small>Pool, middleware, jest</small></div>
-        <div style="align-self:center;opacity:0;transition:opacity .3s;" id="rma3">→</div>
-        <div class="alayer" id="rmo4" style="background:linear-gradient(135deg,#dc2626,#ef4444);color:white;padding:10px 16px;border-radius:10px;opacity:0;transform:translateY(16px);transition:all .5s cubic-bezier(.34,1.3,.64,1);min-width:140px;text-align:center;"><strong>💻 Technology</strong><br><small>Node, TS, pg, supertest</small></div>
-      </div>
-      <div class="box acc" style="margin-top:8px;"><p><strong>Esta aula:</strong> Visão <strong>Computational</strong> — desenhamos a casca do back-end (controller → service → repository) com TDD top-down.</p></div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 15.6: RF + RNF + Artefato ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh green"><div class="st">Esta Aula: Computational</div><div class="ss">RM-ODP · RF, RNF e Artefato — 8 Eixos no back tipado</div></div>
-      <div class="g2" style="gap:12px;">
-        <div>
-          <div class="box grn" style="margin-bottom:10px;"><h3>📌 Requisito Funcional</h3><p>Expor a casca dos endpoints do recurso central do projeto (controller → service → repository) verificada por testes automatizados.</p></div>
-          <div class="box" style="border-left-color:var(--am);"><h3>📦 Artefato</h3><ul>
-            <li id="art0" style="opacity:0;transition:all .4s ease;">🧪 <strong>Specs Jest + supertest</strong> (RED)</li>
-            <li id="art1" style="opacity:0;transition:all .4s ease;">🟢 <strong>Implementação mínima</strong> que faz passar</li>
-            <li id="art2" style="opacity:0;transition:all .4s ease;">♻️ <strong>Refatoração</strong> com cobertura instalada</li>
-          </ul></div>
-        </div>
-        <div>
-          <div class="box acc"><h3>⚖️ RNF — 8 Eixos ISO/IEC 25010</h3>
-            <table class="stbl" id="rnf-tbl" style="border-spacing:0 3px;width:100%;">
-              <tr><td class="scc" data-s="0" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>CONF</strong> Confiabilidade</td><td class="scc" data-s="1" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#dcfce7;font-size:.8rem;">✅ Testes automáticos</td></tr>
-              <tr><td class="scc" data-s="2" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>MANT</strong> Manutenibilidade</td><td class="scc" data-s="3" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#dcfce7;font-size:.8rem;">✅ TS + camadas isoladas</td></tr>
-              <tr><td class="scc" data-s="4" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>DES</strong> Desempenho</td><td class="scc" data-s="5" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f9f9f9;font-size:.8rem;">→ pool reusado</td></tr>
-              <tr><td class="scc" data-s="6" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>SEG</strong> Segurança</td><td class="scc" data-s="7" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f9f9f9;font-size:.8rem;">→ validação no controller</td></tr>
-              <tr><td class="scc" data-s="8" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f1f5f9;font-size:.8rem;"><strong>SUP</strong> Suportabilidade</td><td class="scc" data-s="9" style="opacity:0;transition:all .35s;padding:3px 6px;border-radius:5px;background:#f9f9f9;font-size:.8rem;">→ specs documentam</td></tr>
-            </table>
-          </div>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ====== SLIDE 16: REFACTOR + RM-ODP + ENCERRAMENTO ====== -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh blue"><div class="st"><span class="stage ref">REFACTOR</span>♻️ → RM-ODP → encerramento</div><div class="ss">Com testes verdes, podemos extrair, renomear e reorganizar com segurança</div></div>
-      <div class="tdd-cycle">
-        <div class="tdd-step red" id="tdd0"><div class="tdd-emoji">🔴</div><div class="tdd-name">RED</div><div class="tdd-desc">Spec falha — descreve a intenção</div></div>
-        <div class="tdd-step green" id="tdd1"><div class="tdd-emoji">🟢</div><div class="tdd-name">GREEN</div><div class="tdd-desc">Mínimo código para passar</div></div>
-        <div class="tdd-step refac" id="tdd2"><div class="tdd-emoji">♻️</div><div class="tdd-name">REFACTOR</div><div class="tdd-desc">Limpa, extrai, renomeia — testes seguram</div></div>
-      </div>
-      <div class="g2" style="gap:10px;margin-top:8px;">
-        <div class="box blu">
-          <h3>♻️ O que refatoramos hoje</h3>
+        <div class="box ind">
+          <h3>O que cada campo controla</h3>
           <ul>
-            <li>Extrair <code>asyncHandler</code> para tirar o <code>try/catch</code> dos controllers.</li>
-            <li>Mover validações para <code>helpers/</code> (testáveis isoladamente).</li>
-            <li>Tipar callbacks Express com <code>RequestHandler</code>.</li>
+            <li><code>name</code> — vira o título no app drawer e splash.</li>
+            <li><code>short_name</code> — fallback quando o nome é cortado.</li>
+            <li><code>start_url</code> — página de entrada quando o app abre.</li>
+            <li><code>display:standalone</code> — esconde URL/abas → parece nativo.</li>
+            <li><code>theme_color</code> — cor da barra de status no Android.</li>
+            <li><code>icons</code> — Android usa <em>maskable</em>; iOS usa <code>apple-touch-icon</code>.</li>
+          </ul>
+          <p class="hint" style="margin-top:6px;"><strong>Conectado no HTML:</strong> <code>&lt;link rel="manifest" href="./manifest.webmanifest"&gt;</code>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 06 — SW lifecycle -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh teal"><h2 class="st">Service Worker · ciclo de vida</h2><p class="ss">Três eventos importantes. Dois você implementa, um o navegador dispara.</p></div>
+      <div class="sw-flow">
+        <div class="sw-step">
+          <div class="sw-num">1</div>
+          <h4>install</h4>
+          <p>Pre-cache da shell (HTML, CSS, JS, WASM, ícones, seed do banco). Roda 1 vez por versão.</p>
+        </div>
+        <div class="sw-arrow">→</div>
+        <div class="sw-step">
+          <div class="sw-num">2</div>
+          <h4>activate</h4>
+          <p>Limpa caches antigos. <code>skipWaiting()</code> + <code>clients.claim()</code> para assumir as tabs já abertas.</p>
+        </div>
+        <div class="sw-arrow">→</div>
+        <div class="sw-step">
+          <div class="sw-num">3</div>
+          <h4>fetch</h4>
+          <p>Intercepta toda requisição saindo da página. Aqui mora a estratégia: cache-first, network-first, etc.</p>
+        </div>
+      </div>
+<pre class="codeblock"><span class="hl-cmt">// sw.js — esqueleto</span>
+<span class="hl-kw">const</span> CACHE = <span class="hl-str">'brpec-pwa-v1'</span>;
+<span class="hl-kw">const</span> SHELL = [<span class="hl-str">'./'</span>, <span class="hl-str">'./index.html'</span>, <span class="hl-str">'./app.js'</span>, <span class="hl-str">'./styles.css'</span>, <span class="hl-str">'./manifest.webmanifest'</span>];
+
+self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'install'</span>,  (e) =&gt; e.<span class="hl-fn">waitUntil</span>(caches.<span class="hl-fn">open</span>(CACHE).<span class="hl-fn">then</span>((c) =&gt; c.<span class="hl-fn">addAll</span>(SHELL))));
+self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'activate'</span>, (e) =&gt; e.<span class="hl-fn">waitUntil</span>(self.clients.<span class="hl-fn">claim</span>()));
+self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'fetch'</span>,    (e) =&gt; e.<span class="hl-fn">respondWith</span>(caches.<span class="hl-fn">match</span>(e.request).<span class="hl-fn">then</span>((r) =&gt; r || <span class="hl-fn">fetch</span>(e.request))));</pre>
+    </div>
+  </div>
+
+  <!-- 07 — Estratégias de cache -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh indigo"><h2 class="st">Estratégias de cache · qual usar onde?</h2><p class="ss">A regra: <strong>shell estática</strong> usa <em>cache-first</em>; <strong>dados frescos</strong> usam <em>network-first</em>.</p></div>
+      <div class="strat-grid">
+        <div class="strat-col shell">
+          <h3>cache-first · para a shell</h3>
+          <p>Tenta o cache. Se achou, devolve. Senão, busca rede e cacheia para a próxima.</p>
+<pre class="codeblock" style="font-size:.74rem;">caches.<span class="hl-fn">match</span>(e.request).<span class="hl-fn">then</span>((c) =&gt;
+  c || <span class="hl-fn">fetch</span>(e.request).<span class="hl-fn">then</span>((r) =&gt; {
+    caches.<span class="hl-fn">open</span>(CACHE).<span class="hl-fn">then</span>((b) =&gt; b.<span class="hl-fn">put</span>(e.request, r.<span class="hl-fn">clone</span>()));
+    <span class="hl-kw">return</span> r;
+  })
+);</pre>
+          <p><strong>Bom para:</strong> HTML, CSS, JS, wasm, ícones, <code>brpec.db</code> (seed).</p>
+        </div>
+        <div class="strat-col sync">
+          <h3>network-first · para dados</h3>
+          <p>Tenta a rede primeiro. Se falhou, devolve o cache (ou erro estruturado).</p>
+<pre class="codeblock" style="font-size:.74rem;"><span class="hl-fn">fetch</span>(e.request).<span class="hl-fn">catch</span>(() =&gt;
+  <span class="hl-kw">new</span> <span class="hl-fn">Response</span>(
+    JSON.<span class="hl-fn">stringify</span>({ ok: <span class="hl-kw">false</span>, reason: <span class="hl-str">'offline'</span> }),
+    { status: <span class="hl-num">503</span>, headers: { <span class="hl-str">'content-type'</span>: <span class="hl-str">'application/json'</span> } }
+  )
+);</pre>
+          <p><strong>Bom para:</strong> <code>/sync/*</code> — você quer fresh, mas degradação graciosa.</p>
+        </div>
+      </div>
+      <blockquote>O SW da PWA do BrPec faz exatamente isso: <code>SHELL_ASSETS</code> em cache-first; <code>/sync/*</code> em network-first com fallback 503 JSON estruturado.</blockquote>
+    </div>
+  </div>
+
+  <!-- 08 — IndexedDB para persistência -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><h2 class="st">sql.js + IndexedDB · banco persistente no navegador</h2><p class="ss">Evolução do sandbox da aula 4: o blob do banco vive no IndexedDB. Não some no reload.</p></div>
+      <div class="g2">
+        <div class="box tea">
+          <h3>Fluxo de boot (3 passos)</h3>
+          <ol>
+            <li><strong>Motor</strong> — <code>initSqlJs()</code> carrega o WASM.</li>
+            <li><strong>Blob</strong> — tenta ler do IDB (key <code>brpec.db</code>); se vazio, <code>fetch</code> o seed inicial e grava no IDB.</li>
+            <li><strong>Banco</strong> — <code>new SQL.Database(blob)</code> abre em memória.</li>
+          </ol>
+          <p><strong>Após cada mutação:</strong> <code>db.export()</code> serializa o estado → grava no IDB. Próximo boot reabre exatamente onde parou.</p>
+        </div>
+        <div>
+<pre class="codeblock"><span class="hl-cmt">// db.js — núcleo da persistência</span>
+<span class="hl-kw">async function</span> <span class="hl-fn">initDb</span>() {
+  <span class="hl-kw">const</span> SQL = <span class="hl-kw">await</span> <span class="hl-fn">initSqlJs</span>({
+    locateFile: (f) =&gt; <span class="hl-str">`cdn/${f}`</span>
+  });
+
+  <span class="hl-kw">let</span> blob = <span class="hl-kw">await</span> <span class="hl-fn">idbGet</span>(<span class="hl-str">'brpec.db'</span>);
+  <span class="hl-kw">if</span> (!blob) {
+    blob = <span class="hl-kw">await</span> <span class="hl-fn">fetchSeed</span>();
+    <span class="hl-kw">await</span> <span class="hl-fn">idbSet</span>(<span class="hl-str">'brpec.db'</span>, blob);
+  }
+
+  <span class="hl-kw">const</span> db = <span class="hl-kw">new</span> SQL.<span class="hl-fn">Database</span>(blob);
+
+  <span class="hl-kw">async function</span> <span class="hl-fn">persist</span>() {
+    <span class="hl-kw">await</span> <span class="hl-fn">idbSet</span>(<span class="hl-str">'brpec.db'</span>, db.<span class="hl-fn">export</span>());
+  }
+
+  <span class="hl-kw">return</span> { db, persist };
+}</pre>
+        </div>
+      </div>
+      <p class="hint"><strong>Por que IndexedDB e não OPFS?</strong> OPFS exige <code>crossOriginIsolated</code> (COOP/COEP), que o GitHub Pages não serve. IndexedDB funciona em qualquer host com qualquer header. Portabilidade ganha.</p>
+    </div>
+  </div>
+
+  <!-- 09 — UUID no cliente -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh amber"><h2 class="st">UUID v4 · gerado no celular do capataz</h2><p class="ss">Por que <em>não</em> deixar o servidor gerar o id? Porque o servidor pode estar a 4 horas de distância.</p></div>
+      <div class="g2">
+        <div class="box amr">
+          <h3>O contrato-chave</h3>
+          <p>Cada evento, no momento da coleta, recebe um <code>client_uuid</code> gerado localmente. Ele acompanha o evento toda vez que ele atravessa a rede.</p>
+          <ul>
+            <li><strong>Sem internet</strong>, o registro <em>já tem id estável</em>.</li>
+            <li><strong>Reenvios</strong> usam o mesmo id — servidor reconhece e ignora.</li>
+            <li><strong>Auditoria</strong> liga o registro no celular ao registro no SGBD.</li>
+          </ul>
+          <p class="hint"><strong>Geração:</strong> <code>crypto.randomUUID()</code> em contextos seguros; fallback <code>crypto.getRandomValues</code> em qualquer outro.</p>
+        </div>
+        <div>
+<pre class="codeblock"><span class="hl-cmt">// portable UUID v4</span>
+<span class="hl-kw">function</span> <span class="hl-fn">makeUUID</span>() {
+  <span class="hl-kw">if</span> (crypto.randomUUID) <span class="hl-kw">return</span> crypto.<span class="hl-fn">randomUUID</span>();
+
+  <span class="hl-kw">const</span> b = <span class="hl-kw">new</span> Uint8Array(<span class="hl-num">16</span>);
+  crypto.<span class="hl-fn">getRandomValues</span>(b);
+  b[<span class="hl-num">6</span>] = (b[<span class="hl-num">6</span>] &amp; <span class="hl-num">0x0f</span>) | <span class="hl-num">0x40</span>;  <span class="hl-cmt">// version 4</span>
+  b[<span class="hl-num">8</span>] = (b[<span class="hl-num">8</span>] &amp; <span class="hl-num">0x3f</span>) | <span class="hl-num">0x80</span>;  <span class="hl-cmt">// variant</span>
+
+  <span class="hl-kw">const</span> h = [...b].<span class="hl-fn">map</span>((x) =&gt; x.<span class="hl-fn">toString</span>(<span class="hl-num">16</span>).<span class="hl-fn">padStart</span>(<span class="hl-num">2</span>, <span class="hl-str">'0'</span>));
+  <span class="hl-kw">return</span> <span class="hl-str">`${h[0]}${h[1]}${h[2]}${h[3]}-${h[4]}${h[5]}-${h[6]}${h[7]}-${h[8]}${h[9]}-${h.slice(10).join('')}`</span>;
+}</pre>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 10 — Estratégia de sync -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh indigo"><h2 class="st">Sync · arquitetura do reencontro</h2><p class="ss">Cliente acumula offline. Servidor reconcilia idempotentemente. Sem locks. Sem janela de conflito.</p></div>
+      <div class="arch">
+        <div class="arch-node client">
+          <h4>📲 PWA</h4>
+          <p>sql.js + IndexedDB<br>fila pending</p>
+        </div>
+        <div class="arch-arrow">→<span>POST /sync/deltas</span></div>
+        <div class="arch-node server">
+          <h4>🖧 Node + SQLite</h4>
+          <p>Express +<br>better-sqlite3</p>
+        </div>
+      </div>
+      <div class="g2">
+        <div class="box ind">
+          <h3>POST /sync/deltas</h3>
+          <p>Body: <code>{ deltas: [{ client_uuid, tipo, data, capataz_id, retiro_id, bovino_id, observacao }] }</code></p>
+          <p>Resposta: <code>{ ok, accepted, skipped, accepted_uuids }</code></p>
+          <p>Servidor faz <code>INSERT OR IGNORE</code> com <code>client_uuid</code> como PK — segundo envio do mesmo evento vira <code>skipped</code>.</p>
+        </div>
+        <div class="box ind">
+          <h3>GET /sync/snapshot</h3>
+          <p>Cliente pede últimos N eventos do servidor para conferir consistência. Útil quando entra em rede e quer "olhar o que perdi".</p>
+          <p>Para o MVP, o foco é <strong>push offline → pull online</strong>. Conflitos verdadeiros (mesmo bovino, dois capatazes) ficam para uma aula futura.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 11 — Idempotência -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh red"><h2 class="st">Idempotência · "fazer X duas vezes vira fazer X uma vez"</h2><p class="ss">A propriedade que torna o sync robusto a falhas de rede.</p></div>
+      <div class="g2">
+        <div class="box red">
+          <h3>O cenário sem idempotência</h3>
+          <p>Capataz registra pesagem · clica sync · servidor recebe e insere · resposta se perde no caminho.</p>
+          <p>Cliente acha que falhou · tenta de novo · servidor insere <strong>de novo</strong>.</p>
+          <p>Boletim sai com 2 pesagens para o mesmo bovino no mesmo dia.</p>
+        </div>
+        <div class="box grn">
+          <h3>O cenário com idempotência</h3>
+          <p>Mesma sequência, mas <code>client_uuid</code> é PK no servidor.</p>
+          <p>Segundo INSERT: <code>changes = 0</code>. Vira <code>skipped</code> na resposta.</p>
+          <p>Cliente confia: "o servidor já tem isso". Boletim mostra 1 pesagem.</p>
+        </div>
+      </div>
+<pre class="codeblock"><span class="hl-cmt">-- schema do servidor</span>
+<span class="hl-kw">CREATE TABLE</span> evento_recebido (
+  client_uuid  <span class="hl-kw">TEXT PRIMARY KEY</span>,         <span class="hl-cmt">-- a mágica</span>
+  tipo         <span class="hl-kw">TEXT NOT NULL</span>,
+  data         <span class="hl-kw">TEXT NOT NULL</span>,
+  capataz_id   <span class="hl-kw">INTEGER NOT NULL</span>,
+  retiro_id    <span class="hl-kw">INTEGER NOT NULL</span>,
+  bovino_id    <span class="hl-kw">INTEGER NOT NULL</span>,
+  observacao   <span class="hl-kw">TEXT</span>,
+  received_at  <span class="hl-kw">TEXT NOT NULL DEFAULT</span> (datetime(<span class="hl-str">'now'</span>))
+);
+<span class="hl-cmt">-- a operação:</span>
+<span class="hl-kw">INSERT OR IGNORE INTO</span> evento_recebido (...) <span class="hl-kw">VALUES</span> (...);</pre>
+    </div>
+  </div>
+
+  <!-- 12 — Backend Node -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh teal"><h2 class="st">Backend Node · 60 linhas de Express</h2><p class="ss"><code>better-sqlite3</code> · CORS · um statement por endpoint · uma transação por payload.</p></div>
+<pre class="codeblock"><span class="hl-kw">const</span> express  = <span class="hl-fn">require</span>(<span class="hl-str">'express'</span>);
+<span class="hl-kw">const</span> Database = <span class="hl-fn">require</span>(<span class="hl-str">'better-sqlite3'</span>);
+<span class="hl-kw">const</span> cors     = <span class="hl-fn">require</span>(<span class="hl-str">'cors'</span>);
+
+<span class="hl-kw">const</span> db = <span class="hl-kw">new</span> <span class="hl-fn">Database</span>(<span class="hl-str">'brpec-server.db'</span>);
+db.<span class="hl-fn">pragma</span>(<span class="hl-str">'journal_mode = WAL'</span>);
+db.<span class="hl-fn">exec</span>(<span class="hl-str">`CREATE TABLE IF NOT EXISTS evento_recebido ( client_uuid TEXT PRIMARY KEY, ... );`</span>);
+
+<span class="hl-kw">const</span> stmt = db.<span class="hl-fn">prepare</span>(
+  <span class="hl-str">`INSERT OR IGNORE INTO evento_recebido (client_uuid, tipo, data, capataz_id, retiro_id, bovino_id, observacao)
+      VALUES (@client_uuid, @tipo, @data, @capataz_id, @retiro_id, @bovino_id, @observacao);`</span>
+);
+
+<span class="hl-kw">const</span> app = <span class="hl-fn">express</span>();
+app.<span class="hl-fn">use</span>(<span class="hl-fn">cors</span>());
+app.<span class="hl-fn">use</span>(express.<span class="hl-fn">json</span>());
+
+app.<span class="hl-fn">post</span>(<span class="hl-str">'/sync/deltas'</span>, (req, res) =&gt; {
+  <span class="hl-kw">const</span> deltas = req.body?.deltas;
+  <span class="hl-kw">if</span> (!Array.<span class="hl-fn">isArray</span>(deltas)) <span class="hl-kw">return</span> res.<span class="hl-fn">status</span>(<span class="hl-num">400</span>).<span class="hl-fn">json</span>({ ok: <span class="hl-kw">false</span> });
+
+  <span class="hl-kw">const</span> tx = db.<span class="hl-fn">transaction</span>((items) =&gt; {
+    <span class="hl-kw">const</span> accepted_uuids = []; <span class="hl-kw">let</span> skipped = <span class="hl-num">0</span>;
+    <span class="hl-kw">for</span> (<span class="hl-kw">const</span> d <span class="hl-kw">of</span> items) {
+      <span class="hl-kw">const</span> info = stmt.<span class="hl-fn">run</span>(d);
+      <span class="hl-kw">if</span> (info.changes === <span class="hl-num">1</span>) accepted_uuids.<span class="hl-fn">push</span>(d.client_uuid);
+      <span class="hl-kw">else</span>                    skipped++;
+    }
+    <span class="hl-kw">return</span> { accepted: accepted_uuids.length, skipped, accepted_uuids };
+  });
+
+  res.<span class="hl-fn">json</span>({ ok: <span class="hl-kw">true</span>, ...<span class="hl-fn">tx</span>(deltas) });
+});
+
+app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</pre>
+      <p class="hint"><strong>Por que síncrono (better-sqlite3 vs sqlite3)?</strong> 30k inserts/s, sem callback hell, leitura linear — ideal para a turma ler.</p>
+    </div>
+  </div>
+
+  <!-- 13 — Spec mínimo -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><h2 class="st">"Todo código nasce de um teste que falha" · spec mínimo</h2><p class="ss">Mantemos a cultura de TDD, mas com 1 teste-âncora — o contrato de idempotência.</p></div>
+      <div class="g2">
+        <div>
+<pre class="codeblock"><span class="hl-cmt">// server.test.js</span>
+<span class="hl-kw">const</span> test   = <span class="hl-fn">require</span>(<span class="hl-str">'node:test'</span>);
+<span class="hl-kw">const</span> assert = <span class="hl-fn">require</span>(<span class="hl-str">'node:assert/strict'</span>);
+<span class="hl-kw">const</span> request = <span class="hl-fn">require</span>(<span class="hl-str">'supertest'</span>);
+<span class="hl-kw">const</span> { createServer } = <span class="hl-fn">require</span>(<span class="hl-str">'./server'</span>);
+
+<span class="hl-fn">test</span>(<span class="hl-str">'reenviar não duplica (idempotência)'</span>, <span class="hl-kw">async</span> () =&gt; {
+  <span class="hl-kw">const</span> { app, close } = <span class="hl-fn">createServer</span>({ dbPath: <span class="hl-str">':memory:'</span> });
+
+  <span class="hl-kw">const</span> delta = {
+    client_uuid: <span class="hl-str">'fixed-A'</span>, tipo: <span class="hl-str">'pesagem'</span>,
+    data: <span class="hl-str">'2026-05-14'</span>,
+    capataz_id: <span class="hl-num">1</span>, retiro_id: <span class="hl-num">1</span>, bovino_id: <span class="hl-num">1</span>
+  };
+
+  <span class="hl-kw">const</span> r1 = <span class="hl-kw">await</span> <span class="hl-fn">request</span>(app).<span class="hl-fn">post</span>(<span class="hl-str">'/sync/deltas'</span>).<span class="hl-fn">send</span>({ deltas: [delta] });
+  assert.<span class="hl-fn">equal</span>(r1.body.accepted, <span class="hl-num">1</span>);
+  assert.<span class="hl-fn">equal</span>(r1.body.skipped,  <span class="hl-num">0</span>);
+
+  <span class="hl-kw">const</span> r2 = <span class="hl-kw">await</span> <span class="hl-fn">request</span>(app).<span class="hl-fn">post</span>(<span class="hl-str">'/sync/deltas'</span>).<span class="hl-fn">send</span>({ deltas: [delta] });
+  assert.<span class="hl-fn">equal</span>(r2.body.accepted, <span class="hl-num">0</span>);
+  assert.<span class="hl-fn">equal</span>(r2.body.skipped,  <span class="hl-num">1</span>);
+
+  <span class="hl-fn">close</span>();
+});</pre>
+        </div>
+        <div class="box dkb">
+          <h3>Por que <em>esse</em> teste e não outros?</h3>
+          <p>Idempotência é o <strong>contrato pedagógico</strong> da aula. É o que separa "sync ingênuo" de "sync confiável".</p>
+          <p>Outros testes (validação de campo, snapshot vazio, etc.) viram material de leitura no <code>server.test.js</code> entregue.</p>
+          <h3 style="margin-top:14px;">Cultura TDD herdada do Afonso</h3>
+          <ul>
+            <li><strong>RED → GREEN → REFACTOR</strong> continua sendo o ciclo.</li>
+            <li><strong>"Celebrar o vermelho"</strong> — o primeiro <code>npm test</code> falhando é vitória.</li>
+            <li>Aprofundamento de TDD em camadas → <strong>aula 10 (Testes &amp; Automação)</strong>.</li>
+          </ul>
+          <p class="hint"><strong>Rode:</strong> <code>npm install &amp;&amp; npm test</code> dentro de <code>assets/brpec-sync-server/</code>.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 14 — Demo -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh teal"><h2 class="st">Demo · registrar offline → sincronizar</h2><p class="ss">Roteiro em 4 passos, com a PWA do BrPec, no projetor.</p></div>
+      <ol style="font-size:1rem; line-height:1.85; padding-left:1.4rem;">
+        <li><strong>Abrir</strong> a PWA em <code>localhost:8765/.../brpec-pwa/index.html?server=http://localhost:3000</code>.</li>
+        <li><strong>Cortar a rede</strong> no DevTools (Network → Offline). Status pill vira <em>offline</em>.</li>
+        <li><strong>Registrar 3 eventos</strong> de pesagem para bovinos diferentes — counter "pendentes" sobe.</li>
+        <li><strong>Religar a rede</strong> + clicar <em>sincronizar</em>. Counter zera; "sincronizados" sobe; <code>GET /sync/snapshot</code> confirma.</li>
+      </ol>
+      <div class="box tea">
+        <h3>O que mostrar no inspector</h3>
+        <ul>
+          <li><strong>Application → Manifest</strong> → mostra <code>name</code>, ícones, theme color.</li>
+          <li><strong>Application → Service Workers</strong> → mostra <code>sw.js</code> activated.</li>
+          <li><strong>Application → IndexedDB → brpec-pwa → kv</strong> → mostra o blob <code>brpec.db</code> persistido.</li>
+          <li><strong>Network</strong> ao clicar sync → ver o <code>POST /sync/deltas</code> com payload JSON e a resposta com <code>accepted</code>/<code>skipped</code>.</li>
+        </ul>
+      </div>
+    </div>
+  </div>
+
+  <!-- 15 — Quiz 1 -->
+  <div class="slide">
+    <div class="sc">
+      <div class="quiz-stage">
+        <div class="quiz-num">Pergunta 1 de 3 · UUID no cliente</div>
+        <h2 class="quiz-q">Por que o <code>client_uuid</code> é gerado no celular do capataz, e não no servidor quando ele recebe o evento?</h2>
+        <p class="quiz-tag">⏱ 30 segundos · pense no capataz a 4 horas do escritório</p>
+        <button class="quiz-btn" id="qb1" onclick="revealQuiz(1)">Revelar resposta-âncora ▾</button>
+        <div class="quiz-reveal" id="qr1">
+          <h4>Resposta-âncora</h4>
+          <p>Porque, no momento da coleta, o servidor pode estar <em>inacessível</em> — e o evento precisa de uma <strong>identidade estável</strong> mesmo assim. Três consequências práticas:</p>
+          <p>① <strong>Idempotência:</strong> com id estável, reenvios viram no-op naturais. Sem id estável, o servidor não tem como reconhecer "isso já chegou" — daí duplicatas.<br>② <strong>Auditoria local:</strong> o capataz consegue rastrear "eu registrei isso" sem depender do servidor confirmar.<br>③ <strong>Sync de dois sentidos:</strong> quando o servidor mandar um snapshot de volta ("aqui está o que sei dos seus eventos"), o cliente reconhece pelos UUIDs e não cria duplicatas locais.</p>
+          <p><strong>BrPec real:</strong> o capataz pesa 12 bovinos no retiro Cocho Novo na quinta-feira; volta ao escritório na segunda; sincroniza; rede cai no meio; reenvia. Sem UUID no cliente: 24 pesagens. Com UUID: 12.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 16 — Quiz 2 -->
+  <div class="slide">
+    <div class="sc">
+      <div class="quiz-stage">
+        <div class="quiz-num">Pergunta 2 de 3 · offline-first vs offline-only</div>
+        <h2 class="quiz-q">A PWA do BrPec é "offline-first" ou "offline-only"? Qual a diferença, e por que escolhemos a primeira?</h2>
+        <p class="quiz-tag">⏱ 30 segundos</p>
+        <button class="quiz-btn" id="qb2" onclick="revealQuiz(2)">Revelar resposta-âncora ▾</button>
+        <div class="quiz-reveal" id="qr2">
+          <h4>Resposta-âncora</h4>
+          <p><strong>Offline-only</strong> = o app <em>não</em> conhece servidor. Tudo mora no celular, para sempre. Bom para to-do lists e diários pessoais; péssimo para um ecossistema de fazenda com 1 coordenador + N capatazes.</p>
+          <p><strong>Offline-first</strong> = o app <em>funciona</em> offline (todas as operações principais), mas <em>sabe sincronizar</em> quando online. O caminho online é uma evolução, não uma regressão.</p>
+          <p>Escolhemos offline-first porque:</p>
+          <p>① <strong>Realidade do retiro:</strong> WiFi raro ou nulo. Não dá pra perder coleta esperando sinal.<br>② <strong>Necessidade do coordenador:</strong> dashboard consolidado dos N capatazes. Sem servidor, não tem dashboard.<br>③ <strong>Auditoria:</strong> o SGBD da fazenda é a fonte da verdade, não cada celular individual.</p>
+          <p><strong>Diferença sutil que importa:</strong> em offline-first, "estar online" é uma <em>otimização</em>; em offline-only, é uma <em>limitação</em>. Mude o framing e o produto muda.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 17 — Quiz 3 -->
+  <div class="slide">
+    <div class="sc">
+      <div class="quiz-stage">
+        <div class="quiz-num">Pergunta 3 de 3 · service worker vs app</div>
+        <h2 class="quiz-q">Por que o service worker vive em um arquivo separado da página (<code>sw.js</code>) e roda em uma thread diferente?</h2>
+        <p class="quiz-tag">⏱ 30 segundos · pense no ciclo de vida do app vs do SW</p>
+        <button class="quiz-btn" id="qb3" onclick="revealQuiz(3)">Revelar resposta-âncora ▾</button>
+        <div class="quiz-reveal" id="qr3">
+          <h4>Resposta-âncora</h4>
+          <p>Três razões — cada uma resolveria um problema sozinha, mas as três juntas <em>definem</em> o que SW é:</p>
+          <p>① <strong>Ciclo de vida independente.</strong> O SW continua existindo depois que a aba fecha. Pode receber push notification, sincronizar em background, lidar com fetch. Se estivesse acoplado à página, tudo morreria com ela.<br>② <strong>Interceptação de requisições.</strong> O browser precisa de uma camada <em>entre</em> a página e a rede. O SW é essa camada. Se vivesse na página, intermediar a si mesmo geraria recursão e ciclos.<br>③ <strong>Thread separada (não bloqueia a UI).</strong> Cache, IndexedDB, criptografia podem ser pesados. Numa thread isolada, a UI segue fluida mesmo com SW trabalhando.</p>
+          <p><strong>Consequência prática:</strong> você atualiza a página, mas o SW antigo continua servindo o cache antigo até <code>skipWaiting() + clients.claim()</code>. É por isso que mudanças em PWA às vezes "demoram" — é o SW antigo ainda no comando. <code>brpec-pwa-v1</code> → <code>brpec-pwa-v2</code> força a virada.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 18 — Lab -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh indigo"><h2 class="st">Lab nos 5 grupos · instalar + registrar + sincronizar</h2><p class="ss">20 minutos · 1 representante por grupo apresenta no fim.</p></div>
+      <div class="g3">
+        <div class="lab-card"><h4>Grupo 1 · Cabeceira</h4><p>Subir <code>npm install &amp;&amp; npm start</code> do sync server na sua máquina. Abrir a PWA. <strong>Instalar como app</strong> (botão "Instalar" do Chrome / "Add to Home Screen" no celular). Print da tela inicial pós-instalação.</p></div>
+        <div class="lab-card"><h4>Grupo 2 · Mata-Burro</h4><p>Com a PWA aberta, <strong>cortar a rede no DevTools</strong>. Registrar 3 eventos (1 pesagem, 1 vacinação, 1 tratamento) com bovinos diferentes. Print do counter "3 pendentes" + lista local.</p></div>
+        <div class="lab-card"><h4>Grupo 3 · Vargem do Sucuri</h4><p>Religar a rede. Clicar sincronizar. Validar <code>{accepted: 3, skipped: 0}</code> na response. Em seguida, <strong>clicar sincronizar de novo</strong> e mostrar que vira <code>{accepted: 0}</code> — idempotência ao vivo.</p></div>
+        <div class="lab-card"><h4>Grupo 4 · Faxinal</h4><p>Inspecionar o <code>IndexedDB</code> no DevTools (Application → Storage). Mostrar a chave <code>brpec.db</code> e o tamanho do blob. Comparar antes e depois de registrar um evento.</p></div>
+        <div class="lab-card"><h4>Grupo 5 · Cocho Novo</h4><p>No terminal do server: <code>sqlite3 brpec-server.db "SELECT * FROM evento_recebido;"</code>. Mostrar que os UUIDs do cliente bateram com os do servidor. <strong>Bonus:</strong> rodar <code>npm test</code> e mostrar os 5 specs verdes.</p></div>
+        <div class="lab-card" style="border-left-color:var(--am);"><h4 style="color:var(--am);">🏆 Bônus universal</h4><p>Abrir o <strong>Lighthouse</strong> (DevTools → Lighthouse → PWA) e capturar o score. Trazer pra ponderada — é exatamente o que vão entregar.</p></div>
+      </div>
+      <div class="timer-bar">
+        <div>
+          <div class="timer-label">Cronômetro · Lab</div>
+          <div class="timer-display" id="t-lab-disp">20:00</div>
+        </div>
+        <div class="timer-controls">
+          <button class="timer-btn start" onclick="Timer.start('lab')">▶ Iniciar</button>
+          <button class="timer-btn pause" onclick="Timer.pause('lab')">⏸ Pausar</button>
+          <button class="timer-btn reset" onclick="Timer.reset('lab')">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 19 — Ponderada -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh red"><h2 class="st">Ponderada em sala · Lighthouse PWA ≥ 80</h2><p class="ss">30 minutos · individual · screenshot do Lighthouse + 1 vídeo curto.</p></div>
+      <div class="g2">
+        <div class="box red">
+          <h3>Entrega (via Teams)</h3>
+          <ol>
+            <li><strong>Print do Lighthouse PWA score</strong> da sua PWA rodando local (≥ 80 pontos).</li>
+            <li><strong>Vídeo de 30 s</strong> mostrando: app instalado, registro offline (1 evento), sync, banco do servidor com o evento.</li>
+            <li>Arquivo <code>aula5-ponderada-NOME.md</code> com 3 frases respondendo: <em>"qual foi a decisão de design da minha PWA?"</em>.</li>
+          </ol>
+          <p class="hint"><strong>Critério mínimo:</strong> instalação + 1 evento sincronizado + score ≥ 50.</p>
+        </div>
+        <div class="box dkb">
+          <h3>Como abrir o Lighthouse</h3>
+          <ol>
+            <li>Chrome → F12 → aba <strong>Lighthouse</strong>.</li>
+            <li>Categorias: marque <strong>PWA</strong>.</li>
+            <li>Mode: <em>Navigation</em>. Device: <em>Mobile</em>.</li>
+            <li>Click <strong>Analyze page load</strong>.</li>
+            <li>Screenshot da seção PWA.</li>
+          </ol>
+          <p class="hint"><strong>Score baixo? Verifique:</strong> manifest carregado · SW registrado · start_url cacheado · ícone &gt;= 192px (SVG conta como any) · servido via HTTPS ou localhost.</p>
+        </div>
+      </div>
+      <div class="timer-hero">
+        <div class="timer-label">Ponderada · 30 minutos</div>
+        <div class="timer-display" id="t-pond-disp">30:00</div>
+        <div class="timer-controls">
+          <button class="timer-btn start" onclick="Timer.start('pond')">▶ Iniciar</button>
+          <button class="timer-btn pause" onclick="Timer.pause('pond')">⏸ Pausar</button>
+          <button class="timer-btn reset" onclick="Timer.reset('pond')">↺ Reset</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- 20 — Síntese -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh teal"><h2 class="st">Síntese · e na semana que vem?</h2><p class="ss">Hoje fechamos a stack offline-first. Na próxima aula, esticamos o back-end.</p></div>
+      <div class="g2">
+        <div class="box tea">
+          <h3>O que levamos da aula 5</h3>
+          <ul>
+            <li><strong>3 pilares</strong> da PWA: HTTPS · manifest · service worker.</li>
+            <li><strong>Cache-first</strong> para shell · <strong>network-first</strong> para dados.</li>
+            <li><strong>sql.js + IndexedDB</strong> = banco persistente no celular.</li>
+            <li><strong>UUID v4 no cliente</strong> é a base da idempotência.</li>
+            <li><strong>INSERT OR IGNORE</strong> + UUID PK no servidor = sync robusto sem locks.</li>
+            <li><strong>Spec mínimo</strong> de idempotência sustenta a cultura TDD para a aula 10.</li>
           </ul>
         </div>
-        <div class="box acc">
-          <h3>📊 Coverage — métrica, não meta</h3>
-          <p>Use cobertura para <strong>encontrar buracos</strong>, não para perseguir 100%. Um teste sem asserção real não cobre nada — só engana o relatório.</p>
+        <div class="box ind">
+          <h3>O que vem na aula 6 (19/05)</h3>
+          <ul>
+            <li><strong>Back-End II</strong> — endpoints de leitura e escrita com documentação.</li>
+            <li>CRUD HTTP completo no servidor — POST/PUT/DELETE com validação de payload.</li>
+            <li>Erros estruturados (400/422/404/500) — <code>AppError</code> + middleware.</li>
+            <li>Documentação automática — OpenAPI/Swagger ou alternativa minimalista.</li>
+            <li>Como a PWA consome esses endpoints quando online.</li>
+          </ul>
+          <p class="hint"><strong>Pré-aula da 6:</strong> deixe o sync server rodando local + listar 3 endpoints que faltam (ex.: <code>DELETE /sync/evento/:uuid</code>, <code>GET /relatorios/aftosa</code>).</p>
         </div>
       </div>
-      <div class="odp-pipe" style="margin-top:8px;">
-        <div class="odp-card" id="odp0" style="background:linear-gradient(135deg,#2e2640,#4b5563);"><strong>🏢 Enterprise</strong><br><small>Propósito do recurso</small></div>
-        <div class="odp-arrow" id="oa0">→</div>
-        <div class="odp-card" id="odp1" style="background:linear-gradient(135deg,#0d9488,#10b981);"><strong>📋 Information</strong><br><small>interface User</small></div>
-        <div class="odp-arrow" id="oa1">→</div>
-        <div class="odp-card" id="odp2" style="background:linear-gradient(135deg,#1863dc,#3b82f6);"><strong>⚙️ Computational</strong><br><small>controller/service ◀ aqui</small></div>
-        <div class="odp-arrow" id="oa2">→</div>
-        <div class="odp-card" id="odp3" style="background:linear-gradient(135deg,#d97706,#f59e0b);"><strong>🔧 Engineering</strong><br><small>pool, middleware</small></div>
-        <div class="odp-arrow" id="oa3">→</div>
-        <div class="odp-card" id="odp4" style="background:linear-gradient(135deg,#dc2626,#ef4444);"><strong>💻 Technology</strong><br><small>Node, TS, pg</small></div>
-      </div>
-      <div class="box grn" style="margin-top:8px;">
-        <h3>🚀 Próxima aula — Back-End II</h3>
-        <p>POST/PUT/DELETE com validação, tratamento robusto de erros e o CRUD HTTP completo da entidade do projeto.</p>
-      </div>
+      <blockquote>O capataz registrou ontem no retiro, sem WiFi. Hoje sincronizou na sede em 200ms. O coordenador puxou o dashboard e viu tudo. <strong>É isso que vocês acabaram de construir.</strong></blockquote>
     </div>
   </div>
 
-</div><!-- /slide-container -->
+</div>
 
-<!-- ====== FOOTER ====== -->
 <div class="slide-footer">
   <div class="footer-links">
     <a href="../../index.html" class="back-home">🏠 Home</a>
     <a href="../materials/lesson-5-material.html" class="back-home material">📖 Material</a>
+    <a href="../assets/brpec-pwa/index.html?server=http://localhost:3000" class="back-home pwa" target="_blank">📲 PWA</a>
   </div>
   <div class="nav-wrapper">
     <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
-    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">16</span></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">20</span></div>
     <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
   </div>
   <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>
 </div>
 
-<script src="../js/human-type.js"></script>
 <script>
-// ── DAILY TIMER ───────────────────────────────────────────────────────────
-var dailyInterval = null;
-var dailySeconds = 900;
-var dailyRunning = false;
-function updateDailyDisplay() {
-  var m = Math.floor(dailySeconds / 60);
-  var s = dailySeconds % 60;
-  var el = document.getElementById('daily-timer');
-  if (el) el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
-}
-function startDaily() {
-  if (dailyRunning) { clearInterval(dailyInterval); dailyRunning = false; document.getElementById('daily-start-btn').textContent = '▶ Continuar'; return; }
-  dailyRunning = true;
-  document.getElementById('daily-start-btn').textContent = '⏸ Pausar';
-  dailyInterval = setInterval(function() {
-    if (dailySeconds <= 0) { clearInterval(dailyInterval); dailyRunning = false; document.getElementById('daily-start-btn').textContent = '✅ Fim!'; return; }
-    dailySeconds--;
-    updateDailyDisplay();
-  }, 1000);
-}
-function resetDaily() {
-  clearInterval(dailyInterval);
-  dailyRunning = false;
-  dailySeconds = 900;
-  updateDailyDisplay();
-  document.getElementById('daily-start-btn').textContent = '▶ Iniciar';
-}
-
-// ── NAVIGATION ──────────────────────────────────────────────────────────────
 var currentSlide = 0;
 var slides = document.querySelectorAll('.slide');
 var totalSlides = slides.length;
 document.getElementById('total-slides').textContent = totalSlides;
-
 function showSlide(i) {
   document.querySelectorAll('.slide.active').forEach(function(s){ s.classList.remove('active'); });
   slides[i].classList.add('active');
@@ -771,340 +837,69 @@ function showSlide(i) {
   document.getElementById('current-slide').textContent = i + 1;
   document.getElementById('prev-btn').disabled = i === 0;
   document.getElementById('next-btn').disabled = i === totalSlides - 1;
-  runAnim(i);
 }
 function nextSlide()     { if (currentSlide < totalSlides - 1) showSlide(currentSlide + 1); }
 function previousSlide() { if (currentSlide > 0) showSlide(currentSlide - 1); }
 function toggleFullScreen() { if (!document.fullscreenElement) document.documentElement.requestFullscreen(); else document.exitFullscreen(); }
 document.addEventListener('keydown', function(e) {
-  if (e.key === 'ArrowRight' || e.key === ' ') nextSlide();
+  var tag = (e.target && e.target.tagName) || '';
+  if (tag === 'INPUT' || tag === 'TEXTAREA') return;
+  if (e.key === 'ArrowRight' || e.key === ' ') { nextSlide(); e.preventDefault(); }
   else if (e.key === 'ArrowLeft') previousSlide();
   else if (e.key.toLowerCase() === 'f') toggleFullScreen();
 });
 
-// ── TIMER SYSTEM ──────────────────────────────────────────────────────────
-var _ts = [], _run = false;
-function clearT() { _run = false; _ts.forEach(clearTimeout); _ts = []; }
-function T(fn, d)  { _ts.push(setTimeout(fn, d)); }
-function resetLines(ids) {
-  ids.forEach(function(id) { var el=document.getElementById(id); if(el){ el.innerHTML=''; el.classList.remove('vis'); } });
+function revealQuiz(n) {
+  var btn = document.getElementById('qb' + n);
+  var rev = document.getElementById('qr' + n);
+  if (rev) rev.classList.add('show');
+  if (btn) btn.classList.add('hide');
 }
 
-// ── COVER ────────────────────────────────────────────────────────────────
-function animCover() {
-  ['ct0','ct1','ct2','ct3','ct4'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
-  ['ct0','ct1','ct2','ct3','ct4'].forEach(function(id,i){
-    T(function(){ var el=document.getElementById(id); if(el&&_run) el.classList.add('vis'); }, 200+i*180);
-  });
-}
-
-// ── DAILY ─────────────────────────────────────────────────────────────────
-function animDaily() {
-  ['dt0','dt1','dt2','dt3'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
-  ['dt0','dt1','dt2','dt3'].forEach(function(id,i){
-    T(function(){ var el=document.getElementById(id); if(el&&_run) el.classList.add('vis'); }, 200+i*180);
-  });
-}
-
-// ── ROADMAP ───────────────────────────────────────────────────────────────
-function animRoadmap() {
-  for (var i=0;i<8;i++){var el=document.getElementById('rm'+i);if(el){ el.classList.remove('vis'); }}
-  for (var j=0;j<8;j++){
-    (function(idx){ T(function(){ var el=document.getElementById('rm'+idx); if(el&&_run) el.classList.add('vis'); }, 100+idx*140); })(j);
+var Timer = (function() {
+  var timers = {
+    daily: { total: 15 * 60, left: 15 * 60, intv: null, disp: 't-daily-disp' },
+    lab:   { total: 20 * 60, left: 20 * 60, intv: null, disp: 't-lab-disp'   },
+    pond:  { total: 30 * 60, left: 30 * 60, intv: null, disp: 't-pond-disp'  }
+  };
+  function fmt(s) { var m = Math.floor(s / 60), r = s % 60; return (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r; }
+  function render(key) {
+    var t = timers[key];
+    var el = document.getElementById(t.disp);
+    if (!el) return;
+    el.textContent = fmt(t.left);
+    el.classList.remove('warn', 'crit');
+    var pct = t.left / t.total;
+    if (pct <= 0.1) el.classList.add('crit');
+    else if (pct <= 0.33) el.classList.add('warn');
   }
-}
+  return {
+    start: function(key) {
+      var t = timers[key]; if (!t || t.intv) return;
+      t.intv = setInterval(function() {
+        if (t.left > 0) { t.left--; render(key); }
+        else { clearInterval(t.intv); t.intv = null; }
+      }, 1000);
+    },
+    pause: function(key) { var t = timers[key]; if (t && t.intv) { clearInterval(t.intv); t.intv = null; } },
+    reset: function(key) {
+      var t = timers[key]; if (!t) return;
+      if (t.intv) { clearInterval(t.intv); t.intv = null; }
+      t.left = t.total; render(key);
+    },
+    init: function() { Object.keys(timers).forEach(render); }
+  };
+})();
 
-// SLIDE 5: setup TS
-function animSetup() {
-  var ids=['su0','su1','su2','su3','su4','su5','su6','su7','su8','su9','su10'];
-  resetLines(ids);
-  var d=0,G=40;
-  d=typeLine('su0',[{c:'cmt',v:'$ npm init -y'}],d)+G;
-  d=typeLine('su1',[{c:'cmt',v:'# runtime'}],d)+G;
-  d=typeLine('su2',[{c:'kw',v:'$ npm install '},{c:'txt',v:'express pg dotenv'}],d)+G;
-  d=typeLine('su3',[{c:'cmt',v:'# dev'}],d)+G;
-  d=typeLine('su4',[{c:'kw',v:'$ npm install -D '},{c:'txt',v:'typescript @types/node @types/express \\'}],d)+G;
-  d=typeLine('su5',[{c:'txt',v:'    @types/pg tsx jest ts-jest @types/jest \\'}],d)+G;
-  d=typeLine('su6',[{c:'txt',v:'    supertest @types/supertest'}],d)+G;
-  d=typeLine('su7',[{c:'kw',v:'$ npx '},{c:'txt',v:'tsc --init'}],d)+G;
-  d=typeLine('su8',[{c:'cmt',v:'# tsconfig.json — strict + target ES2022'}],d)+G;
-  d=typeLine('su9',[{c:'txt',v:'  '},{c:'str',v:'"strict": true, "target": "ES2022",'}],d)+G;
-  d=typeLine('su10',[{c:'txt',v:'  '},{c:'str',v:'"rootDir": "src", "outDir": "dist"'}],d);
-}
+var hashMatch = location.hash.match(/^#slide-(\d+)/);
+var initialIdx = hashMatch ? Math.max(0, Math.min(parseInt(hashMatch[1], 10) - 1, totalSlides - 1)) : 0;
+showSlide(initialIdx);
+window.addEventListener('hashchange', function() {
+  var m = location.hash.match(/^#slide-(\d+)/);
+  if (m) showSlide(Math.max(0, Math.min(parseInt(m[1], 10) - 1, totalSlides - 1)));
+});
 
-// SLIDE 6: jest config
-function animJest() {
-  var ids=['je0','je1','je2','je3','je4','je5','je6','je7','je8','je9'];
-  resetLines(ids);
-  var d=0,G=40;
-  d=typeLine('je0',[{c:'kw',v:'import type '},{c:'txt',v:'{ Config } '},{c:'kw',v:'from '},{c:'str',v:"'jest'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('je1',[{c:'txt',v:''}],d)+G;
-  d=typeLine('je2',[{c:'kw',v:'const '},{c:'txt',v:'config: Config = {'}],d)+G;
-  d=typeLine('je3',[{c:'txt',v:'  preset: '},{c:'str',v:"'ts-jest'"},{c:'txt',v:','}],d)+G;
-  d=typeLine('je4',[{c:'txt',v:'  testEnvironment: '},{c:'str',v:"'node'"},{c:'txt',v:','}],d)+G;
-  d=typeLine('je5',[{c:'txt',v:'  testMatch: ['},{c:'str',v:"'**/*.spec.ts'"},{c:'txt',v:'],'}],d)+G;
-  d=typeLine('je6',[{c:'txt',v:'  collectCoverageFrom: ['},{c:'str',v:"'src/**/*.ts'"},{c:'txt',v:'],'}],d)+G;
-  d=typeLine('je7',[{c:'txt',v:'};'}],d)+G;
-  d=typeLine('je8',[{c:'txt',v:''}],d)+G;
-  d=typeLine('je9',[{c:'kw',v:'export default '},{c:'txt',v:'config;'}],d);
-}
-
-// SLIDE 7: spec controller
-function animCtrlSpec() {
-  var ids=['cs0','cs1','cs2','cs3','cs4','cs5','cs6','cs7','cs8','cs9','cs10','cs11','cs12','cs13'];
-  resetLines(ids);
-  var d=0,G=40;
-  d=typeLine('cs0',[{c:'kw',v:'import '},{c:'txt',v:'request '},{c:'kw',v:'from '},{c:'str',v:"'supertest'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('cs1',[{c:'kw',v:'import '},{c:'txt',v:'{ app } '},{c:'kw',v:'from '},{c:'str',v:"'../app'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('cs2',[{c:'kw',v:'import '},{c:'txt',v:'* as svc '},{c:'kw',v:'from '},{c:'str',v:"'../services/userService'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('cs3',[{c:'fn',v:'jest.mock'},{c:'txt',v:'('},{c:'str',v:"'../services/userService'"},{c:'txt',v:');'}],d)+G;
-  d=typeLine('cs4',[{c:'txt',v:''}],d)+G;
-  d=typeLine('cs5',[{c:'fn',v:'describe'},{c:'txt',v:'('},{c:'str',v:"'GET /users/:id'"},{c:'txt',v:', () => {'}],d)+G;
-  d=typeLine('cs6',[{c:'txt',v:'  '},{c:'fn',v:'it'},{c:'txt',v:'('},{c:'str',v:"'200 com user existente'"},{c:'txt',v:', '},{c:'kw',v:'async '},{c:'txt',v:'() => {'}],d)+G;
-  d=typeLine('cs7',[{c:'txt',v:'    (svc.getById '},{c:'kw',v:'as '},{c:'typ',v:'jest.Mock'},{c:'txt',v:').'},{c:'fn',v:'mockResolvedValue'},{c:'txt',v:'({ id: '},{c:'num',v:'1'},{c:'txt',v:' });'}],d)+G;
-  d=typeLine('cs8',[{c:'txt',v:'    '},{c:'kw',v:'const '},{c:'txt',v:'res = '},{c:'kw',v:'await '},{c:'fn',v:'request'},{c:'txt',v:'(app).'},{c:'fn',v:'get'},{c:'txt',v:'('},{c:'str',v:"'/users/1'"},{c:'txt',v:');'}],d)+G;
-  d=typeLine('cs9',[{c:'txt',v:'    '},{c:'fn',v:'expect'},{c:'txt',v:'(res.status).'},{c:'fn',v:'toBe'},{c:'txt',v:'('},{c:'num',v:'200'},{c:'txt',v:');'}],d)+G;
-  d=typeLine('cs10',[{c:'txt',v:'  });'}],d)+G;
-  d=typeLine('cs11',[{c:'txt',v:'  '},{c:'fn',v:'it'},{c:'txt',v:'('},{c:'str',v:"'404 quando inexistente'"},{c:'txt',v:', '},{c:'kw',v:'async '},{c:'txt',v:'() => { /* ... */ });'}],d)+G;
-  d=typeLine('cs12',[{c:'txt',v:'});'}],d)+G;
-  d=typeLine('cs13',[{c:'cmt',v:'// 🔴 RED — falha: app/svc ainda não existem'}],d);
-}
-
-// SLIDE 8: spec service
-function animSvcSpec() {
-  var ids=['ss0','ss1','ss2','ss3','ss4','ss5','ss6','ss7','ss8','ss9','ss10','ss11','ss12'];
-  resetLines(ids);
-  var d=0,G=40;
-  d=typeLine('ss0',[{c:'kw',v:'import '},{c:'txt',v:'* as repo '},{c:'kw',v:'from '},{c:'str',v:"'../repositories/userRepository'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('ss1',[{c:'kw',v:'import '},{c:'txt',v:'{ getById } '},{c:'kw',v:'from '},{c:'str',v:"'./userService'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('ss2',[{c:'kw',v:'import '},{c:'txt',v:'{ NotFoundError } '},{c:'kw',v:'from '},{c:'str',v:"'../errors/AppError'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('ss3',[{c:'fn',v:'jest.mock'},{c:'txt',v:'('},{c:'str',v:"'../repositories/userRepository'"},{c:'txt',v:');'}],d)+G;
-  d=typeLine('ss4',[{c:'txt',v:''}],d)+G;
-  d=typeLine('ss5',[{c:'fn',v:'describe'},{c:'txt',v:'('},{c:'str',v:"'userService.getById'"},{c:'txt',v:', () => {'}],d)+G;
-  d=typeLine('ss6',[{c:'txt',v:'  '},{c:'fn',v:'it'},{c:'txt',v:'('},{c:'str',v:"'retorna user quando existe'"},{c:'txt',v:', '},{c:'kw',v:'async '},{c:'txt',v:'() => {'}],d)+G;
-  d=typeLine('ss7',[{c:'txt',v:'    (repo.findById '},{c:'kw',v:'as '},{c:'typ',v:'jest.Mock'},{c:'txt',v:').'},{c:'fn',v:'mockResolvedValue'},{c:'txt',v:'({ id: '},{c:'num',v:'1'},{c:'txt',v:' });'}],d)+G;
-  d=typeLine('ss8',[{c:'txt',v:'    '},{c:'fn',v:'expect'},{c:'txt',v:'('},{c:'kw',v:'await '},{c:'fn',v:'getById'},{c:'txt',v:'('},{c:'num',v:'1'},{c:'txt',v:')).'},{c:'fn',v:'toMatchObject'},{c:'txt',v:'({ id: '},{c:'num',v:'1'},{c:'txt',v:' });'}],d)+G;
-  d=typeLine('ss9',[{c:'txt',v:'  });'}],d)+G;
-  d=typeLine('ss10',[{c:'txt',v:'  '},{c:'fn',v:'it'},{c:'txt',v:'('},{c:'str',v:"'lança NotFoundError quando null'"},{c:'txt',v:', '},{c:'kw',v:'async '},{c:'txt',v:'() => {'}],d)+G;
-  d=typeLine('ss11',[{c:'txt',v:'    (repo.findById '},{c:'kw',v:'as '},{c:'typ',v:'jest.Mock'},{c:'txt',v:').'},{c:'fn',v:'mockResolvedValue'},{c:'txt',v:'('},{c:'kw',v:'null'},{c:'txt',v:');'}],d)+G;
-  d=typeLine('ss12',[{c:'txt',v:'    '},{c:'kw',v:'await '},{c:'fn',v:'expect'},{c:'txt',v:'('},{c:'fn',v:'getById'},{c:'txt',v:'('},{c:'num',v:'9'},{c:'txt',v:')).rejects.'},{c:'fn',v:'toThrow'},{c:'txt',v:'(NotFoundError);'}],d);
-}
-
-// SLIDE 9: spec repo
-function animRepoSpec() {
-  var ids=['rs0','rs1','rs2','rs3','rs4','rs5','rs6','rs7','rs8','rs9','rs10'];
-  resetLines(ids);
-  var d=0,G=40;
-  d=typeLine('rs0',[{c:'kw',v:'import '},{c:'txt',v:'{ pool } '},{c:'kw',v:'from '},{c:'str',v:"'../db/pool'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('rs1',[{c:'kw',v:'import '},{c:'txt',v:'{ findById } '},{c:'kw',v:'from '},{c:'str',v:"'./userRepository'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('rs2',[{c:'fn',v:'jest.mock'},{c:'txt',v:'('},{c:'str',v:"'../db/pool'"},{c:'txt',v:', () => ({ pool: { query: '},{c:'fn',v:'jest.fn'},{c:'txt',v:'() } }));'}],d)+G;
-  d=typeLine('rs3',[{c:'txt',v:''}],d)+G;
-  d=typeLine('rs4',[{c:'fn',v:'describe'},{c:'txt',v:'('},{c:'str',v:"'userRepository.findById'"},{c:'txt',v:', () => {'}],d)+G;
-  d=typeLine('rs5',[{c:'txt',v:'  '},{c:'fn',v:'it'},{c:'txt',v:'('},{c:'str',v:"'usa SQL parametrizado com $1'"},{c:'txt',v:', '},{c:'kw',v:'async '},{c:'txt',v:'() => {'}],d)+G;
-  d=typeLine('rs6',[{c:'txt',v:'    (pool.query '},{c:'kw',v:'as '},{c:'typ',v:'jest.Mock'},{c:'txt',v:').'},{c:'fn',v:'mockResolvedValue'},{c:'txt',v:'({ rows: [{ id: '},{c:'num',v:'1'},{c:'txt',v:' }] });'}],d)+G;
-  d=typeLine('rs7',[{c:'txt',v:'    '},{c:'kw',v:'await '},{c:'fn',v:'findById'},{c:'txt',v:'('},{c:'num',v:'1'},{c:'txt',v:');'}],d)+G;
-  d=typeLine('rs8',[{c:'txt',v:'    '},{c:'fn',v:'expect'},{c:'txt',v:'(pool.query).'},{c:'fn',v:'toHaveBeenCalledWith'},{c:'txt',v:'('}],d)+G;
-  d=typeLine('rs9',[{c:'txt',v:'      '},{c:'str',v:"'SELECT * FROM users WHERE id = $1'"},{c:'txt',v:', ['},{c:'num',v:'1'},{c:'txt',v:']);'}],d)+G;
-  d=typeLine('rs10',[{c:'txt',v:'  }); });'}],d);
-}
-
-// SLIDE 10: spec helper
-function animHelperSpec() {
-  var ids=['hs0','hs1','hs2','hs3','hs4','hs5','hs6','hs7','hs8'];
-  resetLines(ids);
-  var d=0,G=40;
-  d=typeLine('hs0',[{c:'kw',v:'import '},{c:'txt',v:'{ isValidEmail } '},{c:'kw',v:'from '},{c:'str',v:"'./email'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('hs1',[{c:'txt',v:''}],d)+G;
-  d=typeLine('hs2',[{c:'fn',v:'describe'},{c:'txt',v:'('},{c:'str',v:"'isValidEmail'"},{c:'txt',v:', () => {'}],d)+G;
-  d=typeLine('hs3',[{c:'txt',v:'  '},{c:'fn',v:'it'},{c:'txt',v:'('},{c:'str',v:"'aceita email válido'"},{c:'txt',v:', () => {'}],d)+G;
-  d=typeLine('hs4',[{c:'txt',v:'    '},{c:'fn',v:'expect'},{c:'txt',v:'('},{c:'fn',v:'isValidEmail'},{c:'txt',v:'('},{c:'str',v:"'ana@inteli.edu'"},{c:'txt',v:')).'},{c:'fn',v:'toBe'},{c:'txt',v:'('},{c:'kw',v:'true'},{c:'txt',v:');'}],d)+G;
-  d=typeLine('hs5',[{c:'txt',v:'  });'}],d)+G;
-  d=typeLine('hs6',[{c:'txt',v:'  '},{c:'fn',v:'it'},{c:'txt',v:'('},{c:'str',v:"'rejeita string sem @'"},{c:'txt',v:', () => {'}],d)+G;
-  d=typeLine('hs7',[{c:'txt',v:'    '},{c:'fn',v:'expect'},{c:'txt',v:'('},{c:'fn',v:'isValidEmail'},{c:'txt',v:'('},{c:'str',v:"'foo'"},{c:'txt',v:')).'},{c:'fn',v:'toBe'},{c:'txt',v:'('},{c:'kw',v:'false'},{c:'txt',v:');'}],d)+G;
-  d=typeLine('hs8',[{c:'txt',v:'  }); });'}],d);
-}
-
-// SLIDE 11: layers anim
-function animLayers() {
-  for (var i=0;i<6;i++){var el=document.getElementById('ly'+i);if(el){ el.classList.remove('vis'); }}
-  for (var j=0;j<6;j++){
-    (function(idx){ T(function(){ var el=document.getElementById('ly'+idx); if(el&&_run) el.classList.add('vis'); }, 100+idx*150); })(j);
-  }
-}
-
-// SLIDE 12: green controller + routes
-function animGreenCtrl() {
-  var ids=['gc0','gc1','gc2','gc3','gc4','gc5','gc6','gc7','gc8','gc9'];
-  resetLines(ids);
-  var d=0,G=35;
-  d=typeLine('gc0',[{c:'kw',v:'import type '},{c:'txt',v:'{ Request, Response, NextFunction } '},{c:'kw',v:'from '},{c:'str',v:"'express'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('gc1',[{c:'kw',v:'import '},{c:'txt',v:'* as svc '},{c:'kw',v:'from '},{c:'str',v:"'../services/userService'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('gc2',[{c:'txt',v:''}],d)+G;
-  d=typeLine('gc3',[{c:'kw',v:'export async function '},{c:'fn',v:'show'},{c:'txt',v:'('}],d)+G;
-  d=typeLine('gc4',[{c:'txt',v:'  req: '},{c:'typ',v:'Request'},{c:'txt',v:', res: '},{c:'typ',v:'Response'},{c:'txt',v:', next: '},{c:'typ',v:'NextFunction'}],d)+G;
-  d=typeLine('gc5',[{c:'txt',v:') {'}],d)+G;
-  d=typeLine('gc6',[{c:'txt',v:'  '},{c:'kw',v:'try '},{c:'txt',v:'{'}],d)+G;
-  d=typeLine('gc7',[{c:'txt',v:'    '},{c:'kw',v:'const '},{c:'txt',v:'user = '},{c:'kw',v:'await '},{c:'fn',v:'svc.getById'},{c:'txt',v:'('},{c:'typ',v:'Number'},{c:'txt',v:'(req.params.id));'}],d)+G;
-  d=typeLine('gc8',[{c:'txt',v:'    res.'},{c:'fn',v:'json'},{c:'txt',v:'(user);'}],d)+G;
-  d=typeLine('gc9',[{c:'txt',v:'  } '},{c:'kw',v:'catch '},{c:'txt',v:'(e) { '},{c:'fn',v:'next'},{c:'txt',v:'(e); } }'}],d);
-
-  var ids2=['gr0','gr1','gr2','gr3','gr4','gr5','gr6','gr7','gr8','gr9','gr10'];
-  resetLines(ids2);
-  var d2=400,G2=35;
-  d2=typeLine('gr0',[{c:'cmt',v:'// src/routes/userRoutes.ts'}],d2)+G2;
-  d2=typeLine('gr1',[{c:'kw',v:'import '},{c:'txt',v:'{ Router } '},{c:'kw',v:'from '},{c:'str',v:"'express'"},{c:'txt',v:';'}],d2)+G2;
-  d2=typeLine('gr2',[{c:'kw',v:'import '},{c:'txt',v:'{ show } '},{c:'kw',v:'from '},{c:'str',v:"'../controllers/userController'"},{c:'txt',v:';'}],d2)+G2;
-  d2=typeLine('gr3',[{c:'kw',v:'export const '},{c:'txt',v:'userRoutes = '},{c:'fn',v:'Router'},{c:'txt',v:'();'}],d2)+G2;
-  d2=typeLine('gr4',[{c:'txt',v:'userRoutes.'},{c:'fn',v:'get'},{c:'txt',v:'('},{c:'str',v:"'/:id'"},{c:'txt',v:', show);'}],d2)+G2;
-  d2=typeLine('gr5',[{c:'txt',v:''}],d2)+G2;
-  d2=typeLine('gr6',[{c:'cmt',v:'// src/app.ts'}],d2)+G2;
-  d2=typeLine('gr7',[{c:'kw',v:'import '},{c:'txt',v:'express '},{c:'kw',v:'from '},{c:'str',v:"'express'"},{c:'txt',v:';'}],d2)+G2;
-  d2=typeLine('gr8',[{c:'kw',v:'export const '},{c:'txt',v:'app = '},{c:'fn',v:'express'},{c:'txt',v:'();'}],d2)+G2;
-  d2=typeLine('gr9',[{c:'txt',v:'app.'},{c:'fn',v:'use'},{c:'txt',v:'('},{c:'fn',v:'express.json'},{c:'txt',v:'());'}],d2)+G2;
-  d2=typeLine('gr10',[{c:'txt',v:'app.'},{c:'fn',v:'use'},{c:'txt',v:'('},{c:'str',v:"'/users'"},{c:'txt',v:', userRoutes);'}],d2);
-}
-
-// SLIDE 13: green service
-function animGreenSvc() {
-  var ids=['gs0','gs1','gs2','gs3','gs4','gs5','gs6','gs7','gs8','gs9','gs10'];
-  resetLines(ids);
-  var d=0,G=40;
-  d=typeLine('gs0',[{c:'kw',v:'import '},{c:'txt',v:'{ findById } '},{c:'kw',v:'from '},{c:'str',v:"'../repositories/userRepository'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('gs1',[{c:'kw',v:'import type '},{c:'txt',v:'{ User } '},{c:'kw',v:'from '},{c:'str',v:"'../models/user'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('gs2',[{c:'kw',v:'import '},{c:'txt',v:'{ NotFoundError } '},{c:'kw',v:'from '},{c:'str',v:"'../errors/AppError'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('gs3',[{c:'txt',v:''}],d)+G;
-  d=typeLine('gs4',[{c:'kw',v:'export async function '},{c:'fn',v:'getById'},{c:'txt',v:'(id: '},{c:'typ',v:'number'},{c:'txt',v:'): '},{c:'typ',v:'Promise<User>'},{c:'txt',v:' {'}],d)+G;
-  d=typeLine('gs5',[{c:'txt',v:'  '},{c:'kw',v:'const '},{c:'txt',v:'user = '},{c:'kw',v:'await '},{c:'fn',v:'findById'},{c:'txt',v:'(id);'}],d)+G;
-  d=typeLine('gs6',[{c:'txt',v:'  '},{c:'kw',v:'if '},{c:'txt',v:'(!user) {'}],d)+G;
-  d=typeLine('gs7',[{c:'txt',v:'    '},{c:'kw',v:'throw new '},{c:'fn',v:'NotFoundError'},{c:'txt',v:'('},{c:'str',v:'`User ${id} not found`'},{c:'txt',v:');'}],d)+G;
-  d=typeLine('gs8',[{c:'txt',v:'  }'}],d)+G;
-  d=typeLine('gs9',[{c:'txt',v:'  '},{c:'kw',v:'return '},{c:'txt',v:'user;'}],d)+G;
-  d=typeLine('gs10',[{c:'txt',v:'}'}],d);
-}
-
-// SLIDE 14: green repo + pool
-function animGreenRepo() {
-  var ids=['gp0','gp1','gp2','gp3','gp4','gp5','gp6','gp7','gp8'];
-  resetLines(ids);
-  var d=0,G=40;
-  d=typeLine('gp0',[{c:'kw',v:'import '},{c:'txt',v:'{ pool } '},{c:'kw',v:'from '},{c:'str',v:"'../db/pool'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('gp1',[{c:'kw',v:'import type '},{c:'txt',v:'{ User } '},{c:'kw',v:'from '},{c:'str',v:"'../models/user'"},{c:'txt',v:';'}],d)+G;
-  d=typeLine('gp2',[{c:'txt',v:''}],d)+G;
-  d=typeLine('gp3',[{c:'kw',v:'export async function '},{c:'fn',v:'findById'},{c:'txt',v:'('}],d)+G;
-  d=typeLine('gp4',[{c:'txt',v:'  id: '},{c:'typ',v:'number'}],d)+G;
-  d=typeLine('gp5',[{c:'txt',v:'): '},{c:'typ',v:'Promise<User | null>'},{c:'txt',v:' {'}],d)+G;
-  d=typeLine('gp6',[{c:'txt',v:'  '},{c:'kw',v:'const '},{c:'txt',v:'r = '},{c:'kw',v:'await '},{c:'txt',v:'pool.'},{c:'fn',v:'query'},{c:'txt',v:'<'},{c:'typ',v:'User'},{c:'txt',v:'>('}],d)+G;
-  d=typeLine('gp7',[{c:'txt',v:'    '},{c:'str',v:"'SELECT * FROM users WHERE id = $1'"},{c:'txt',v:', [id]);'}],d)+G;
-  d=typeLine('gp8',[{c:'txt',v:'  '},{c:'kw',v:'return '},{c:'txt',v:'r.rows['},{c:'num',v:'0'},{c:'txt',v:'] ?? '},{c:'kw',v:'null'},{c:'txt',v:'; }'}],d);
-
-  var ids2=['gd0','gd1','gd2','gd3','gd4','gd5','gd6','gd7'];
-  resetLines(ids2);
-  var d2=300,G2=40;
-  d2=typeLine('gd0',[{c:'cmt',v:'// src/db/pool.ts'}],d2)+G2;
-  d2=typeLine('gd1',[{c:'kw',v:'import '},{c:'txt',v:'{ Pool } '},{c:'kw',v:'from '},{c:'str',v:"'pg'"},{c:'txt',v:';'}],d2)+G2;
-  d2=typeLine('gd2',[{c:'kw',v:'import '},{c:'txt',v:'dotenv '},{c:'kw',v:'from '},{c:'str',v:"'dotenv'"},{c:'txt',v:';'}],d2)+G2;
-  d2=typeLine('gd3',[{c:'fn',v:'dotenv.config'},{c:'txt',v:'();'}],d2)+G2;
-  d2=typeLine('gd4',[{c:'txt',v:''}],d2)+G2;
-  d2=typeLine('gd5',[{c:'kw',v:'export const '},{c:'txt',v:'pool = '},{c:'kw',v:'new '},{c:'fn',v:'Pool'},{c:'txt',v:'({'}],d2)+G2;
-  d2=typeLine('gd6',[{c:'txt',v:'  connectionString: process.env.'},{c:'typ',v:'DATABASE_URL'}],d2)+G2;
-  d2=typeLine('gd7',[{c:'txt',v:'});'}],d2);
-}
-
-// SLIDE 15: green errors + middleware + helper
-function animGreenErr() {
-  var ids=['ge0','ge1','ge2','ge3','ge4','ge5','ge6','ge7','ge8'];
-  resetLines(ids);
-  var d=0,G=40;
-  d=typeLine('ge0',[{c:'kw',v:'export class '},{c:'typ',v:'AppError'},{c:'txt',v:' '},{c:'kw',v:'extends '},{c:'typ',v:'Error'},{c:'txt',v:' {'}],d)+G;
-  d=typeLine('ge1',[{c:'txt',v:'  '},{c:'fn',v:'constructor'},{c:'txt',v:'('}],d)+G;
-  d=typeLine('ge2',[{c:'txt',v:'    msg: '},{c:'typ',v:'string'},{c:'txt',v:','}],d)+G;
-  d=typeLine('ge3',[{c:'kw',v:'    public '},{c:'txt',v:'status = '},{c:'num',v:'500'}],d)+G;
-  d=typeLine('ge4',[{c:'txt',v:'  ) { '},{c:'kw',v:'super'},{c:'txt',v:'(msg); } }'}],d)+G;
-  d=typeLine('ge5',[{c:'txt',v:''}],d)+G;
-  d=typeLine('ge6',[{c:'kw',v:'export class '},{c:'typ',v:'NotFoundError'},{c:'txt',v:' '},{c:'kw',v:'extends '},{c:'typ',v:'AppError'},{c:'txt',v:' {'}],d)+G;
-  d=typeLine('ge7',[{c:'txt',v:'  '},{c:'fn',v:'constructor'},{c:'txt',v:'(msg = '},{c:'str',v:"'Not Found'"},{c:'txt',v:') {'}],d)+G;
-  d=typeLine('ge8',[{c:'txt',v:'    '},{c:'kw',v:'super'},{c:'txt',v:'(msg, '},{c:'num',v:'404'},{c:'txt',v:'); } }'}],d);
-
-  var ids2=['gm0','gm1','gm2','gm3','gm4','gm5','gm6','gm7'];
-  resetLines(ids2);
-  var d2=300,G2=40;
-  d2=typeLine('gm0',[{c:'kw',v:'import type '},{c:'txt',v:'{ ErrorRequestHandler } '},{c:'kw',v:'from '},{c:'str',v:"'express'"},{c:'txt',v:';'}],d2)+G2;
-  d2=typeLine('gm1',[{c:'kw',v:'import '},{c:'txt',v:'{ AppError } '},{c:'kw',v:'from '},{c:'str',v:"'../errors/AppError'"},{c:'txt',v:';'}],d2)+G2;
-  d2=typeLine('gm2',[{c:'txt',v:''}],d2)+G2;
-  d2=typeLine('gm3',[{c:'kw',v:'export const '},{c:'txt',v:'errorHandler: '},{c:'typ',v:'ErrorRequestHandler'},{c:'txt',v:' = (err, _req, res, _next) => {'}],d2)+G2;
-  d2=typeLine('gm4',[{c:'txt',v:'  '},{c:'kw',v:'if '},{c:'txt',v:'(err '},{c:'kw',v:'instanceof '},{c:'typ',v:'AppError'},{c:'txt',v:') {'}],d2)+G2;
-  d2=typeLine('gm5',[{c:'txt',v:'    '},{c:'kw',v:'return '},{c:'txt',v:'res.'},{c:'fn',v:'status'},{c:'txt',v:'(err.status).'},{c:'fn',v:'json'},{c:'txt',v:'({ error: err.message });'}],d2)+G2;
-  d2=typeLine('gm6',[{c:'txt',v:'  }'}],d2)+G2;
-  d2=typeLine('gm7',[{c:'txt',v:'  res.'},{c:'fn',v:'status'},{c:'txt',v:'('},{c:'num',v:'500'},{c:'txt',v:').'},{c:'fn',v:'json'},{c:'txt',v:'({ error: '},{c:'str',v:"'Internal'"},{c:'txt',v:' }); };'}],d2);
-
-  var ids3=['gh0','gh1','gh2','gh3','gh4','gh5'];
-  resetLines(ids3);
-  var d3=600,G3=40;
-  d3=typeLine('gh0',[{c:'cmt',v:'// src/helpers/email.ts'}],d3)+G3;
-  d3=typeLine('gh1',[{c:'kw',v:'const '},{c:'txt',v:'RX = '},{c:'str',v:'/^[^\\s@]+@[^\\s@]+\\.[^\\s@]+$/'},{c:'txt',v:';'}],d3)+G3;
-  d3=typeLine('gh2',[{c:'txt',v:''}],d3)+G3;
-  d3=typeLine('gh3',[{c:'kw',v:'export function '},{c:'fn',v:'isValidEmail'},{c:'txt',v:'(s: '},{c:'typ',v:'string'},{c:'txt',v:'): '},{c:'typ',v:'boolean'},{c:'txt',v:' {'}],d3)+G3;
-  d3=typeLine('gh4',[{c:'txt',v:'  '},{c:'kw',v:'return '},{c:'txt',v:'RX.'},{c:'fn',v:'test'},{c:'txt',v:'(s);'}],d3)+G3;
-  d3=typeLine('gh5',[{c:'txt',v:'}'}],d3);
-}
-
-// SLIDE 16: refactor + odp
-function animRefac() {
-  ['tdd0','tdd1','tdd2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.classList.remove('vis'); });
-  ['tdd0','tdd1','tdd2'].forEach(function(id,i){
-    T(function(){ var el=document.getElementById(id); if(el&&_run) el.classList.add('vis'); }, 200+i*250);
-  });
-  ['odp0','oa0','odp1','oa1','odp2','oa2','odp3','oa3','odp4'].forEach(function(id){
-    var el=document.getElementById(id); if(el) el.classList.remove('vis');
-  });
-  ['odp0','oa0','odp1','oa1','odp2','oa2','odp3','oa3','odp4'].forEach(function(id,i){
-    T(function(){ var el=document.getElementById(id); if(el&&_run) el.classList.add('vis'); }, 1000+i*200);
-  });
-}
-
-// ── AGENDA / RM-ODP / RF+RNF (compliance slides) ─────────────────────────
-function animAgenda() {
-  ['ag0','ag1','ag2','ag3'].forEach(function(id){ var el=document.getElementById(id); if(el){ el.style.opacity='0'; el.style.transform='translateY(18px)'; } });
-  ['ag0','ag1','ag2','ag3'].forEach(function(id,i){
-    T(function(){ var el=document.getElementById(id); if(el&&_run){ el.style.opacity='1'; el.style.transform='translateY(0)'; el.style.transition='all .4s ease'; } }, i*160);
-  });
-}
-function animRmOdp() {
-  ['rmo0','rma0','rmo1','rma1','rmo2','rma2','rmo3','rma3','rmo4'].forEach(function(id){
-    var el=document.getElementById(id); if(el){ el.style.opacity='0'; el.style.transform='translateY(16px)'; }
-  });
-  ['rmo0','rma0','rmo1','rma1','rmo2','rma2','rmo3','rma3','rmo4'].forEach(function(id,i){
-    T(function(lid){ var el=document.getElementById(lid); if(el&&_run){ el.style.opacity='1'; el.style.transform='translateY(0)'; } }.bind(null,id), 120+i*320);
-  });
-}
-function animRfRnf() {
-  var cells=document.querySelectorAll('#rnf-tbl .scc');
-  cells.forEach(function(el){ el.style.opacity='0'; });
-  ['art0','art1','art2'].forEach(function(id){ var el=document.getElementById(id); if(el) el.style.opacity='0'; });
-  cells.forEach(function(el){
-    var step=parseInt(el.getAttribute('data-s'),10);
-    T(function(c){ if(_run) c.style.opacity='1'; }.bind(null,el), 100+step*160);
-  });
-  ['art0','art1','art2'].forEach(function(id,i){
-    T(function(lid){ var el=document.getElementById(lid); if(el&&_run) el.style.opacity='1'; }.bind(null,id), 200+i*200);
-  });
-}
-
-// ── DISPATCH ─────────────────────────────────────────────────────────────
-var animMap = [
-  animCover, animDaily, animAgenda, animRoadmap, function(){}, animSetup, animJest,
-  animCtrlSpec, animSvcSpec, animRepoSpec, animHelperSpec, animLayers,
-  animGreenCtrl, animGreenSvc, animGreenRepo, animGreenErr, animRmOdp, animRfRnf, animRefac
-];
-
-function runAnim(idx) {
-  clearT();
-  _run = true;
-  var fn = animMap[idx];
-  if (fn) T(fn, 150);
-}
-
-showSlide(0);
+Timer.init();
 </script>
 </body>
 </html>

@@ -1,0 +1,102 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+  <meta name="theme-color" content="#0d9488">
+  <title>BrPec · Coletor</title>
+  <link rel="manifest" href="./manifest.webmanifest">
+  <link rel="icon" href="./icon.svg" type="image/svg+xml">
+  <link rel="apple-touch-icon" href="./icon.svg">
+  <link rel="stylesheet" href="./styles.css">
+  <!-- sql.js: motor SQLite via WebAssembly. SW cacheia ambos. -->
+  <script src="https://cdn.jsdelivr.net/npm/sql.js@1.13.0/dist/sql-wasm.js"></script>
+</head>
+<body>
+  <header>
+    <h1><span class="ico">🐄</span> BrPec · Coletor</h1>
+    <span id="online-pill" class="status-pill on">online</span>
+  </header>
+
+  <div id="install-prompt">
+    <p>Instale como app no celular para abrir sem navegador.</p>
+    <button id="btn-install">📲 instalar</button>
+  </div>
+
+  <section class="card">
+    <h2>Registrar evento zootécnico</h2>
+    <form id="form">
+      <div class="row">
+        <div style="flex:1;">
+          <label for="f-tipo">Tipo</label>
+          <select id="f-tipo">
+            <option value="pesagem">pesagem</option>
+            <option value="vacinacao">vacinação</option>
+            <option value="tratamento">tratamento</option>
+            <option value="mudanca_retiro">mudança de retiro</option>
+            <option value="nascimento">nascimento</option>
+            <option value="abate">abate</option>
+          </select>
+        </div>
+        <div style="width:140px;">
+          <label for="f-data">Data</label>
+          <input type="date" id="f-data" required>
+        </div>
+      </div>
+      <div class="row">
+        <div style="flex:1;">
+          <label for="f-bovino">Bovino</label>
+          <select id="f-bovino" required>
+            <option value="">— escolha —</option>
+          </select>
+        </div>
+        <div style="flex:1;">
+          <label for="f-retiro">Retiro</label>
+          <select id="f-retiro" required>
+            <option value="">— escolha —</option>
+          </select>
+        </div>
+      </div>
+      <div class="row">
+        <div style="flex:1;">
+          <label for="f-obs">Observação (peso, lote, …)</label>
+          <input type="text" id="f-obs" maxlength="120" placeholder="ex.: 482kg · lote 7821">
+        </div>
+      </div>
+      <button type="submit" class="btn-primary">+ registrar (offline ok)</button>
+    </form>
+  </section>
+
+  <section class="card">
+    <h2>Fila local · este dispositivo</h2>
+    <div class="counter-row">
+      <div class="counter pending">
+        <div class="n" id="cnt-pending">0</div>
+        <div class="l">pendentes</div>
+      </div>
+      <div class="counter synced">
+        <div class="n" id="cnt-synced">0</div>
+        <div class="l">sincronizados</div>
+      </div>
+    </div>
+    <button id="btn-sync" class="btn-sync">
+      ⇅ sincronizar com servidor <span class="badge" id="sync-badge">0</span>
+    </button>
+  </section>
+
+  <section class="card">
+    <h2>Últimos eventos</h2>
+    <ul id="evt-list" class="evt-list"><li class="empty">carregando…</li></ul>
+  </section>
+
+  <footer>
+    Stack offline: <code>sql.js</code> · <code>IndexedDB</code> · <code>Service Worker</code><br>
+    Servidor de sync (Node + Express + SQLite) na porta <code>3000</code>.<br>
+    Pode passar <code>?server=URL</code> para sobrescrever o endpoint.
+  </footer>
+
+  <div id="toast" class="toast"></div>
+
+  <script type="module" src="./app.js"></script>
+</body>
+</html>

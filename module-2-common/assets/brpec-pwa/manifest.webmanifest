@@ -1,0 +1,21 @@
+{
+  "name": "BrPec — Coletor de Eventos Zootécnicos",
+  "short_name": "BrPec",
+  "description": "App offline para o capataz registrar eventos zootécnicos no retiro, com sincronização quando o sinal voltar.",
+  "start_url": "./index.html",
+  "scope": "./",
+  "display": "standalone",
+  "orientation": "portrait",
+  "background_color": "#0f172a",
+  "theme_color": "#0d9488",
+  "lang": "pt-BR",
+  "icons": [
+    {
+      "src": "./icon.svg",
+      "sizes": "any",
+      "type": "image/svg+xml",
+      "purpose": "any maskable"
+    }
+  ],
+  "categories": ["productivity", "business"]
+}
