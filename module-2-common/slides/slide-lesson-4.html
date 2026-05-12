@@ -245,8 +245,7 @@
           <div class="daily-tag"><span class="step">Bloco 2</span>JOINs com Venn animado<span class="when">25 min</span></div>
           <div class="daily-tag"><span class="step">Bloco 3</span>Agregação + subqueries<span class="when">20 min</span></div>
           <div class="daily-tag"><span class="step">Bloco 4</span>EXPLAIN + sql.js demo<span class="when">10 min</span></div>
-          <div class="daily-tag" style="grid-column:span 2;"><span class="step">Bloco 5</span>Lab nos 5 grupos · sandbox no navegador<span class="when">20 min</span></div>
-          <div class="daily-tag" style="grid-column:span 2; background:rgba(252,165,165,.18); border-color:rgba(252,165,165,.35);"><span class="step">Bloco 6</span>Ponderada em sala · 5 queries individuais<span class="when">30 min</span></div>
+          <div class="daily-tag" style="grid-column:span 4;"><span class="step">Bloco 5</span>Lab nos 5 grupos · sandbox no navegador<span class="when">20 min</span></div>
         </div>
       </div>
     </div>
@@ -936,46 +935,7 @@
     </div>
   </div>
 
-  <!-- ╔══════════════════════ 20 — Ponderada ═════════════╗ -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh red"><h2 class="st">Ponderada em sala · entrega individual</h2><p class="ss">30 minutos · arquivo <code>aula4-ponderada-NOME.sql</code> · cinco queries</p></div>
-      <div class="g2">
-        <div class="box red">
-          <h3>Regras</h3>
-          <ol>
-            <li>Cada aluno entrega <strong>1 arquivo .sql</strong> com 5 queries numeradas.</li>
-            <li>Cada query resolve <em>uma</em> das perguntas abaixo, usando o sandbox para validar.</li>
-            <li>Sem cópia entre alunos — pode comparar nos primeiros 5 min, depois individual.</li>
-            <li>Comentar cada query com a pergunta resolvida em <code>-- Q1: …</code></li>
-            <li>Entrega via Teams (canal da disciplina) <strong>antes</strong> do timer zerar.</li>
-          </ol>
-          <p class="hint"><strong>Critério mínimo de aprovação:</strong> 3 das 5 queries rodando sem erro no sandbox.</p>
-        </div>
-        <div class="box dkb">
-          <h3>As 5 perguntas</h3>
-          <ol style="font-size:.92rem;">
-            <li><strong>Q1</strong> · Top 3 bovinos com mais eventos registrados, com o brinco e o total.</li>
-            <li><strong>Q2</strong> · Para cada retiro, a média de eventos por mês em 2025 (use <code>substr(data, 1, 7)</code>).</li>
-            <li><strong>Q3</strong> · Capatazes que <em>nunca</em> registraram um evento de <code>tratamento</code> (LEFT + IS NULL ou NOT IN).</li>
-            <li><strong>Q4</strong> · Bezerros nascidos em 2026, com brinco da mãe e o capataz que registrou o nascimento.</li>
-            <li><strong>Q5</strong> · Para cada par <em>(retiro, mês)</em>, contagem de cada tipo de evento, com HAVING qtd ≥ 3.</li>
-          </ol>
-        </div>
-      </div>
-      <div class="timer-hero">
-        <div class="timer-label">Ponderada · 30 minutos</div>
-        <div class="timer-display" id="t-pond-disp">30:00</div>
-        <div class="timer-controls">
-          <button class="timer-btn start" onclick="Timer.start('pond')">▶ Iniciar</button>
-          <button class="timer-btn pause" onclick="Timer.pause('pond')">⏸ Pausar</button>
-          <button class="timer-btn reset" onclick="Timer.reset('pond')">↺ Reset</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- ╔══════════════════════ 21 — Próxima aula ═════════════╗ -->
+  <!-- ╔══════════════════════ 20 — Próxima aula ═════════════╗ -->
   <div class="slide">
     <div class="sc">
       <div class="sh pasture"><h2 class="st">Síntese · e na quinta?</h2><p class="ss">Hoje rodamos SQL no navegador. Na próxima aula, viramos isso em <em>app instalável no celular do capataz</em>.</p></div>
@@ -1017,7 +977,7 @@
   </div>
   <div class="nav-wrapper">
     <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
-    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">23</span></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">22</span></div>
     <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
   </div>
   <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>
@@ -1054,12 +1014,11 @@ function revealQuiz(n) {
   if (btn) btn.classList.add('hide');
 }
 
-// ── Timers (daily 15 min · lab 20 min · ponderada 30 min) ───────
+// ── Timers (daily 15 min · lab 20 min) ──────────────────────────
 var Timer = (function() {
   var timers = {
     daily: { total: 15 * 60, left: 15 * 60, intv: null, disp: 't-daily-disp' },
-    lab:   { total: 20 * 60, left: 20 * 60, intv: null, disp: 't-lab-disp'   },
-    pond:  { total: 30 * 60, left: 30 * 60, intv: null, disp: 't-pond-disp'  }
+    lab:   { total: 20 * 60, left: 20 * 60, intv: null, disp: 't-lab-disp'   }
   };
   function fmt(s) {
     var m = Math.floor(s / 60), r = s % 60;
