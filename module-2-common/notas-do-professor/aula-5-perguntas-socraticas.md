@@ -1,16 +1,16 @@
 # Aula 5 — Perguntas socráticas (cola do professor)
 
-> **Slides 15, 16 e 17 da aula 5 · 3 perguntas · ~2 min cada**
-> Formato: pergunta projetada · alunos pensam 30 s · 2–3 voluntários respondem · você revela a resposta-âncora e amarra com o artefato (PWA real ou servidor).
-> **Não é prova.** É diagnóstico do modelo mental antes da ponderada.
+> **Slides 17, 18 e 19 da aula 5 · 3 perguntas · ~2 min cada**
+> Formato: pergunta projetada · alunos pensam 30 s · 2–3 voluntários respondem · você revela a resposta-âncora (botão no slide) e amarra com o artefato real (PWA + servidor).
+> **Não é prova.** É diagnóstico do modelo mental — usado para calibrar o lab cooperativo.
 
 ---
 
 ## Pergunta 1 — UUID no cliente, não no servidor
 
-> *"Por que o `client_uuid` é gerado no celular do capataz, e não no servidor quando ele recebe o evento?"*
+> *"Por que o `client_uuid` é gerado no celular do capataz, e não no servidor Node quando ele recebe o evento?"*
 
-**Âncora:** seções 9 e 11 do material da aula 5; código real em `assets/brpec-pwa/app.js` (função `makeUUID`).
+**Âncora:** seções 10 e 11 do material da aula 5; código real em `assets/brpec-pwa/app.js` (função `makeUUID`).
 
 ### Resposta-âncora
 
@@ -33,68 +33,59 @@ Porque, no momento da coleta, o servidor pode estar **inacessível** — e o eve
 
 ---
 
-## Pergunta 2 — Offline-first vs offline-only
+## Pergunta 2 — MVC e responsabilidades
 
-> *"A PWA do BrPec é 'offline-first' ou 'offline-only'? Qual a diferença, e por que escolhemos a primeira?"*
+> *"Por que o Model não deve conhecer `req` e `res`? E por que o Controller não deve escrever SQL?"*
 
-**Âncora:** introdução do material da aula 5 + diagrama de arquitetura (slide 10).
+**Âncora:** seções 3 (SWEBOK) e 4 (MVC no BrPec) do material; arquivos `models/evento.model.js` e `controllers/sync.controller.js` no servidor.
 
 ### Resposta-âncora
 
-São coisas **diferentes**, com escolha de produto por trás.
+Porque cada camada tem **um motivo para mudar** — Single Responsibility Principle, base do *structural design* descrito no SWEBOK v4 Cap. 2. Misturar responsabilidades quebra o código quando a próxima mudança chega.
 
-- **Offline-only** = o app *não* conhece servidor. Tudo mora no celular, para sempre. Bom para to-do lists pessoais, diários, calculadoras. Péssimo para um ecossistema com 1 coordenador + N capatazes que precisam compartilhar dados.
-- **Offline-first** = o app *funciona* offline (todas as operações principais), mas *sabe* sincronizar quando online. O caminho online é uma **evolução**, não uma regressão.
-
-Escolhemos offline-first no BrPec por três razões:
-
-1. **Realidade do retiro.** WiFi raro ou nulo. Não dá pra perder coleta esperando sinal — é dado zootécnico que se perde para sempre se não for capturado na hora.
-2. **Necessidade do coordenador.** O dashboard de aftosa, o relatório de pesagens, a auditoria de movimentação — tudo depende de **N celulares convergindo para 1 SGBD**. Sem servidor, não tem dashboard.
-3. **Auditoria.** O SGBD da fazenda é a fonte da verdade. Cada celular é uma cópia parcial e temporária. Sem essa hierarquia, não tem fechamento contábil, não tem prestação de conta sanitária, não tem rastreabilidade.
+1. **Model conhecendo `req`/`res`.** Quando você decidir que parte do BrPec vai consumir via fila (RabbitMQ, Kafka, AWS SQS — comum para ingestão de eventos em escala), você precisa chamar a mesma lógica de validar+inserir sem ter um HTTP no meio. Se o Model tiver `req.body.deltas` espalhado por dentro, tudo quebra — você vai precisar reescrever o Model do zero. Modelo deve falar **SQL e regras de negócio**, e só.
+2. **Controller escrevendo SQL.** Quando você decidir trocar SQLite por Postgres (porque o servidor central da fazenda padronizou) ou por MongoDB (porque é o que o time já mantém), você precisa achar todos os `db.prepare(...)` espalhados pelos controllers. Controller deve **orquestrar** — receber, validar, chamar Model, formatar resposta.
+3. **O ganho prático:** dá pra testar Model sem subir HTTP (injetar `:memory:` e chamar `insertMany` direto). Dá pra testar Controller com Model mockado (forçar erro do banco e ver o JSON de resposta). Cada teste fica pequeno, rápido, sem ressonância em refactor.
 
 ### Exemplo BrPec aplicado
 
-- **Offline-only seria:** "cada capataz tem suas pesagens no celular dele, e ponto." Funciona até alguém pedir o relatório consolidado da fazenda — aí não tem.
-- **Offline-first é:** "cada capataz tem suas pesagens, mas elas *vão* para o SGBD quando der." Quando o coordenador puxa o dashboard, ele vê tudo (dos celulares que já sincronizaram).
-
-### A virada conceitual que importa
-
-Em offline-first, "estar online" é uma **otimização** (sincronizar agora em vez de daqui a uma hora). Em offline-only, "estar online" é uma **limitação** (você nem pensa em servidor). **Mude o framing e o produto muda.** Esse é o salto da aula 5.
+- **Cenário real:** aula 6 (Back-End II) vai adicionar 3 endpoints CRUD (GET listar, PUT editar, DELETE remover). Se respeitarmos MVC hoje, basta criar `evento.controller.js` (ou expandir o `sync.controller.js`) e adicionar novas funções no `evento.model.js` que retornam dados — reusando o `Database` que já existe. Se misturarmos hoje, na próxima aula vamos refatorar tudo antes de adicionar feature.
+- **No próprio repo:** abra `assets/brpec-sync-server/server.js`. Se o arquivo tiver mais de 100 linhas e estiver fazendo SQL + validação + roteamento, é candidato número 1 a refactor MVC.
 
 ### Possíveis confusões
 
-- *"Então PWA é sempre offline-first?"* → **Não.** PWA é tecnologia (manifest + SW + HTTPS). Você pode fazer PWA online-only que só cacheia a shell e exige rede pra tudo (ex.: Twitter Lite tinha aspectos disso). Offline-first é decisão de produto sobre como usar a tecnologia.
+- *"Não é overengineering para uma aula de back-end inicial?"* → **Não.** MVC não é padrão de "projeto grande" — é o mínimo para o código durar 2 sprints. Um arquivo só é viável até ~150 linhas; depois disso vira espaguete em 100% dos casos.
+- *"E onde fica a View no nosso servidor HTTP?"* → **A View é o JSON de resposta.** No frontend (PWA), tem View HTML. No backend HTTP, View = contrato de saída (o objeto que o cliente recebe). Não confundir com template engines (EJS, Pug etc.), que são uma forma de View.
+- *"Posso ter o Model sem usar classes?"* → **Sim.** No nosso BrPec, o Model é só um módulo com funções exportadas (`insertMany`, `findRecent`). Não precisa ser uma classe — basta ser um arquivo com uma fronteira clara.
 
 ---
 
-## Pergunta 3 — Por que SW vive separado da página
+## Pergunta 3 — TDD bem feito · teste de porta, não de entranha
 
-> *"Por que o service worker vive em um arquivo separado da página (`sw.js`) e roda em uma thread diferente?"*
+> *"Por que nosso teste de idempotência usa `supertest` + `POST` em vez de chamar `insertMany()` direto do Model?"*
 
-**Âncora:** seção 4 do material (Service Worker · ciclo de vida) + experimentação com DevTools → Application → Service Workers.
+**Âncora:** seção 13 (TDD) e 14 (TDD WDIAGW + SDD) do material; arquivo `server.test.js`. Vídeo de referência: Ian Cooper · "TDD, Where Did It All Go Wrong" · DevTernity.
 
 ### Resposta-âncora
 
-Três razões — cada uma resolveria um problema sozinha, mas as três juntas **definem** o que SW é:
+Porque queremos testar **comportamento**, não **implementação**. Essa é a tese central de Ian Cooper em *"TDD, Where Did It All Go Wrong"* — e é o que separa um teste útil de um teste-zumbi.
 
-1. **Ciclo de vida independente.** O SW continua existindo *depois* que a aba fecha. Ele pode receber push notification, sincronizar em background, lidar com fetch de outras abas. Se estivesse acoplado à página, tudo morreria com ela — e você perderia 90% da utilidade.
-2. **Interceptação de requisições.** O browser precisa de uma camada *entre* a página e a rede. O SW é essa camada. Se ele vivesse na página, intermediar a si mesmo geraria recursão infinita. Separação é arquitetural, não estilística.
-3. **Thread separada (não bloqueia a UI).** Operações de cache, IndexedDB, criptografia podem ser pesadas. Numa thread isolada, a UI segue fluida mesmo com SW trabalhando. É como ter um web worker, mas com superpoderes de rede.
+1. **Sobrevivência a refactor.** Se amanhã quebrarmos `insertMany` em duas funções (`validate` + `insertOne`), o teste continua verde — porque ele só observa "POST com este body → resposta com `{accepted, skipped}`". A implementação interna pode mudar 100%, contanto que o contrato HTTP fique igual.
+2. **Documentação do contrato real.** Quem lê o teste sabe exatamente o que o cliente HTTP vai ver — header, status, body. Não precisa adivinhar o caminho até o banco. **O teste virou a especificação executável da rota.**
+3. **Pega bugs de integração.** Falha de CORS, middleware errado, parsing de JSON quebrado, content-type esquisito — tudo dentro do raio do teste. Um teste que ataca só `insertMany` *não* pegaria nenhum desses bugs reais.
 
-### Consequência prática (e contraintuitiva)
-
-Você atualiza a página, mas o **SW antigo continua servindo o cache antigo** até `skipWaiting() + clients.claim()`. É por isso que mudanças em PWA às vezes "demoram a aparecer" — é o SW antigo ainda no comando, e ele só dá lugar ao novo na próxima visita "limpa".
-
-No BrPec, isso é gerenciado pelo nome do cache: `brpec-pwa-v1` → `brpec-pwa-v2`. Quando você muda o número, o SW novo entra em estado "waiting"; quando você dispara `skipWaiting` no `install`, ele assume na hora.
+A linha do Ian Cooper: **escreva testes contra portas (entradas do sistema), não contra entranhas (classes/funções internas).** Cada bug encontrado em produção vira 1 teste novo, mas só na borda. Refactor permanece barato.
 
 ### Exemplo BrPec aplicado
 
-- **Cenário:** capataz registrou evento offline. Fechou o app. Andou 200m até a sede, onde tem WiFi. **Sem SW separado:** o app só sincronizaria quando ele reabrisse. **Com SW e Background Sync API (futuro próximo):** o SW detecta que voltou conectividade e sincroniza sozinho — o capataz nem precisa abrir o app.
+- **Cenário concreto:** depois da aula 10 (Testes & Automação), vamos quebrar o controller em `validate(deltas)` + `insertBatch(deltas)`. Se o teste atacasse o Model diretamente, teríamos que reescrever 5 testes. Como ataca a porta HTTP, **não precisamos tocar em teste nenhum.** Toda a equipe trabalha mais rápido.
+- **Ponte para SDD (Spec-Driven Development):** Kiro, spec-kit e Tessl extrapolam essa ideia — em vez de "teste descreve o contrato", a *spec* descreve o contrato, e tanto código quanto teste são derivados dela. Quem domina TDD bem feito hoje (Cooper) já tem o mindset para SDD amanhã.
 
 ### Possíveis confusões
 
-- *"Se SW é tão poderoso, posso colocar tudo nele?"* → **Não.** SW não acessa DOM, não acessa `localStorage`, não acessa `window`. É um runtime restrito de propósito — para forçar bons hábitos de design.
-- *"Como faço o SW pegar nova versão imediatamente?"* → **`self.skipWaiting()` no `install` + `clients.claim()` no `activate`.** Isso é o que a PWA do BrPec faz — ver `sw.js`, linhas 26 e 36.
+- *"Então testes unitários do Model são errados?"* → **Não.** Eles têm lugar quando o Model tem regra de negócio complexa que vale testar isoladamente (ex.: cálculo de juros). Para CRUD direto como o nosso, teste de porta cobre tudo com 5 linhas.
+- *"E performance? Não é mais lento subir um app inteiro a cada teste?"* → **Quase imperceptível com `:memory:`.** O nosso suite roda em ~300 ms. Para suites maiores, fixtures + setup compartilhado resolvem.
+- *"Spec-Driven Development vai matar TDD?"* → **Vai redefinir, não matar.** TDD sobrevive como modelo mental ("contrato antes de implementação"); SDD muda o artefato que captura esse contrato (de teste para spec executável). É evolução, não substituição.
 
 ---
 
@@ -104,24 +95,27 @@ No BrPec, isso é gerenciado pelo nome do cache: `brpec-pwa-v1` → `brpec-pwa-v
 2. **30 segundos de silêncio absoluto.** O silêncio é o autoestudo subindo à consciência.
 3. **Chame 2–3 voluntários.** Não corrija ainda — colete.
 4. **Revele a resposta-âncora** (próximo clique no slide). Use 1 dos exemplos BrPec dessa folha.
-5. **Amarre com o artefato real:** *"abrindo a PWA agora no projetor — repare que isso aqui no `app.js` é exatamente o que estamos falando."*
+5. **Amarre com o artefato real:** *"abrindo o `evento.model.js` agora no projetor — repare que isso aqui é exatamente o que estamos falando."*
 6. **Não puna quem errou** — diagnostique. Erros consistentes apontam para reforço no lab.
 
 ### Sinais de alarme
 
-- Se **mais da metade da turma** errar a Pergunta 1 (UUID no cliente): pause o lab por 5 min e mostre o cenário "rede cai no meio do POST" passo a passo no projetor. A ponderada depende dessa intuição firme.
-- Se quase ninguém errar a Pergunta 3 (SW separado): bom sinal — a turma absorveu o conceito do material. Pode acelerar o demo.
+- Se **mais da metade da turma** errar a Pergunta 1 (UUID no cliente): pause antes do lab e mostre o cenário "rede cai no meio do POST" passo a passo no projetor.
+- Se **mais da metade da turma** errar a Pergunta 2 (MVC): faça um mini-tour pelos 3 arquivos do servidor (`models/`, `controllers/`, `server.js`) antes do lab. Sem essa intuição, o autoestudo da aula 6 quebra.
+- Se quase ninguém errar a Pergunta 3 (TDD bem feito): bom sinal — a turma absorveu o conceito. Pode acelerar o demo e dar mais tempo ao lab.
 
 ---
 
-## Bônus · perguntas-pivô para o lab e ponderada
+## Bônus · perguntas-pivô para o lab cooperativo
 
 Quando um grupo travar no lab, use estas perguntas-pivô:
 
 | Sintoma | Pergunta-pivô |
 |---|---|
-| "O sync não funciona" | *"Você abriu o DevTools → Network → procura o POST /sync/deltas. Que status ele retornou?"* |
-| "O Lighthouse PWA score está baixo" | *"Abra a aba Application no DevTools. Manifest está válido? Service Worker está activated? Esses são 2 dos 3 critérios principais."* |
+| "O servidor não sobe" | *"Qual a saída do `npm install`? `better-sqlite3` requer compilação — node-gyp + Python instalados?"* |
+| "O sync não funciona" | *"Abriu o DevTools → Network → procura o POST /sync/deltas. Que status ele retornou?"* |
 | "Os dados somem no reload" | *"Você está vendo a chave 'brpec.db' no IndexedDB → kv? Se sim, ela tem tamanho > 0? O `persist()` está sendo chamado depois do INSERT?"* |
 | "O segundo sync ainda aceita os mesmos eventos" | *"O `client_uuid` é o mesmo nos dois POSTs? Verifique no DevTools → Network → preview do payload."* |
 | "Tem erro `crypto.randomUUID is not a function`" | *"Você está em HTTPS ou localhost? Se for IP de LAN, o fallback do `makeUUID()` precisa estar ativo. Releia `app.js`."* |
+| "Não sei onde fica a regra de negócio" | *"Olhe no `models/evento.model.js`. Toda regra que tem SQL mora lá. Se vir SQL em `controllers/`, é bug."* |
+| "Os 5 testes não passam todos" | *"Qual o nome do teste vermelho? Leia a mensagem do `assert.equal` — ela está descrevendo o contrato esperado vs o real."* |

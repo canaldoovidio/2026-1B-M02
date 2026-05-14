@@ -4,7 +4,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📲</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aula 5 — PWA + Sync Offline-First — Material — BrPec — Inteli</title>
+  <title>Aula 5 — Back-End I · Node.js + PWA Sync — Material — BrPec — Inteli</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../../css/inteli-styles.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600&display=swap" rel="stylesheet">
@@ -116,8 +116,8 @@
     <div class="container">
       <span class="mat-badge">Módulo 2 · IN02 · Turma 26</span>
       <span class="mat-badge">Material de leitura</span>
-      <h1>Aula 5 — PWA + Sync Offline-First com Node</h1>
-      <p class="subtitle">Como transformar uma página com sql.js (aula 4) em um <strong>app instalável</strong> que persiste banco entre sessões, sincroniza com o servidor quando online e mantém a integridade via UUID v4 no cliente. Toda a engenharia explicada — e o código real está em <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">assets/brpec-pwa/</code> e <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">assets/brpec-sync-server/</code>.</p>
+      <h1>Aula 5 — Back-End I · Node.js, Models e Controllers + PWA Sync</h1>
+      <p class="subtitle">O que é <strong>Node.js</strong>, como organizar um servidor em <strong>Models / Controllers / Routes</strong> (SWEBOK v4 Cap. 2), e como esse servidor recebe os eventos da PWA da aula anterior e os persiste no <strong>SQLite</strong> da aula 4 — tudo sustentado por <strong>TDD</strong> (Red-Green-Refactor, "teste de porta") com uma janela sobre <strong>Spec-Driven Development</strong>. Código real em <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">assets/brpec-pwa/</code> + <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">assets/brpec-sync-server/</code>.</p>
       <a href="../../index.html" class="btn btn-outline-light btn-sm">← Voltar ao Módulo</a>
     </div>
   </header>
@@ -128,19 +128,22 @@
         <h4>Neste material</h4>
         <a href="#sec-auto">0. Autoestudos</a>
         <a href="#sec-context">1. De onde paramos</a>
-        <a href="#sec-pwa">2. PWA · 3 pilares</a>
-        <a href="#sec-manifest">3. Manifest</a>
-        <a href="#sec-sw">4. Service Worker</a>
-        <a href="#sec-cache">5. Estratégias de cache</a>
-        <a href="#sec-idb">6. Persistência · sql.js + IndexedDB</a>
-        <a href="#sec-uuid">7. UUID v4 no cliente</a>
-        <a href="#sec-sync">8. Estratégia de sync</a>
-        <a href="#sec-server">9. Servidor Node</a>
-        <a href="#sec-test">10. Spec mínimo</a>
-        <a href="#sec-tour">11. Tour pelo código</a>
-        <a href="#sec-lab">12. Lab nos 5 grupos</a>
-        <a href="#sec-pond">13. Ponderada · Lighthouse</a>
-        <a href="#sec-next">14. Conexão com a aula 6</a>
+        <a href="#sec-node">2. O que é Node.js?</a>
+        <a href="#sec-swebok">3. SWEBOK v4 · Models e Controllers</a>
+        <a href="#sec-mvc">4. MVC aplicado ao BrPec</a>
+        <a href="#sec-pwa">5. PWA · 3 pilares</a>
+        <a href="#sec-manifest">6. Manifest</a>
+        <a href="#sec-sw">7. Service Worker</a>
+        <a href="#sec-cache">8. Estratégias de cache</a>
+        <a href="#sec-idb">9. Persistência · sql.js + IndexedDB</a>
+        <a href="#sec-uuid">10. UUID v4 no cliente</a>
+        <a href="#sec-sync">11. Estratégia de sync</a>
+        <a href="#sec-server">12. Servidor Node · MVC</a>
+        <a href="#sec-test">13. TDD · Red-Green-Refactor</a>
+        <a href="#sec-sdd">14. TDD WDIAGW + Spec-Driven</a>
+        <a href="#sec-tour">15. Tour pelo código</a>
+        <a href="#sec-lab">16. Lab cooperativo (40min)</a>
+        <a href="#sec-next">17. Conexão com a aula 6</a>
       </div>
     </aside>
 
@@ -173,8 +176,38 @@
           </div>
           <div class="auto-card">
             <h5>better-sqlite3</h5>
-            <p>SQLite síncrono em Node — usado no servidor de sync. API clara, performance ótima, sem callback hell.</p>
+            <p>SQLite síncrono em Node — usado no servidor. API clara, performance ótima, sem callback hell.</p>
             <p class="src"><a href="https://github.com/WiseLibs/better-sqlite3" target="_blank">github.com/WiseLibs/better-sqlite3</a></p>
+          </div>
+          <div class="auto-card">
+            <h5>Como sair do zero em Node.js em apenas uma aula</h5>
+            <p>Referência do Prof. Ovidio — leitura/vídeo curto. Faça antes ou logo após a aula 5 e antes da aula 6.</p>
+            <p class="src">Indicação Ovidio · COM Semana 04</p>
+          </div>
+          <div class="auto-card">
+            <h5>SWEBOK v4 · Cap. 2 — Structural &amp; Behavioral Design</h5>
+            <p>Base teórica para "Models e Controllers". Define estrutura (camadas) antes do comportamento (fluxos).</p>
+            <p class="src">IEEE Computer Society · 2024</p>
+          </div>
+          <div class="auto-card">
+            <h5>Livro Didático — Teste de Unidade</h5>
+            <p>Capítulo introdutório de TDD. Forma base teórica para nossa abordagem com <code>node:test</code> + supertest.</p>
+            <p class="src">Indicação Ovidio · COM Semana 04</p>
+          </div>
+          <div class="auto-card">
+            <h5>Test-Driven Development</h5>
+            <p>Kent Beck — caps. 1–3. O texto canônico do ciclo Red → Green → Refactor.</p>
+            <p class="src">Beck, Kent · Addison-Wesley</p>
+          </div>
+          <div class="auto-card">
+            <h5>TDD, Where Did It All Go Wrong</h5>
+            <p>Ian Cooper · DevTernity (~1 h). Por que a maioria das equipes faz TDD errado — e como consertar.</p>
+            <p class="src"><a href="https://www.youtube.com/results?search_query=Ian+Cooper+TDD+Where+did+it+all+go+wrong" target="_blank">YouTube · busque "Ian Cooper TDD"</a></p>
+          </div>
+          <div class="auto-card">
+            <h5>Understanding Spec-Driven Development</h5>
+            <p>O que está nascendo após o TDD: Kiro (AWS), spec-kit (GitHub), Tessl. Janela para o futuro.</p>
+            <p class="src">Indicação Ovidio · COM Semana 04</p>
           </div>
         </div>
       </section>
@@ -189,17 +222,114 @@
           <li><strong>Não é instalável.</strong> É uma aba do Chrome. O capataz, quando precisar registrar uma pesagem no Cocho Novo, vai ter que abrir o navegador, digitar URL, navegar… ou esquecer e usar papel.</li>
           <li><strong>Não fala com servidor.</strong> Cada celular tem seu sandbox isolado. O coordenador não tem dashboard consolidado. Sem caminho de volta para o SGBD da fazenda.</li>
         </ol>
-        <p>Esta aula resolve as três limitações com técnicas precisas:</p>
+        <p>Esta aula resolve as três limitações com técnicas precisas — mas, antes da PWA, vamos olhar com cuidado para o <em>back-end</em> que recebe os dados quando o sinal volta:</p>
         <ul>
-          <li><strong>Persistência</strong> → blob do banco vai pro <strong>IndexedDB</strong> a cada mutação; no boot, lê de lá.</li>
-          <li><strong>Instalabilidade</strong> → <strong>manifest</strong> + <strong>service worker</strong> = Chrome oferece "Instalar".</li>
-          <li><strong>Sincronização</strong> → <code>POST /sync/deltas</code> contra um servidor Node que aceita idempotentemente via <code>INSERT OR IGNORE</code>.</li>
+          <li><strong>O que é Node.js</strong> e por que ele encaixa bem nesse ecossistema (mesma linguagem da PWA).</li>
+          <li><strong>Como organizar</strong> o servidor em <em>Models</em> e <em>Controllers</em> (SWEBOK v4 Cap. 2) — separar estrutura e comportamento.</li>
+          <li><strong>Como conectar</strong> esse servidor ao SQLite da aula 4 (mesmo motor, do outro lado da rede) via <code>better-sqlite3</code>.</li>
+          <li><strong>Como sustentar</strong> esse código com <strong>TDD</strong> bem feito — teste de porta, não de entranha — e abrir janela para <strong>Spec-Driven Development</strong>.</li>
+          <li>E só então: <strong>persistência</strong> (IndexedDB), <strong>instalabilidade</strong> (manifest + SW) e <strong>sync idempotente</strong> (<code>INSERT OR IGNORE</code> + <code>client_uuid</code>) — revisita compacta para amarrar o ciclo.</li>
         </ul>
       </section>
 
-      <!-- ─── 2. PWA · 3 pilares ────────────────────────────── -->
+      <!-- ─── 2. O que é Node.js ────────────────────────────── -->
+      <section class="mat-section" id="sec-node">
+        <h2>2. O que é Node.js?</h2>
+        <p><strong>Node.js</strong> é um runtime que executa JavaScript fora do navegador. Usa o motor <strong>V8</strong> (o mesmo do Chrome) + APIs de sistema (arquivos, rede, processos). Com isso, o mesmo JS que rodava só no navegador agora roda em servidores, ferramentas de linha de comando, e tudo entre os dois.</p>
+        <h3>3 ideias-âncora</h3>
+        <ul>
+          <li><strong>Event loop.</strong> Um único thread principal cuida de I/O assíncrono (rede, disco). Enquanto uma requisição espera o banco, o servidor já atende outras 1000. Perfeito para servidores web — muita conexão, pouca CPU por requisição.</li>
+          <li><strong>npm.</strong> O maior ecossistema de pacotes do mundo. <code>express</code> (HTTP), <code>better-sqlite3</code> (SQLite), <code>supertest</code> (testar HTTP), <code>cors</code> — todos viram <code>npm install &lt;pkg&gt;</code> e <code>require('&lt;pkg&gt;')</code>.</li>
+          <li><strong>Mesma linguagem dos dois lados.</strong> A PWA da aula 4 é JS. O servidor de hoje é JS. Modelos e validações podem ser <em>literalmente</em> compartilhados via módulos comuns. Sem context switch entre linguagens.</li>
+        </ul>
+        <h3>Server HTTP em 8 linhas</h3>
+<pre class="codeblock"><span class="hl-cmt">// servidor.js</span>
+<span class="hl-kw">const</span> express = <span class="hl-fn">require</span>(<span class="hl-str">'express'</span>);
+<span class="hl-kw">const</span> app = <span class="hl-fn">express</span>();
+app.<span class="hl-fn">use</span>(express.<span class="hl-fn">json</span>());
+app.<span class="hl-fn">get</span>(<span class="hl-str">'/ping'</span>, (req, res) =&gt; {
+  res.<span class="hl-fn">json</span>({ ok: <span class="hl-kw">true</span>, ts: Date.<span class="hl-fn">now</span>() });
+});
+app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>, () =&gt; console.<span class="hl-fn">log</span>(<span class="hl-str">'BrPec rodando em :3000'</span>));</pre>
+        <h3>Como Node se posiciona vs outras stacks</h3>
+        <table class="mat-table">
+          <thead><tr><th>Stack</th><th>Tipicamente para</th><th>O que ganha em Node</th></tr></thead>
+          <tbody>
+            <tr><td>Python + Flask/FastAPI</td><td>APIs, data science</td><td>Mesma linguagem do front (no BrPec, casa)</td></tr>
+            <tr><td>Java + Spring</td><td>Sistemas corporativos</td><td>Curva de aprendizado mais suave para iniciantes</td></tr>
+            <tr><td>Go + net/http</td><td>Performance bruta, infra</td><td>Ecossistema mais maduro para SaaS web</td></tr>
+            <tr><td>Ruby + Rails</td><td>MVPs rápidos</td><td>Mais flexível, menos opinativo</td></tr>
+          </tbody>
+        </table>
+        <div class="callout callout-tip">
+          <div class="callout-label">Autoestudo essencial</div>
+          <p>Leia/assista <strong>"Como sair do zero em Node.js em apenas uma aula"</strong> (referência do Prof. Ovidio) antes da próxima aula. Vamos aprofundar endpoints CRUD na aula 6 — não dá pra parar para revisitar fundamentos lá.</p>
+        </div>
+      </section>
+
+      <!-- ─── 3. SWEBOK v4 · Models e Controllers ────────────── -->
+      <section class="mat-section" id="sec-swebok">
+        <h2>3. SWEBOK v4 · Cap. 2 · base teórica de Models e Controllers</h2>
+        <p>Antes de "MVC vira jargão", vale ancorar a ideia na literatura. O <strong>SWEBOK (Software Engineering Body of Knowledge)</strong> v4, da IEEE Computer Society (2024), dedica o Capítulo 2 do Knowledge Area "Software Design" para o que chama de <em>Structural and Behavioral Design</em>.</p>
+        <h3>Os dois lados do design</h3>
+        <ul>
+          <li><strong>Structural design</strong> — como o sistema é <em>dividido em partes</em>: módulos, camadas, interfaces, dependências. Resposta a "<em>quem faz o quê?</em>"</li>
+          <li><strong>Behavioral design</strong> — como as partes <em>colaboram em tempo de execução</em>: fluxos de dados, sequências de eventos, casos de uso. Resposta a "<em>como elas conversam?</em>"</li>
+        </ul>
+        <p>A regra-ouro: <strong>defina os limites antes dos fluxos</strong>. Cada parte deve ter <em>um motivo para mudar</em> (Single Responsibility Principle).</p>
+        <h3>Por que isso importa <em>agora</em>?</h3>
+        <p>Quando você escreve um servidor inteiro em um único <code>app.js</code> com rotas, SQL, validações e regras de negócio todos misturados, ele funciona — até começar a crescer. Daí o primeiro bug pequeno vira refactor gigante porque <em>todo mundo conhece todo mundo</em>.</p>
+        <p><strong>MVC</strong> é uma escolha estrutural (3 camadas, 3 responsabilidades). Os controllers definem o comportamento (o que cada rota faz). Mantendo as camadas separadas:</p>
+        <ul>
+          <li>Trocar o banco (SQLite → Postgres) toca <em>apenas</em> o Model.</li>
+          <li>Trocar o transporte (HTTP → fila de mensagens) toca <em>apenas</em> o Routes + Controller.</li>
+          <li>Testar regra de negócio pura: chama o Model direto, sem subir HTTP.</li>
+        </ul>
+        <div class="callout callout-deep">
+          <div class="callout-label">Trio para construir intuição teórica</div>
+          <p>① <strong>SWEBOK v4 Cap. 2</strong> — vocabulário canônico. ② <strong>Livro Didático — Teste de Unidade</strong> (Ovidio) — como testar cada parte isoladamente. ③ <strong>Test-Driven Development</strong> de Kent Beck (caps. 1–3) — o ritmo que faz a estrutura emergir naturalmente.</p>
+        </div>
+      </section>
+
+      <!-- ─── 4. MVC aplicado ao BrPec ─────────────────────── -->
+      <section class="mat-section" id="sec-mvc">
+        <h2>4. MVC aplicado ao BrPec</h2>
+        <p>"Model, View, Controller" é uma sigla antiga (1979 · Trygve Reenskaug · Smalltalk-80). No contexto de servidores HTTP modernos, ela se ajusta assim:</p>
+        <table class="mat-table">
+          <thead><tr><th>Camada</th><th>Responde a</th><th>No BrPec hoje</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Model</strong></td><td>Como o estado é guardado? Qual a regra de negócio? Qual a invariante?</td><td><code>evento.model.js</code> — schema da tabela <code>evento_recebido</code> + statements preparados + funções <code>insertMany</code>, <code>findRecent</code>.</td></tr>
+            <tr><td><strong>View</strong></td><td>Como o estado vira saída para o cliente?</td><td>No HTTP/JSON: a View é o objeto retornado por <code>res.json(...)</code> no Controller.</td></tr>
+            <tr><td><strong>Controller</strong></td><td>Quem orquestra: recebe request, valida, chama o model, monta resposta?</td><td><code>sync.controller.js</code> — <code>postDeltas(req, res)</code>, <code>getSnapshot(req, res)</code>.</td></tr>
+            <tr><td><strong>Routes</strong></td><td>Que URL chama qual controller?</td><td><code>server.js</code> — <code>app.post('/sync/deltas', postDeltas)</code>.</td></tr>
+          </tbody>
+        </table>
+        <h3>As 3 regras que <em>não se quebra</em></h3>
+        <ol>
+          <li><strong>Model nunca conhece <code>req</code>/<code>res</code>.</strong> Se conhecer, quando você trocar de HTTP para fila (Kafka, RabbitMQ), tudo quebra. Model fala SQL e regras, e só.</li>
+          <li><strong>Controller nunca escreve SQL.</strong> Se escrever, quando você trocar SQLite por Postgres (ou MongoDB), tudo quebra. Controller orquestra, valida, formata.</li>
+          <li><strong>Routes não tem lógica.</strong> Só liga URL → função do Controller. Se for tentado a adicionar <code>if</code> em route, é sinal de que o controller precisa de uma sub-rotina.</li>
+        </ol>
+        <h3>Estrutura de pastas que vamos seguir</h3>
+        <div class="file-tree">
+<span class="dir">module-2-common/assets/brpec-sync-server/</span>
+  <span class="file">server.js</span>              <span class="comment"># ROUTES + bootstrap do Express</span>
+  <span class="dir">controllers/</span>
+    <span class="file">sync.controller.js</span>    <span class="comment"># CONTROLLER · valida payload, chama Model</span>
+  <span class="dir">models/</span>
+    <span class="file">evento.model.js</span>       <span class="comment"># MODEL · SQL + statements + transações</span>
+  <span class="file">server.test.js</span>         <span class="comment"># testes contra a PORTA HTTP</span>
+  <span class="file">package.json</span>
+        </div>
+        <div class="callout callout-info">
+          <div class="callout-label">Conexão com a aula 4</div>
+          <p>O <em>Model</em> do BrPec usa exatamente as mesmas tabelas e os mesmos JOINs que vocês aprenderam ontem (capataz, retiro, bovino, evento_zootecnico). A diferença é só: agora o motor SQLite roda no servidor Node, não no navegador. <strong>O SQL é o mesmo; muda quem digita.</strong></p>
+        </div>
+      </section>
+
+      <!-- ─── 5. PWA · 3 pilares ────────────────────────────── -->
       <section class="mat-section" id="sec-pwa">
-        <h2>2. PWA · três pilares</h2>
+        <h2>5. PWA · três pilares</h2>
         <p>Uma <strong>Progressive Web App</strong> é uma página web que ganha 3 superpoderes: instalabilidade, capacidade offline e acesso a APIs nativas (notificações, sync em background, câmera, …). Os superpoderes vêm de três tecnologias mínimas:</p>
         <h3>🔒 HTTPS (ou localhost)</h3>
         <p>Sem HTTPS, o navegador bloqueia Service Worker, <code>crypto.subtle</code>, e várias outras APIs. Em produção é obrigatório — GitHub Pages serve via HTTPS. Em dev, <code>localhost</code> é exceção válida.</p>
@@ -215,7 +345,7 @@
 
       <!-- ─── 3. Manifest ───────────────────────────────────── -->
       <section class="mat-section" id="sec-manifest">
-        <h2>3. Manifest · o cartão de visita do app</h2>
+        <h2>6. Manifest · o cartão de visita do app</h2>
         <p>Arquivo único, JSON. Linkado pelo HTML com <code>&lt;link rel="manifest" href="./manifest.webmanifest"&gt;</code>.</p>
 <pre class="codeblock"><span class="hl-cmt">// module-2-common/assets/brpec-pwa/manifest.webmanifest</span>
 {
@@ -250,7 +380,7 @@
 
       <!-- ─── 4. Service Worker ────────────────────────────── -->
       <section class="mat-section" id="sec-sw">
-        <h2>4. Service Worker · ciclo de vida</h2>
+        <h2>7. Service Worker · ciclo de vida</h2>
         <p>O SW tem 3 eventos importantes. Dois você implementa, um o navegador dispara para cada requisição.</p>
         <h3>install · pre-cache da shell</h3>
         <p>Roda uma vez por versão do SW. O lugar para carregar o cache com tudo que o app precisa para subir offline: HTML, CSS, JS, manifest, ícone, motor WASM, banco seed.</p>
@@ -291,7 +421,7 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'activate'
 
       <!-- ─── 5. Estratégias de cache ──────────────────────── -->
       <section class="mat-section" id="sec-cache">
-        <h2>5. Estratégias de cache · qual usar onde?</h2>
+        <h2>8. Estratégias de cache · qual usar onde?</h2>
         <p>A regra básica: <strong>shell estática</strong> usa <em>cache-first</em>; <strong>dados frescos</strong> usam <em>network-first</em>.</p>
         <h3>cache-first · para a shell</h3>
         <p>Tenta o cache. Se achou, devolve direto. Senão, busca rede e cacheia. Bom para HTML, CSS, JS, WASM, ícones, banco seed — coisas que mudam só com deploy.</p>
@@ -321,7 +451,7 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'activate'
 
       <!-- ─── 6. Persistência ──────────────────────────────── -->
       <section class="mat-section" id="sec-idb">
-        <h2>6. Persistência · sql.js + IndexedDB</h2>
+        <h2>9. Persistência · sql.js + IndexedDB</h2>
         <p>O sandbox da aula 4 carrega o banco em memória — fim do reload, banco volta ao seed. Para persistir, gravamos o blob binário do banco no IndexedDB depois de cada mutação. No próximo boot, lemos de lá em vez do seed.</p>
         <h3>Fluxo de boot (3 passos)</h3>
         <ol>
@@ -360,7 +490,7 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'activate'
 
       <!-- ─── 7. UUID ─────────────────────────────────────── -->
       <section class="mat-section" id="sec-uuid">
-        <h2>7. UUID v4 · gerado no celular do capataz</h2>
+        <h2>10. UUID v4 · gerado no celular do capataz</h2>
         <p>Cada evento, no momento da coleta, recebe um <code>client_uuid</code> gerado localmente. Esse id acompanha o evento toda vez que ele atravessa a rede — e é a base da idempotência.</p>
         <h3>Por que não deixar o servidor gerar o id?</h3>
         <ul>
@@ -390,7 +520,7 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'activate'
 
       <!-- ─── 8. Estratégia de sync ──────────────────────── -->
       <section class="mat-section" id="sec-sync">
-        <h2>8. Estratégia de sync · arquitetura do reencontro</h2>
+        <h2>11. Estratégia de sync · arquitetura do reencontro</h2>
         <p>Cliente acumula offline. Servidor reconcilia idempotentemente. Sem locks, sem janela de conflito.</p>
         <h3>Push de deltas (foco do MVP)</h3>
         <p>Fluxo: cliente lista eventos com <code>synced=0</code> → monta payload → <code>POST /sync/deltas</code> → servidor responde com <code>{accepted, skipped, accepted_uuids}</code> → cliente marca como <code>synced=1</code>.</p>
@@ -418,9 +548,9 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'activate'
 
       <!-- ─── 9. Servidor Node ────────────────────────────── -->
       <section class="mat-section" id="sec-server">
-        <h2>9. Servidor Node · Express + better-sqlite3</h2>
-        <p>O servidor é deliberadamente minúsculo (~120 linhas com comentários generosos). Sua única responsabilidade: receber deltas e gravar idempotentemente em um SQLite mestre.</p>
-        <h3>Anatomia</h3>
+        <h2>12. Servidor Node · MVC com Express + better-sqlite3</h2>
+        <p>O servidor é deliberadamente minúsculo (~120 linhas com comentários generosos), mas <strong>organizado em MVC</strong>: cada arquivo tem uma e apenas uma responsabilidade. Releia a seção 4 se precisar refrescar o porquê.</p>
+        <h3>Anatomia (versão didática · MVC visível)</h3>
 <pre class="codeblock"><span class="hl-kw">const</span> express  = <span class="hl-fn">require</span>(<span class="hl-str">'express'</span>);
 <span class="hl-kw">const</span> cors     = <span class="hl-fn">require</span>(<span class="hl-str">'cors'</span>);
 <span class="hl-kw">const</span> Database = <span class="hl-fn">require</span>(<span class="hl-str">'better-sqlite3'</span>);
@@ -486,8 +616,17 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'activate'
 
       <!-- ─── 10. Spec ─────────────────────────────────────── -->
       <section class="mat-section" id="sec-test">
-        <h2>10. Spec mínimo · idempotência via supertest</h2>
-        <p>Mantemos a cultura TDD do material original do Afonso ("todo código nasce de um teste que falha"), mas com <strong>1 teste-âncora</strong> em vez de 4 specs por camada. O contrato-chave da aula é idempotência — vamos testá-lo.</p>
+        <h2>13. TDD · Red → Green → Refactor + spec mínimo</h2>
+        <p><strong>Test-Driven Development</strong> não é "escrever testes". É um <em>ritmo</em> de trabalho em 3 tempos:</p>
+        <ul>
+          <li>🔴 <strong>RED</strong> — escrever um teste que descreve o comportamento desejado. Ele falha (não existe código para passar). <em>Esse "vermelho" é o contrato.</em></li>
+          <li>🟢 <strong>GREEN</strong> — escrever <em>o mínimo</em> de código de produção para passar. Não tente resolver problemas futuros. Só passa o teste.</li>
+          <li>🔵 <strong>REFACTOR</strong> — agora que está verde, reorganize: extrair função, renomear, eliminar duplicação. Os testes verdes formam a rede de segurança.</li>
+        </ul>
+        <p>Mantemos a cultura TDD com <strong>1 teste-âncora</strong>: idempotência via <code>supertest</code>. O contrato-chave da aula é justamente esse — testá-lo é forçar que o servidor exista para cumpri-lo.</p>
+        <h3>Por que <em>esse</em> teste em particular?</h3>
+        <p>Idempotência é o <strong>contrato pedagógico</strong> da aula 5: o que separa "sync ingênuo" de "sync confiável". E é o teste mais ilustrativo de uma boa prática: <em>atacar a porta do sistema, não as entranhas.</em></p>
+        <p>Observe: chamamos <code>POST /sync/deltas</code> via supertest — não <code>insertMany()</code> direto do Model. Isso é deliberado. Se amanhã quebrarmos o Model em duas funções (<code>validate()</code> + <code>insert()</code>), o teste continua verde. <strong>O teste descreve o contrato HTTP, não o detalhe da implementação.</strong></p>
 <pre class="codeblock"><span class="hl-cmt">// server.test.js</span>
 <span class="hl-kw">const</span> test   = <span class="hl-fn">require</span>(<span class="hl-str">'node:test'</span>);
 <span class="hl-kw">const</span> assert = <span class="hl-fn">require</span>(<span class="hl-str">'node:assert/strict'</span>);
@@ -529,14 +668,40 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'activate'
 <span class="hl-cmt">ℹ pass 5</span></pre>
         <div class="callout callout-tip">
           <div class="callout-label">Cultura TDD: aprofundamento futuro</div>
-          <p>Aprofundamento em testes em camadas (controller / service / repository / helper, com <code>jest.mock</code>) vai para a <strong>aula 10 — Testes &amp; Automação</strong>. Aqui, o foco é PWA + sync e o spec é a âncora.</p>
+          <p>Testes em camadas (controller / service / repository / helper, com <code>jest.mock</code> ou stubs nativos) vai para a <strong>aula 10 — Testes &amp; Automação</strong>. Aqui, o foco é estabelecer o ritmo R-G-R e o hábito de "testar a porta".</p>
         </div>
       </section>
 
-      <!-- ─── 11. Tour pelo código ────────────────────────── -->
+      <!-- ─── 14. TDD WDIAGW + Spec-Driven Development ──────── -->
+      <section class="mat-section" id="sec-sdd">
+        <h2>14. TDD bem feito · "Where Did It All Go Wrong" + Spec-Driven Development</h2>
+        <p>Duas leituras provocadoras para fechar o bloco de qualidade da aula. A primeira mostra <em>por que</em> tantas equipes adotam TDD e não veem resultado. A segunda aponta para onde a indústria está indo depois.</p>
+        <h3>🔧 TDD, Where Did It All Go Wrong (Ian Cooper · DevTernity 2017)</h3>
+        <p><strong>Tese central:</strong> a maioria das equipes faz TDD <em>errado</em> — testa <em>implementação</em> em vez de <em>comportamento</em>. Resultado: suíte de testes frágil, qualquer refactor quebra 30 testes, equipe começa a odiar testes, abandona TDD.</p>
+        <p><strong>O que mudar:</strong> escrever testes contra as <em>portas</em> (pontos de entrada do sistema — endpoints HTTP, comandos CLI, callbacks de eventos), <em>não</em> contra as entranhas (classes/funções internas). Cada bug encontrado vira 1 teste novo, mas só na borda.</p>
+        <p><strong>Aplicado ao BrPec:</strong> nosso teste de idempotência ataca a porta HTTP (<code>POST /sync/deltas</code> + body + status code). Se amanhã quebrarmos <code>insertMany</code> em <code>validate</code> + <code>insertOne</code>, o teste continua verde. Esse é o ritmo certo: <strong>refactor livre internamente, garantia constante na borda.</strong></p>
+        <h3>📐 Understanding Spec-Driven Development (Kiro · spec-kit · Tessl)</h3>
+        <p><strong>Tese central:</strong> a próxima fronteira não é "escrever testes antes do código". É <em>declarar a especificação</em> e deixar a IA gerar, em conjunto, (1) o código de produção, (2) os testes que validam essa spec, (3) documentação coerente.</p>
+        <p><strong>3 ferramentas para conhecer:</strong></p>
+        <table class="mat-table">
+          <thead><tr><th>Ferramenta</th><th>Origem</th><th>Posição</th></tr></thead>
+          <tbody>
+            <tr><td><strong>Kiro</strong></td><td>AWS · 2024</td><td>IDE com "spec-mode" embutido — escreve <code>.spec.md</code>, IA gera + sincroniza implementação.</td></tr>
+            <tr><td><strong>spec-kit</strong></td><td>GitHub · 2025</td><td>CLI open-source. Roda em qualquer projeto, qualquer linguagem. Gera código a partir de specs versionadas.</td></tr>
+            <tr><td><strong>Tessl</strong></td><td>Tessl AI · 2025</td><td>Plataforma SaaS — specs executáveis como artefato primário; "código" é derivado.</td></tr>
+          </tbody>
+        </table>
+        <p><strong>No BrPec hoje:</strong> nosso "spec" ainda é texto em prosa + 1 teste-âncora. Em ~2 anos, <em>esperamos</em> que <code>brpec.spec.md</code> gere <code>server.js</code> + <code>server.test.js</code> automaticamente. A direção é clara; só falta amadurecimento das ferramentas.</p>
+        <div class="callout callout-deep">
+          <div class="callout-label">A mensagem para a turma 26</div>
+          <p>Testes <em>não são burocracia</em>. São o <strong>contrato executável</strong> que sobrevive a refactors, mudanças de stack, e até a substituições do autor original do código. Quem domina TDD bem feito (Ian Cooper) ganha velocidade. Quem se prepara para SDD ganha relevância nos próximos 5 anos.</p>
+        </div>
+      </section>
+
+      <!-- ─── 15. Tour pelo código ──────────────────────────── -->
       <section class="mat-section" id="sec-tour">
-        <h2>11. Tour pelo código real</h2>
-        <p>O código de referência está no próprio repo do módulo. Use como esqueleto para a sua versão na ponderada.</p>
+        <h2>15. Tour pelo código real</h2>
+        <p>O código de referência está no próprio repo do módulo. Use como esqueleto para a sua exploração no lab e para os autoestudos da aula 6.</p>
         <h3>Cliente</h3>
         <div class="file-tree">
 <span class="dir">module-2-common/assets/brpec-pwa/</span>
@@ -567,46 +732,22 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'activate'
         </div>
       </section>
 
-      <!-- ─── 12. Lab ───────────────────────────────────────── -->
+      <!-- ─── 16. Lab cooperativo ──────────────────────────── -->
       <section class="mat-section" id="sec-lab">
-        <h2>12. Lab nos 5 grupos · ciclo cooperativo</h2>
-        <p>15 minutos. Cada grupo faz um passo do ciclo. Juntando os 5 prints, a turma tem a documentação completa.</p>
+        <h2>16. Lab cooperativo (40 min) · subir a stack e fazer o evento atravessar</h2>
+        <p>40 minutos. Cada grupo faz um passo do ciclo PWA → Node → SQLite. Juntando os 5 prints, a turma tem a documentação completa de uma stack offline-first em produção.</p>
         <ul>
-          <li><strong>Grupo 1 (Cabeceira):</strong> sobe o servidor + instala a PWA → print do ícone na home screen.</li>
-          <li><strong>Grupo 2 (Mata-Burro):</strong> corta a rede → registra 3 eventos → print do counter "3 pendentes".</li>
-          <li><strong>Grupo 3 (Vargem do Sucuri):</strong> religa a rede, sync, sync de novo → mostra <code>{accepted: 3}</code> e depois <code>{accepted: 0}</code>.</li>
-          <li><strong>Grupo 4 (Faxinal):</strong> inspeciona IndexedDB no DevTools → print do blob persistido.</li>
-          <li><strong>Grupo 5 (Cocho Novo):</strong> <code>sqlite3 brpec-server.db "SELECT * FROM evento_recebido;"</code> + <code>npm test</code> → 5 verdes.</li>
+          <li><strong>Grupo 1 (Cabeceira):</strong> sobe o servidor (<code>npm install &amp;&amp; npm start</code>) e verifica com <code>curl localhost:3000/sync/snapshot</code> → print do log + JSON.</li>
+          <li><strong>Grupo 2 (Mata-Burro):</strong> sobe a PWA via <code>npx serve</code> ou Live Server, clica "Instalar como app" → print do ícone na home screen.</li>
+          <li><strong>Grupo 3 (Vargem do Sucuri):</strong> DevTools → Offline, registra 3 eventos (pesagem + vacinação + tratamento), religa, sync → print de <code>{accepted:3, skipped:0}</code>.</li>
+          <li><strong>Grupo 4 (Faxinal):</strong> dispara sync de novo (sem novos eventos) — prova idempotência — e inspeciona IndexedDB (Application → kv) → print de <code>{accepted:0, skipped:3}</code> + chave <code>brpec.db</code>.</li>
+          <li><strong>Grupo 5 (Cocho Novo):</strong> <code>sqlite3 brpec-server.db "SELECT * FROM evento_recebido;"</code> + <code>npm test</code> → print dos UUIDs no servidor + 5 specs verdes.</li>
         </ul>
       </section>
 
-      <!-- ─── 13. Ponderada ─────────────────────────────────── -->
-      <section class="mat-section" id="sec-pond">
-        <h2>13. Ponderada em sala · Lighthouse PWA ≥ 80</h2>
-        <p>30 minutos individuais. Entregar via Teams 3 artefatos:</p>
-        <ol>
-          <li><strong>Print do Lighthouse PWA score</strong> da sua PWA rodando local (≥ 80 pontos).</li>
-          <li><strong>Vídeo de 30 segundos</strong> mostrando: app instalado, registro offline (1 evento), sync, banco do servidor confirmando.</li>
-          <li><strong>ADR mínimo</strong> em <code>aula5-ponderada-NOME.md</code> — 3 frases respondendo <em>"qual foi a decisão de design da minha PWA?"</em></li>
-        </ol>
-        <h3>Como rodar o Lighthouse</h3>
-        <ol>
-          <li>Sirva a PWA via HTTP local (não <code>file://</code>).</li>
-          <li>Chrome → F12 → aba <strong>Lighthouse</strong>.</li>
-          <li>Categorias: marque <strong>PWA</strong>.</li>
-          <li>Mode: <em>Navigation</em>. Device: <em>Mobile</em>.</li>
-          <li>Click <strong>Analyze page load</strong>.</li>
-          <li>Screenshot da seção PWA com o score.</li>
-        </ol>
-        <div class="callout callout-warn">
-          <div class="callout-label">Score baixo? Checklist de troubleshooting</div>
-          <p>① manifest é servido com <code>Content-Type: application/manifest+json</code>? ② SW está <em>registered</em>? ③ <code>start_url</code> está cacheado? ④ Ícone declara <code>sizes:any</code> (SVG) ou tem PNG 192×192? ⑤ Está em HTTPS ou localhost?</p>
-        </div>
-      </section>
-
-      <!-- ─── 14. Aula 6 ────────────────────────────────────── -->
+      <!-- ─── 17. Aula 6 ────────────────────────────────────── -->
       <section class="mat-section" id="sec-next">
-        <h2>14. Conexão com a aula 6</h2>
+        <h2>17. Conexão com a aula 6</h2>
         <p>A <strong>aula 6 (19/05)</strong> — <em>Back-End II · Endpoints de Leitura e Escrita com Documentação</em> — expande o servidor de hoje:</p>
         <ul>
           <li>De <code>POST /sync/deltas</code> + <code>GET /sync/snapshot</code> para <strong>CRUD HTTP completo</strong> (POST, PUT, DELETE).</li>

@@ -1,10 +1,10 @@
 <!DOCTYPE html>
 <html lang="pt-BR">
 <head>
-  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📲</text></svg>">
+  <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧩</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aula 5 — PWA + Sync Offline-First — BrPec — Inteli</title>
+  <title>Aula 5 — Back-End I · Node.js + PWA Sync — BrPec — Inteli</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;500;600;700&display=swap" rel="stylesheet">
@@ -13,6 +13,7 @@
     :root {
       --ac:#4b5563; --hi:#b2b6bf; --dk:#0b1d3a; --gr:#0d9488; --re:#dc2626; --am:#d97706;
       --bg:#f5f7fb; --teal:#0d9488; --teal-l:#5eead4; --indigo:#4338ca; --pri:#1d4ed8;
+      --node:#3c873a;
     }
     body { margin:0; padding:0; overflow:hidden; font-family:'Manrope',sans-serif; background:var(--bg); color:var(--dk); }
     .slide-container { width:100vw; height:100vh; position:relative; overflow:hidden; }
@@ -27,6 +28,7 @@
     .sh.indigo { background:linear-gradient(135deg,#312e81,var(--indigo)); }
     .sh.amber  { background:linear-gradient(135deg,#b45309,var(--am)); }
     .sh.red    { background:linear-gradient(135deg,#7f1d1d,var(--re)); }
+    .sh.node   { background:linear-gradient(135deg,#1f4d1e,var(--node)); }
     .st { font-size:1.85rem; font-weight:800; margin:0 0 4px; line-height:1.15; }
     .ss { font-size:.96rem; opacity:.92; margin:0; }
 
@@ -41,6 +43,7 @@
     .box.dkb { border-left-color:var(--dk); }
     .box.red { border-left-color:var(--re); }
     .box.grn { border-left-color:#22c55e; }
+    .box.nod { border-left-color:var(--node); }
 
     code, .mono { font-family:'JetBrains Mono',monospace; }
     code { background:#f1f5f9; color:var(--dk); padding:1px 6px; border-radius:5px; font-size:.86em; }
@@ -50,10 +53,10 @@
     .g3 { display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px; }
 
     /* Cover */
-    .cover-bg { background:linear-gradient(135deg,#0b1d3a 0%,#1e3a8a 55%,#0d9488 100%) !important; position:relative; overflow:hidden; }
+    .cover-bg { background:linear-gradient(135deg,#0b1d3a 0%,#1e3a8a 45%,#0d9488 100%) !important; position:relative; overflow:hidden; }
     .cover-bg::before { content:""; position:absolute; inset:0; background-image:radial-gradient(circle at 10% 80%, rgba(94,234,212,.15), transparent 35%), radial-gradient(circle at 90% 18%, rgba(255,255,255,.08), transparent 30%); pointer-events:none; }
     .cv-badge { background:rgba(255,255,255,.14); border:1px solid rgba(255,255,255,.28); color:white; padding:5px 16px; border-radius:999px; font-size:.82rem; font-weight:600; display:inline-block; margin-bottom:14px; }
-    .cv-title { font-size:2.85rem; font-weight:800; color:white; line-height:1.12; margin:0 0 10px; }
+    .cv-title { font-size:2.7rem; font-weight:800; color:white; line-height:1.12; margin:0 0 10px; }
     .cv-sub   { font-size:1.06rem; color:rgba(255,255,255,.9); margin:0 0 18px; max-width:820px; }
     .cv-tags  { display:flex; flex-wrap:wrap; gap:8px; margin-bottom:18px; }
     .cv-tag   { background:rgba(255,255,255,.13); border:1px solid rgba(255,255,255,.28); backdrop-filter:blur(8px); color:white; padding:6px 14px; border-radius:10px; font-weight:700; font-size:.82rem; }
@@ -66,6 +69,9 @@
 
     .pill-row { display:flex; gap:8px; flex-wrap:wrap; margin:8px 0 12px; }
     .pill { display:inline-block; padding:5px 12px; border-radius:999px; font-size:.78rem; font-weight:700; background:#eef2ff; color:#4338ca; border:1px solid #c7d2fe; }
+    .pill.nod { background:#dcfce7; color:#166534; border-color:#86efac; }
+    .pill.tea { background:#ccfbf1; color:#0f766e; border-color:#5eead4; }
+    .pill.amr { background:#fef3c7; color:#92400e; border-color:#fcd34d; }
 
     pre.codeblock { background:#1e1e2e; color:#cdd6f4; padding:14px 16px; margin:8px 0; border-radius:10px; font-family:'JetBrains Mono',monospace; font-size:.78rem; line-height:1.65; overflow:auto; box-shadow:0 4px 14px rgba(0,0,0,.18); max-height:340px; }
     .hl-kw  { color:#89b4fa; font-weight:600; }
@@ -104,10 +110,6 @@
     .timer-btn.pause { background:#eab308; border-color:#eab308; color:#422006; }
     .timer-btn.reset { background:rgba(239,68,68,.18); border-color:rgba(239,68,68,.4); }
     .timer-label { font-size:.78rem; opacity:.7; letter-spacing:.06em; text-transform:uppercase; font-weight:700; margin-bottom:2px; }
-    .timer-hero { background:linear-gradient(135deg,#0f172a,#7c2d12); color:white; border-radius:16px; padding:24px 28px; text-align:center; box-shadow:0 12px 32px rgba(15,23,42,.35); }
-    .timer-hero .timer-label { font-size:.88rem; opacity:.85; }
-    .timer-hero .timer-display { font-size:4.2rem; min-width:auto; margin:8px 0 12px; color:#fbbf24; }
-    .timer-hero .timer-controls { justify-content:center; }
 
     .quiz-stage { background:linear-gradient(135deg,#0f172a,#1e293b); color:white; border-radius:16px; padding:34px 38px; text-align:center; box-shadow:0 14px 40px rgba(15,23,42,.35); }
     .quiz-num { display:inline-block; background:rgba(255,255,255,.1); border:1px solid rgba(255,255,255,.25); padding:4px 14px; border-radius:999px; font-size:.78rem; font-weight:700; letter-spacing:.06em; text-transform:uppercase; margin-bottom:14px; }
@@ -124,42 +126,68 @@
     .quiz-btn.hide { display:none; }
 
     .pillars { display:grid; grid-template-columns:repeat(3,1fr); gap:14px; margin:14px 0; }
-    .pillar { background:white; border:1px solid #dfe5ec; border-radius:14px; padding:16px 18px; box-shadow:0 6px 18px rgba(11,29,58,.08); position:relative; overflow:hidden; }
+    .pillar { background:white; border:1px solid #dfe5ec; border-radius:14px; padding:14px 16px; box-shadow:0 6px 18px rgba(11,29,58,.08); position:relative; overflow:hidden; }
     .pillar::before { content:""; position:absolute; top:0; left:0; right:0; height:5px; }
     .pillar.https::before { background:#22c55e; }
     .pillar.manif::before { background:var(--indigo); }
     .pillar.sw::before    { background:var(--teal); }
-    .pillar .ico { font-size:1.6rem; margin-bottom:4px; }
-    .pillar h3 { font-size:.96rem; font-weight:800; color:var(--dk); margin:6px 0 4px; }
-    .pillar h3 small { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--ac); }
-    .pillar p { font-size:.84rem; color:#374151; line-height:1.55; margin:0 0 4px; }
-    .pillar ul { padding-left:1rem; margin:6px 0 0; font-size:.8rem; color:#475569; }
+    .pillar .ico { font-size:1.5rem; margin-bottom:2px; }
+    .pillar h3 { font-size:.92rem; font-weight:800; color:var(--dk); margin:4px 0 4px; }
+    .pillar h3 small { font-family:'JetBrains Mono',monospace; font-size:.7rem; color:var(--ac); }
+    .pillar p { font-size:.8rem; color:#374151; line-height:1.5; margin:0 0 4px; }
+    .pillar ul { padding-left:1rem; margin:4px 0 0; font-size:.76rem; color:#475569; }
 
-    .sw-flow { display:flex; align-items:center; justify-content:space-between; gap:8px; background:white; border:1px solid #dfe5ec; border-radius:14px; padding:18px 20px; margin:12px 0; box-shadow:0 6px 18px rgba(11,29,58,.08); }
+    .sw-flow { display:flex; align-items:center; justify-content:space-between; gap:8px; background:white; border:1px solid #dfe5ec; border-radius:14px; padding:14px 18px; margin:10px 0; box-shadow:0 6px 18px rgba(11,29,58,.08); }
     .sw-step { flex:1; text-align:center; }
-    .sw-step .sw-num { width:44px; height:44px; border-radius:50%; background:var(--teal); color:white; font-weight:800; font-size:1rem; display:flex; align-items:center; justify-content:center; margin:0 auto 6px; box-shadow:0 4px 14px rgba(13,148,136,.3); }
-    .sw-step h4 { font-size:.86rem; font-weight:800; color:var(--dk); margin:0 0 4px; font-family:'JetBrains Mono',monospace; letter-spacing:-.02em; }
-    .sw-step p  { font-size:.74rem; color:#475569; margin:0; line-height:1.45; }
-    .sw-arrow { font-size:1.4rem; color:var(--teal); }
+    .sw-step .sw-num { width:40px; height:40px; border-radius:50%; background:var(--teal); color:white; font-weight:800; font-size:.96rem; display:flex; align-items:center; justify-content:center; margin:0 auto 4px; box-shadow:0 4px 14px rgba(13,148,136,.3); }
+    .sw-step h4 { font-size:.84rem; font-weight:800; color:var(--dk); margin:0 0 2px; font-family:'JetBrains Mono',monospace; letter-spacing:-.02em; }
+    .sw-step p  { font-size:.72rem; color:#475569; margin:0; line-height:1.4; }
+    .sw-arrow { font-size:1.3rem; color:var(--teal); }
 
-    .strat-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:8px 0; }
-    .strat-col { background:white; border:1px solid #dfe5ec; border-radius:14px; padding:14px 18px; box-shadow:0 4px 14px rgba(11,29,58,.06); }
+    .strat-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:6px 0; }
+    .strat-col { background:white; border:1px solid #dfe5ec; border-radius:14px; padding:12px 16px; box-shadow:0 4px 14px rgba(11,29,58,.06); }
     .strat-col.shell { border-left:5px solid var(--teal); }
     .strat-col.sync  { border-left:5px solid var(--indigo); }
-    .strat-col h3 { margin:0 0 8px; }
+    .strat-col h3 { margin:0 0 6px; font-size:.96rem; }
     .strat-col.shell h3 { color:var(--teal); }
     .strat-col.sync  h3 { color:var(--indigo); }
-    .strat-col p { font-size:.88rem; }
+    .strat-col p { font-size:.84rem; }
     .strat-col code { font-size:.78em; }
 
-    .arch { display:flex; align-items:center; justify-content:center; gap:18px; margin:14px 0; flex-wrap:wrap; }
-    .arch-node { background:white; border:2px solid var(--dk); border-radius:12px; padding:12px 18px; text-align:center; min-width:180px; box-shadow:0 4px 14px rgba(11,29,58,.1); }
-    .arch-node.client { border-color:var(--teal); }
-    .arch-node.server { border-color:var(--indigo); }
-    .arch-node h4 { margin:0 0 4px; font-size:.96rem; color:var(--dk); font-weight:800; }
-    .arch-node p  { font-size:.78rem; color:#475569; margin:0; font-family:'JetBrains Mono',monospace; }
-    .arch-arrow { font-size:1.6rem; color:var(--ac); display:flex; flex-direction:column; align-items:center; min-width:120px; }
-    .arch-arrow span { font-size:.7rem; color:var(--ac); margin-top:4px; font-family:'JetBrains Mono',monospace; }
+    /* Arquitetura integradora — 3 nós */
+    .arch3 { display:flex; align-items:center; justify-content:center; gap:14px; margin:14px 0; flex-wrap:nowrap; }
+    .arch-node { background:white; border:2px solid var(--dk); border-radius:14px; padding:14px 18px; text-align:center; min-width:200px; max-width:240px; box-shadow:0 4px 14px rgba(11,29,58,.1); }
+    .arch-node.pwa    { border-color:var(--teal);  background:linear-gradient(135deg,#fff,#ccfbf1); }
+    .arch-node.server { border-color:var(--node);  background:linear-gradient(135deg,#fff,#dcfce7); }
+    .arch-node.db     { border-color:var(--indigo);background:linear-gradient(135deg,#fff,#e0e7ff); }
+    .arch-node h4 { margin:0 0 4px; font-size:1rem; color:var(--dk); font-weight:800; }
+    .arch-node p  { font-size:.78rem; color:#475569; margin:0 0 2px; font-family:'JetBrains Mono',monospace; }
+    .arch-node .role { font-size:.7rem; color:var(--ac); font-style:italic; margin-top:6px; }
+    .arch-arrow { font-size:1.4rem; color:var(--ac); display:flex; flex-direction:column; align-items:center; min-width:110px; }
+    .arch-arrow span { font-size:.66rem; color:var(--ac); margin-top:4px; font-family:'JetBrains Mono',monospace; }
+
+    /* MVC diagram */
+    .mvc-grid { display:grid; grid-template-columns:repeat(3,1fr); gap:12px; margin:12px 0; }
+    .mvc-card { background:white; border:1px solid #dfe5ec; border-radius:14px; padding:14px 16px; box-shadow:0 4px 14px rgba(11,29,58,.06); position:relative; overflow:hidden; }
+    .mvc-card::before { content:""; position:absolute; top:0; left:0; right:0; height:5px; }
+    .mvc-card.m::before { background:var(--indigo); }
+    .mvc-card.v::before { background:var(--teal); }
+    .mvc-card.c::before { background:var(--am); }
+    .mvc-card h3 { font-size:1rem; font-weight:800; margin:6px 0 4px; color:var(--dk); }
+    .mvc-card h3 small { font-family:'JetBrains Mono',monospace; font-size:.72rem; color:var(--ac); font-weight:600; }
+    .mvc-card p  { margin:0 0 4px; font-size:.84rem; line-height:1.5; color:#374151; }
+    .mvc-card ul { margin:4px 0 0; padding-left:1rem; }
+    .mvc-card li { font-size:.78rem; line-height:1.45; color:#475569; }
+
+    /* TDD ring */
+    .tdd-ring { display:flex; align-items:center; justify-content:center; gap:12px; margin:12px 0; }
+    .tdd-step { padding:12px 18px; border-radius:14px; min-width:170px; text-align:center; box-shadow:0 4px 14px rgba(11,29,58,.08); }
+    .tdd-step.red    { background:linear-gradient(135deg,#7f1d1d,#dc2626); color:white; }
+    .tdd-step.green  { background:linear-gradient(135deg,#166534,#22c55e); color:white; }
+    .tdd-step.refac  { background:linear-gradient(135deg,#1e3a8a,#3b82f6); color:white; }
+    .tdd-step h4 { margin:0 0 4px; font-weight:800; font-family:'JetBrains Mono',monospace; font-size:1rem; }
+    .tdd-step p  { margin:0; font-size:.8rem; opacity:.95; line-height:1.4; }
+    .tdd-arrow { font-size:1.5rem; color:var(--ac); }
 
     .lab-card { background:white; border:1px solid #dfe5ec; border-left:5px solid var(--indigo); border-radius:12px; padding:14px 16px; }
     .lab-card h4 { margin:0 0 4px; color:var(--indigo); font-size:.88rem; font-weight:800; }
@@ -167,93 +195,105 @@
 
     .hint { background:#eef2ff; border:1px solid #c7d2fe; border-radius:10px; padding:10px 14px; color:#3730a3; font-size:.88rem; }
     .hint strong { color:#1e1b4b; }
+    .hint.nod { background:#f0fdf4; border-color:#86efac; color:#14532d; }
+    .hint.nod strong { color:#052e16; }
 
     .recap-card { background:linear-gradient(135deg,#ecfeff,#cffafe); border:1px solid #67e8f9; border-radius:14px; padding:16px 20px; box-shadow:0 4px 14px rgba(8,145,178,.1); }
     .recap-card h3 { color:#0e7490; margin:0 0 8px; font-size:1.05rem; font-weight:800; }
     .recap-card p  { color:#155e75; font-size:.92rem; margin:0 0 4px; }
+
+    /* Refs cards (SWEBOK, TDD WDIAGW, SDD) */
+    .ref-grid { display:grid; grid-template-columns:1fr 1fr; gap:14px; margin:10px 0; }
+    .ref-card { background:white; border:1px solid #dfe5ec; border-radius:14px; padding:14px 16px; box-shadow:0 4px 14px rgba(11,29,58,.06); border-left:5px solid var(--dk); }
+    .ref-card.amber { border-left-color:var(--am); }
+    .ref-card.indigo { border-left-color:var(--indigo); }
+    .ref-card.teal { border-left-color:var(--teal); }
+    .ref-card h4 { margin:0 0 4px; font-size:.96rem; color:var(--dk); font-weight:800; }
+    .ref-card .meta { font-size:.72rem; color:var(--ac); font-family:'JetBrains Mono',monospace; margin-bottom:6px; }
+    .ref-card p { margin:0 0 4px; font-size:.86rem; color:#374151; line-height:1.55; }
+    .ref-card a { color:var(--indigo); text-decoration:none; font-weight:700; font-size:.84rem; }
+    .ref-card a:hover { text-decoration:underline; }
   </style>
 </head>
 <body>
 <div class="slide-container">
 
-  <!-- 01 — Cover -->
+  <!-- ╔══════ 01 — Cover ═════╗ -->
   <div class="slide active cover-bg">
     <div class="sc" style="color:white;">
       <div class="cv-badge">Módulo 2 · Aula 5 · Back-End I · 14 / mai / 2026</div>
-      <h1 class="cv-title">PWA + Sync no celular do capataz</h1>
-      <p class="cv-sub">O sandbox da aula 4 ganha persistência, vira app instalável, e se reconcilia com um servidor Node quando o sinal volta. <em>Offline-first, da boleta ao SGBD.</em></p>
+      <h1 class="cv-title">Back-End I · Node.js, Models e Controllers</h1>
+      <p class="cv-sub">A PWA da aula anterior ganha um servidor próprio. Hoje: o que é Node, como ele se organiza em MVC, como conversa com o banco da aula 4, e como sustenta o sync da PWA — tudo guiado por testes.</p>
       <div class="cv-tags">
-        <span class="cv-tag">manifest · service worker · cache</span>
-        <span class="cv-tag">sql.js + IndexedDB</span>
-        <span class="cv-tag">UUID v4 no cliente</span>
-        <span class="cv-tag">Node + Express + better-sqlite3</span>
-        <span class="cv-tag">INSERT OR IGNORE · idempotência</span>
+        <span class="cv-tag">Node.js + Express</span>
+        <span class="cv-tag">Models · Controllers · SWEBOK v4</span>
+        <span class="cv-tag">better-sqlite3 (BD da aula 4)</span>
+        <span class="cv-tag">PWA ↔ Node ↔ SQLite</span>
+        <span class="cv-tag">TDD + Spec-Driven</span>
       </div>
-      <div class="agenda-card" style="margin-top:14px;">
+      <div class="agenda-card" style="margin-top:8px;">
         <h4>Plano de voo · 2 h</h4>
         <div class="agenda-grid">
           <div class="daily-tag"><span class="step">Bloco 1</span>Daily · dado offline no campo<span class="when">15 min</span></div>
-          <div class="daily-tag"><span class="step">Bloco 2</span>PWA · 3 pilares<span class="when">15 min</span></div>
-          <div class="daily-tag"><span class="step">Bloco 3</span>Persistência + sync<span class="when">20 min</span></div>
-          <div class="daily-tag"><span class="step">Bloco 4</span>Servidor Node + spec<span class="when">15 min</span></div>
-          <div class="daily-tag" style="grid-column:span 2;"><span class="step">Bloco 5</span>Lab nos 5 grupos · instalar + registrar + sync<span class="when">20 min</span></div>
-          <div class="daily-tag" style="grid-column:span 2; background:rgba(252,165,165,.18); border-color:rgba(252,165,165,.35);"><span class="step">Bloco 6</span>Ponderada em sala · Lighthouse PWA ≥ 80<span class="when">30 min</span></div>
+          <div class="daily-tag"><span class="step">Bloco 2</span>Node.js + MVC + SWEBOK<span class="when">25 min</span></div>
+          <div class="daily-tag"><span class="step">Bloco 3</span>PWA: pilares + sync<span class="when">20 min</span></div>
+          <div class="daily-tag"><span class="step">Bloco 4</span>Servidor Node + TDD + SDD<span class="when">20 min</span></div>
+          <div class="daily-tag" style="grid-column:span 4;"><span class="step">Bloco 5</span>Lab nos 5 grupos · subir o servidor, plugar a PWA, ver o evento aterrissar no SQLite<span class="when">40 min</span></div>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 02 — Recap aula 4 -->
+  <!-- ╔══════ 02 — Recap aula 4 → ponte para back-end ═════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh dark"><h2 class="st">De onde paramos · onde vamos</h2><p class="ss">A aula 4 deixou um sandbox SQLite no navegador. Funciona, mas tem 3 limitações concretas.</p></div>
+      <div class="sh dark"><h2 class="st">De onde paramos · onde chegamos hoje</h2><p class="ss">Aula 4 fechou o banco no navegador. Hoje colocamos um servidor real na frente dele.</p></div>
       <div class="recap-card" style="margin-bottom:14px;">
-        <h3>🐄 BrPec Sandbox · estado atual</h3>
-        <p>Em <code>module-2-common/assets/brpec/sandbox-sqljs.html</code>, o motor SQLite (sql.js / WebAssembly) carrega <code>brpec.db</code> e executa SELECTs no navegador, offline-friendly.</p>
+        <h3>🐄 BrPec · estado ao fim da aula 4</h3>
+        <p>Sandbox SQLite no navegador (<code>sql.js</code>) executando JOINs, GROUP BY e subqueries sobre o schema BrPec — gerentes, capatazes, retiros, bovinos, eventos. <strong>Tudo client-side</strong>: nenhuma linha viaja.</p>
       </div>
       <div class="g3">
         <div class="box red">
-          <h3>① Não persiste mudanças</h3>
-          <p>INSERT no sandbox funciona — até o reload. O motor mora em memória. Recarregou, voltou ao estado inicial.</p>
+          <h3>① O que ainda não temos</h3>
+          <p>Um <strong>servidor</strong> que receba eventos do campo, valide, persista e devolva visão consolidada para o coordenador.</p>
         </div>
         <div class="box red">
-          <h3>② Não é instalável</h3>
-          <p>É uma aba do navegador. O capataz não vê "BrPec" entre os apps do celular. Sem ícone, sem splash, sem janela própria.</p>
+          <h3>② O que ainda não sabemos</h3>
+          <p>Como <strong>organizar o código</strong> do servidor (Models, Controllers, Routes) para escalar sem virar espaguete.</p>
         </div>
         <div class="box red">
-          <h3>③ Não fala com servidor</h3>
-          <p>Cada celular tem seu banco. O coordenador não tem uma visão consolidada. Sem caminho de volta para o SGBD da fazenda.</p>
+          <h3>③ O que falta para fechar o loop</h3>
+          <p>Como a PWA <strong>fala</strong> com esse servidor, e como o servidor <strong>fala</strong> com o SQLite — o mesmo motor da aula 4, agora server-side.</p>
         </div>
       </div>
-      <blockquote><strong>Hoje:</strong> resolvemos os três. <code>IndexedDB</code> persiste o banco · <code>manifest</code> + <code>service worker</code> tornam instalável · <code>POST /sync/deltas</code> reconcilia com Node + SQLite no servidor.</blockquote>
+      <blockquote><strong>Hoje:</strong> Node.js + Express + MVC + better-sqlite3 + TDD. PWA pisca-pisca de volta para mostrar que a stack <em>inteira</em> está viva.</blockquote>
     </div>
   </div>
 
-  <!-- 03 — Daily -->
+  <!-- ╔══════ 03 — Daily ═════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh dark"><h2 class="st">Daily · dado offline no campo</h2><p class="ss">15 minutos · cada aluno 1 minuto · partir do retiro real</p></div>
+      <div class="sh dark"><h2 class="st">Daily · dado offline no campo</h2><p class="ss">15 minutos · cada aluno 1 minuto · imagine o capataz a 4 h do escritório</p></div>
       <div class="g2">
         <div class="box dkb">
           <h3>A pergunta</h3>
-          <p style="font-size:1.05rem;"><em>"Que dado seu app precisaria no celular do capataz <strong>quando ele não tem internet</strong>?"</em></p>
-          <p>Responda na lógica:</p>
+          <p style="font-size:1.05rem;"><em>"Que dado seu app precisaria no celular do capataz <strong>quando ele não tem internet</strong>, e que rota de volta esse dado vai precisar quando o sinal voltar?"</em></p>
           <ol>
-            <li>Qual entidade do BrPec ele precisa <em>ler</em>?</li>
+            <li>Qual entidade do BrPec ele precisa <em>ler</em> no campo?</li>
             <li>Qual ele precisa <em>escrever</em>?</li>
-            <li>Quando o sinal voltar, o que precisa subir pro servidor?</li>
+            <li>Quando o sinal voltar, <strong>quem recebe</strong> esse dado no servidor?</li>
           </ol>
         </div>
         <div class="box amr">
-          <h3>Banco de respostas (se faltar inspiração)</h3>
+          <h3>Banco de respostas</h3>
           <ul>
-            <li>"Lista de bovinos do meu retiro" — leitura</li>
+            <li>"Lista de bovinos do meu retiro" — leitura local</li>
             <li>"Pesagem do dia" — escrita pesada</li>
-            <li>"Vacinas pendentes na minha equipe" — leitura derivada</li>
-            <li>"Boleta de movimentação de bovinos" — escrita</li>
-            <li>"Última mudança de retiro do BR0014" — leitura histórica</li>
+            <li>"Vacinas pendentes na equipe" — leitura derivada</li>
+            <li>"Movimentação de bovinos entre retiros" — escrita</li>
+            <li>"Última nascimento do BR0014" — leitura histórica</li>
           </ul>
-          <p class="hint" style="margin-top:8px;"><strong>Padrão a procurar:</strong> a maioria das respostas é <em>ler antigo</em> + <em>escrever novo</em>. Esse é exatamente o shape que a PWA otimiza.</p>
+          <p class="hint" style="margin-top:8px;"><strong>Padrão:</strong> <em>ler antigo</em> + <em>escrever novo</em> + <em>sincronizar depois</em>. É o shape que MVC + sync atendem.</p>
         </div>
       </div>
       <div class="timer-bar">
@@ -270,142 +310,206 @@
     </div>
   </div>
 
-  <!-- 04 — O que é PWA -->
+  <!-- ╔══════ 04 — Arquitetura do dia (integrador PWA ↔ Node ↔ SQLite) ═════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh teal"><h2 class="st">PWA · três pilares</h2><p class="ss">Uma página web que ganha 3 superpoderes — e vira "quase nativo".</p></div>
+      <div class="sh node"><h2 class="st">Arquitetura do dia · PWA ↔ Node ↔ SQLite</h2><p class="ss">3 pedaços, 2 contratos. Cada peça com 1 responsabilidade. <em>Esse é o desenho mestre da aula.</em></p></div>
+      <div class="arch3">
+        <div class="arch-node pwa">
+          <h4>📲 PWA · Cliente</h4>
+          <p>sql.js + IndexedDB</p>
+          <p>UUID v4 local</p>
+          <div class="role">vista da aula anterior</div>
+        </div>
+        <div class="arch-arrow">→<span>HTTP/JSON</span><span style="margin-top:0;">POST /sync/deltas</span></div>
+        <div class="arch-node server">
+          <h4>🟩 Node + Express</h4>
+          <p>Routes · Controllers</p>
+          <p>Models</p>
+          <div class="role">foco de hoje</div>
+        </div>
+        <div class="arch-arrow">→<span>SQL</span><span style="margin-top:0;">prepared stmt</span></div>
+        <div class="arch-node db">
+          <h4>🗄️ SQLite</h4>
+          <p>better-sqlite3</p>
+          <p>WAL · síncrono</p>
+          <div class="role">motor da aula 4 · agora server</div>
+        </div>
+      </div>
+      <div class="g3" style="margin-top:6px;">
+        <div class="box tea"><h3>Contrato 1 · PWA → Node</h3><p>POST <code>/sync/deltas</code> com <code>{deltas:[{client_uuid, tipo, data, ...}]}</code>. Resposta: <code>{accepted, skipped, accepted_uuids}</code>. JSON puro, idempotente.</p></div>
+        <div class="box nod"><h3>Contrato 2 · Node → SQLite</h3><p>Statement preparado: <code>INSERT OR IGNORE INTO evento_recebido (...)</code>. PK = <code>client_uuid</code>. Transação por payload. Síncrono.</p></div>
+        <div class="box ind"><h3>O que muda hoje</h3><p>Aula 4: SQL <em>no navegador</em>. Aula 5: o mesmo SQL <em>no servidor</em>. Mesmo motor (SQLite), camadas diferentes. <strong>É a mesma BD da aula 4, do outro lado da rede.</strong></p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════ 05 — O que é Node.js + Como sair do zero ═════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh node"><h2 class="st">O que é Node.js?</h2><p class="ss">JavaScript fora do navegador. Runtime baseado em V8 (mesma engine do Chrome) + APIs de sistema (arquivos, rede, processos).</p></div>
+      <div class="g2">
+        <div class="box nod">
+          <h3>3 ideias-âncora</h3>
+          <ul>
+            <li><strong>Event loop.</strong> Um único thread principal cuida de I/O assíncrono — perfeito para servidores web (muitas conexões, pouca CPU por requisição).</li>
+            <li><strong>npm.</strong> O maior ecossistema de pacotes do mundo. Express, better-sqlite3, supertest — todos viram <code>npm install</code> e <code>require()</code>.</li>
+            <li><strong>Mesma linguagem dos dois lados.</strong> O front (PWA da aula passada) e o back (de hoje) compartilham JS. Models e validações podem ser <em>literalmente</em> o mesmo arquivo.</li>
+          </ul>
+          <p class="hint nod" style="margin-top:8px;"><strong>Comparativo rápido:</strong> Python tem Flask/FastAPI; Java tem Spring; Node tem Express. A diferença não é "qual é melhor" — é <em>onde o ecossistema do parceiro vai</em>. No BrPec, JS+Node casa porque a PWA já é JS.</p>
+        </div>
+        <div>
+<pre class="codeblock"><span class="hl-cmt">// servidor.js · 8 linhas, server HTTP funcional</span>
+<span class="hl-kw">const</span> express = <span class="hl-fn">require</span>(<span class="hl-str">'express'</span>);
+<span class="hl-kw">const</span> app = <span class="hl-fn">express</span>();
+
+app.<span class="hl-fn">use</span>(express.<span class="hl-fn">json</span>());
+
+app.<span class="hl-fn">get</span>(<span class="hl-str">'/ping'</span>, (req, res) =&gt; {
+  res.<span class="hl-fn">json</span>({ ok: <span class="hl-kw">true</span>, ts: Date.<span class="hl-fn">now</span>() });
+});
+
+app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>, () =&gt;
+  console.<span class="hl-fn">log</span>(<span class="hl-str">'BrPec rodando em :3000'</span>)
+);</pre>
+          <p class="hint nod"><strong>Autoestudo (Ovidio):</strong> <em>"Como sair do zero em Node.js em apenas uma aula"</em>. Recomendado <em>antes</em> da próxima aula — vamos aprofundar endpoints CRUD na aula 6.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════ 06 — SWEBOK v4 Cap.2: Structural and Behavioral Design ═════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh indigo"><h2 class="st">SWEBOK v4 · Cap. 2 · separar estrutura e comportamento</h2><p class="ss">A literatura por trás de "Models e Controllers". Sem isso, MVC vira jargão sem ancoragem.</p></div>
+      <div class="g2">
+        <div class="ref-card indigo">
+          <h4>SWEBOK v4 · Structural and Behavioral Design</h4>
+          <div class="meta">IEEE Computer Society · 2024 · Capítulo 2 do Knowledge Area "Software Design"</div>
+          <p><strong>Structural design</strong> — como o sistema é <em>dividido em partes</em>: módulos, camadas, interfaces, dependências.</p>
+          <p><strong>Behavioral design</strong> — como as partes <em>colaboram em tempo de execução</em>: fluxos, eventos, casos de uso.</p>
+          <p><strong>A regra:</strong> defina os limites antes de definir os fluxos. Cada parte deve ter <em>um motivo para mudar</em> (single responsibility).</p>
+        </div>
+        <div class="box ind">
+          <h3>Por que isso importa <em>agora</em>?</h3>
+          <p>MVC é uma escolha <em>estrutural</em> (3 camadas, 3 responsabilidades). Os controllers definem o <em>comportamento</em> (o que cada rota faz). Sem essa separação, o servidor vira "um arquivo gigante chamado <code>app.js</code>" — funciona, mas não evolui.</p>
+          <ul>
+            <li><strong>Model</strong> = estado + invariantes (o capataz tem nome, RG, retiro_id; nunca nasce sem retiro).</li>
+            <li><strong>View</strong> = como o estado vira saída (no backend HTTP, é o JSON que volta).</li>
+            <li><strong>Controller</strong> = quem recebe a requisição, valida, chama o model, decide a resposta.</li>
+          </ul>
+          <p class="hint"><strong>Autoestudo:</strong> <em>"Livro Didático — Teste de Unidade"</em> e <em>"SWEBOK v4 Cap. 2"</em> formam a base teórica das próximas 3 aulas.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ╔══════ 07 — MVC aplicado ao BrPec ═════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh teal"><h2 class="st">MVC no BrPec · uma responsabilidade por arquivo</h2><p class="ss">Como o servidor de hoje se desdobra. O esqueleto pequeno; o padrão claro.</p></div>
+      <div class="mvc-grid">
+        <div class="mvc-card m">
+          <h3>Model <small>· evento.model.js</small></h3>
+          <p>Define o que é um <em>evento</em> e como ele toca o banco.</p>
+          <ul>
+            <li>Schema da tabela <code>evento_recebido</code>.</li>
+            <li>Statements preparados (<code>INSERT OR IGNORE</code>, <code>SELECT</code>).</li>
+            <li>Funções <code>insertMany(deltas)</code>, <code>findRecent(n)</code>.</li>
+            <li><strong>Nunca</strong> conhece HTTP. Não sabe que existe um req/res.</li>
+          </ul>
+        </div>
+        <div class="mvc-card c">
+          <h3>Controller <small>· sync.controller.js</small></h3>
+          <p>Recebe a requisição, valida, orquestra o model, monta a resposta.</p>
+          <ul>
+            <li><code>postDeltas(req,res)</code> — valida payload, chama <code>insertMany</code>, devolve JSON.</li>
+            <li><code>getSnapshot(req,res)</code> — chama <code>findRecent</code>, devolve JSON.</li>
+            <li><strong>Nunca</strong> faz SQL direto. Não sabe se o banco é SQLite ou Postgres.</li>
+          </ul>
+        </div>
+        <div class="mvc-card v">
+          <h3>View / Routes <small>· server.js</small></h3>
+          <p>O <em>"router"</em> liga URL → controller. No HTTP, a "view" é o JSON de resposta.</p>
+          <ul>
+            <li><code>app.post('/sync/deltas', postDeltas)</code></li>
+            <li><code>app.get('/sync/snapshot', getSnapshot)</code></li>
+            <li>Middlewares: <code>cors()</code>, <code>express.json()</code>.</li>
+          </ul>
+        </div>
+      </div>
+      <p class="hint"><strong>Conexão com a aula 4:</strong> o <em>Model</em> usa exatamente as mesmas tabelas e os mesmos JOINs que vocês aprenderam ontem — só que agora o motor SQLite roda no servidor Node, não no navegador. <em>O SQL é o mesmo; muda quem digita.</em></p>
+    </div>
+  </div>
+
+  <!-- ╔══════ 08 — PWA: 3 pilares + Manifest (comprimido) ═════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh teal"><h2 class="st">PWA · 3 pilares (revisita rápida)</h2><p class="ss">Recapitulação compacta para conectar com o sync: o que a PWA <em>precisa</em> ter para chegar até o Node.</p></div>
       <div class="pillars">
         <div class="pillar https">
           <div class="ico">🔒</div>
           <h3>HTTPS <small>(ou localhost)</small></h3>
-          <p>Sem HTTPS, navegador bloqueia SW e <code>crypto.subtle</code>. Em produção é obrigatório — GitHub Pages serve via HTTPS, ok.</p>
-          <ul><li>Em dev: <code>localhost</code> é exceção válida.</li></ul>
+          <p>Sem HTTPS, navegador bloqueia SW e <code>crypto</code>. Localhost é exceção dev. <strong>GitHub Pages serve HTTPS</strong> — ok para produção.</p>
         </div>
         <div class="pillar manif">
           <div class="ico">📄</div>
           <h3>Manifest <small>(.webmanifest)</small></h3>
-          <p>JSON que descreve o app: nome, ícones, cor de tema, modo de exibição. É o que aparece quando o navegador oferece "Instalar".</p>
-          <ul><li><code>display: standalone</code> esconde a barra do browser.</li></ul>
+          <p>JSON com nome, ícones, theme, <code>display:standalone</code>. Define o "Instalar" do browser. Conectado via <code>&lt;link rel="manifest"&gt;</code>.</p>
         </div>
         <div class="pillar sw">
           <div class="ico">⚙️</div>
           <h3>Service Worker</h3>
-          <p>Script que vive <em>fora</em> da página. Intercepta requisições, cacheia, responde offline. É o coração do offline-first.</p>
-          <ul><li>Roda em thread própria — não bloqueia a UI.</li></ul>
+          <p>Script numa thread separada. Intercepta requisições, cacheia shell, decide o que vai pra rede e o que sai do cache. Coração do offline-first.</p>
         </div>
       </div>
-      <p class="hint"><strong>Lighthouse PWA score</strong> (que vamos avaliar na ponderada) é basicamente: você tem os 3 pilares funcionando + alguns detalhes (ícone 192x192, start_url cacheável, etc).</p>
-    </div>
-  </div>
-
-  <!-- 05 — Manifest -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh indigo"><h2 class="st">Manifest · o cartão de visita do app</h2><p class="ss">Arquivo JSON declarativo. Sem regra de negócio, só metadados.</p></div>
-      <div class="g2">
+      <div class="g2" style="margin-top:6px;">
+        <div class="box tea">
+          <h3>Resumo executivo</h3>
+          <p>Os 3 pilares + um icon &gt;= 192px + <code>start_url</code> cacheável = Lighthouse PWA passando.</p>
+          <p>No BrPec, o SW garante que <em>a PWA abre offline</em>; o manifest garante que <em>ela vira app no celular</em>; o HTTPS garante que <em>o navegador permite</em>.</p>
+        </div>
         <div>
 <pre class="codeblock"><span class="hl-cmt">// manifest.webmanifest</span>
 {
-  <span class="hl-str">"name"</span>:        <span class="hl-str">"BrPec — Coletor de Eventos Zootécnicos"</span>,
+  <span class="hl-str">"name"</span>:        <span class="hl-str">"BrPec — Coletor"</span>,
   <span class="hl-str">"short_name"</span>:  <span class="hl-str">"BrPec"</span>,
   <span class="hl-str">"start_url"</span>:   <span class="hl-str">"./index.html"</span>,
   <span class="hl-str">"display"</span>:     <span class="hl-str">"standalone"</span>,
-  <span class="hl-str">"orientation"</span>: <span class="hl-str">"portrait"</span>,
-  <span class="hl-str">"background_color"</span>: <span class="hl-str">"#0f172a"</span>,
-  <span class="hl-str">"theme_color"</span>:      <span class="hl-str">"#0d9488"</span>,
-  <span class="hl-str">"lang"</span>: <span class="hl-str">"pt-BR"</span>,
-  <span class="hl-str">"icons"</span>: [
-    {
-      <span class="hl-str">"src"</span>: <span class="hl-str">"./icon.svg"</span>,
-      <span class="hl-str">"sizes"</span>: <span class="hl-str">"any"</span>,
-      <span class="hl-str">"type"</span>: <span class="hl-str">"image/svg+xml"</span>,
-      <span class="hl-str">"purpose"</span>: <span class="hl-str">"any maskable"</span>
-    }
-  ]
+  <span class="hl-str">"theme_color"</span>:  <span class="hl-str">"#0d9488"</span>,
+  <span class="hl-str">"icons"</span>: [{ <span class="hl-str">"src"</span>:<span class="hl-str">"./icon.svg"</span>, <span class="hl-str">"sizes"</span>:<span class="hl-str">"any"</span>, <span class="hl-str">"purpose"</span>:<span class="hl-str">"any maskable"</span> }]
 }</pre>
         </div>
-        <div class="box ind">
-          <h3>O que cada campo controla</h3>
-          <ul>
-            <li><code>name</code> — vira o título no app drawer e splash.</li>
-            <li><code>short_name</code> — fallback quando o nome é cortado.</li>
-            <li><code>start_url</code> — página de entrada quando o app abre.</li>
-            <li><code>display:standalone</code> — esconde URL/abas → parece nativo.</li>
-            <li><code>theme_color</code> — cor da barra de status no Android.</li>
-            <li><code>icons</code> — Android usa <em>maskable</em>; iOS usa <code>apple-touch-icon</code>.</li>
-          </ul>
-          <p class="hint" style="margin-top:6px;"><strong>Conectado no HTML:</strong> <code>&lt;link rel="manifest" href="./manifest.webmanifest"&gt;</code>.</p>
-        </div>
       </div>
     </div>
   </div>
 
-  <!-- 06 — SW lifecycle -->
+  <!-- ╔══════ 09 — SW lifecycle + cache strategies (comprimido) ═════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh teal"><h2 class="st">Service Worker · ciclo de vida</h2><p class="ss">Três eventos importantes. Dois você implementa, um o navegador dispara.</p></div>
+      <div class="sh teal"><h2 class="st">Service Worker · ciclo de vida + estratégias de cache</h2><p class="ss">3 eventos no SW. 2 estratégias. Tudo cabe num único arquivo <code>sw.js</code>.</p></div>
       <div class="sw-flow">
-        <div class="sw-step">
-          <div class="sw-num">1</div>
-          <h4>install</h4>
-          <p>Pre-cache da shell (HTML, CSS, JS, WASM, ícones, seed do banco). Roda 1 vez por versão.</p>
-        </div>
+        <div class="sw-step"><div class="sw-num">1</div><h4>install</h4><p>Pre-cache da shell (HTML, CSS, JS, WASM, ícones, seed do banco).</p></div>
         <div class="sw-arrow">→</div>
-        <div class="sw-step">
-          <div class="sw-num">2</div>
-          <h4>activate</h4>
-          <p>Limpa caches antigos. <code>skipWaiting()</code> + <code>clients.claim()</code> para assumir as tabs já abertas.</p>
-        </div>
+        <div class="sw-step"><div class="sw-num">2</div><h4>activate</h4><p>Limpa caches antigos. <code>clients.claim()</code> assume as abas abertas.</p></div>
         <div class="sw-arrow">→</div>
-        <div class="sw-step">
-          <div class="sw-num">3</div>
-          <h4>fetch</h4>
-          <p>Intercepta toda requisição saindo da página. Aqui mora a estratégia: cache-first, network-first, etc.</p>
-        </div>
+        <div class="sw-step"><div class="sw-num">3</div><h4>fetch</h4><p>Intercepta cada requisição. Aqui mora a estratégia: cache-first ou network-first.</p></div>
       </div>
-<pre class="codeblock"><span class="hl-cmt">// sw.js — esqueleto</span>
-<span class="hl-kw">const</span> CACHE = <span class="hl-str">'brpec-pwa-v1'</span>;
-<span class="hl-kw">const</span> SHELL = [<span class="hl-str">'./'</span>, <span class="hl-str">'./index.html'</span>, <span class="hl-str">'./app.js'</span>, <span class="hl-str">'./styles.css'</span>, <span class="hl-str">'./manifest.webmanifest'</span>];
-
-self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'install'</span>,  (e) =&gt; e.<span class="hl-fn">waitUntil</span>(caches.<span class="hl-fn">open</span>(CACHE).<span class="hl-fn">then</span>((c) =&gt; c.<span class="hl-fn">addAll</span>(SHELL))));
-self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'activate'</span>, (e) =&gt; e.<span class="hl-fn">waitUntil</span>(self.clients.<span class="hl-fn">claim</span>()));
-self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'fetch'</span>,    (e) =&gt; e.<span class="hl-fn">respondWith</span>(caches.<span class="hl-fn">match</span>(e.request).<span class="hl-fn">then</span>((r) =&gt; r || <span class="hl-fn">fetch</span>(e.request))));</pre>
-    </div>
-  </div>
-
-  <!-- 07 — Estratégias de cache -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh indigo"><h2 class="st">Estratégias de cache · qual usar onde?</h2><p class="ss">A regra: <strong>shell estática</strong> usa <em>cache-first</em>; <strong>dados frescos</strong> usam <em>network-first</em>.</p></div>
       <div class="strat-grid">
         <div class="strat-col shell">
           <h3>cache-first · para a shell</h3>
-          <p>Tenta o cache. Se achou, devolve. Senão, busca rede e cacheia para a próxima.</p>
-<pre class="codeblock" style="font-size:.74rem;">caches.<span class="hl-fn">match</span>(e.request).<span class="hl-fn">then</span>((c) =&gt;
-  c || <span class="hl-fn">fetch</span>(e.request).<span class="hl-fn">then</span>((r) =&gt; {
-    caches.<span class="hl-fn">open</span>(CACHE).<span class="hl-fn">then</span>((b) =&gt; b.<span class="hl-fn">put</span>(e.request, r.<span class="hl-fn">clone</span>()));
-    <span class="hl-kw">return</span> r;
-  })
-);</pre>
-          <p><strong>Bom para:</strong> HTML, CSS, JS, wasm, ícones, <code>brpec.db</code> (seed).</p>
+          <p>Tenta o cache. Se achou, devolve. Senão, busca rede e cacheia. <strong>Bom para</strong> HTML, CSS, JS, WASM, ícones, seed <code>brpec.db</code>.</p>
         </div>
         <div class="strat-col sync">
           <h3>network-first · para dados</h3>
-          <p>Tenta a rede primeiro. Se falhou, devolve o cache (ou erro estruturado).</p>
-<pre class="codeblock" style="font-size:.74rem;"><span class="hl-fn">fetch</span>(e.request).<span class="hl-fn">catch</span>(() =&gt;
-  <span class="hl-kw">new</span> <span class="hl-fn">Response</span>(
-    JSON.<span class="hl-fn">stringify</span>({ ok: <span class="hl-kw">false</span>, reason: <span class="hl-str">'offline'</span> }),
-    { status: <span class="hl-num">503</span>, headers: { <span class="hl-str">'content-type'</span>: <span class="hl-str">'application/json'</span> } }
-  )
-);</pre>
-          <p><strong>Bom para:</strong> <code>/sync/*</code> — você quer fresh, mas degradação graciosa.</p>
+          <p>Tenta a rede primeiro. Se falhou, devolve cache (ou JSON 503 estruturado). <strong>Bom para</strong> <code>/sync/*</code> — quer fresh, com degradação graciosa.</p>
         </div>
       </div>
-      <blockquote>O SW da PWA do BrPec faz exatamente isso: <code>SHELL_ASSETS</code> em cache-first; <code>/sync/*</code> em network-first com fallback 503 JSON estruturado.</blockquote>
+      <blockquote>O SW do BrPec faz exatamente isso: <code>SHELL_ASSETS</code> em cache-first; <code>/sync/*</code> em network-first com fallback <code>{ok:false, reason:'offline'}</code>.</blockquote>
     </div>
   </div>
 
-  <!-- 08 — IndexedDB para persistência -->
+  <!-- ╔══════ 10 — sql.js + IndexedDB ═════╗ -->
   <div class="slide">
     <div class="sc">
       <div class="sh dark"><h2 class="st">sql.js + IndexedDB · banco persistente no navegador</h2><p class="ss">Evolução do sandbox da aula 4: o blob do banco vive no IndexedDB. Não some no reload.</p></div>
@@ -414,10 +518,10 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'fetch'</s
           <h3>Fluxo de boot (3 passos)</h3>
           <ol>
             <li><strong>Motor</strong> — <code>initSqlJs()</code> carrega o WASM.</li>
-            <li><strong>Blob</strong> — tenta ler do IDB (key <code>brpec.db</code>); se vazio, <code>fetch</code> o seed inicial e grava no IDB.</li>
+            <li><strong>Blob</strong> — tenta ler do IDB (key <code>brpec.db</code>); se vazio, <code>fetch</code> o seed e grava no IDB.</li>
             <li><strong>Banco</strong> — <code>new SQL.Database(blob)</code> abre em memória.</li>
           </ol>
-          <p><strong>Após cada mutação:</strong> <code>db.export()</code> serializa o estado → grava no IDB. Próximo boot reabre exatamente onde parou.</p>
+          <p><strong>Após cada mutação:</strong> <code>db.export()</code> serializa → grava no IDB. Próximo boot reabre exatamente onde parou.</p>
         </div>
         <div>
 <pre class="codeblock"><span class="hl-cmt">// db.js — núcleo da persistência</span>
@@ -433,20 +537,18 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'fetch'</s
   }
 
   <span class="hl-kw">const</span> db = <span class="hl-kw">new</span> SQL.<span class="hl-fn">Database</span>(blob);
-
   <span class="hl-kw">async function</span> <span class="hl-fn">persist</span>() {
     <span class="hl-kw">await</span> <span class="hl-fn">idbSet</span>(<span class="hl-str">'brpec.db'</span>, db.<span class="hl-fn">export</span>());
   }
-
   <span class="hl-kw">return</span> { db, persist };
 }</pre>
         </div>
       </div>
-      <p class="hint"><strong>Por que IndexedDB e não OPFS?</strong> OPFS exige <code>crossOriginIsolated</code> (COOP/COEP), que o GitHub Pages não serve. IndexedDB funciona em qualquer host com qualquer header. Portabilidade ganha.</p>
+      <p class="hint"><strong>Por que IndexedDB e não OPFS?</strong> OPFS exige <code>crossOriginIsolated</code> (COOP/COEP), que GitHub Pages não serve. IndexedDB funciona em qualquer host. Portabilidade ganha.</p>
     </div>
   </div>
 
-  <!-- 09 — UUID no cliente -->
+  <!-- ╔══════ 11 — UUID no cliente ═════╗ -->
   <div class="slide">
     <div class="sc">
       <div class="sh amber"><h2 class="st">UUID v4 · gerado no celular do capataz</h2><p class="ss">Por que <em>não</em> deixar o servidor gerar o id? Porque o servidor pode estar a 4 horas de distância.</p></div>
@@ -457,7 +559,7 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'fetch'</s
           <ul>
             <li><strong>Sem internet</strong>, o registro <em>já tem id estável</em>.</li>
             <li><strong>Reenvios</strong> usam o mesmo id — servidor reconhece e ignora.</li>
-            <li><strong>Auditoria</strong> liga o registro no celular ao registro no SGBD.</li>
+            <li><strong>Auditoria</strong> liga o registro do celular ao registro do SGBD.</li>
           </ul>
           <p class="hint"><strong>Geração:</strong> <code>crypto.randomUUID()</code> em contextos seguros; fallback <code>crypto.getRandomValues</code> em qualquer outro.</p>
         </div>
@@ -468,8 +570,8 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'fetch'</s
 
   <span class="hl-kw">const</span> b = <span class="hl-kw">new</span> Uint8Array(<span class="hl-num">16</span>);
   crypto.<span class="hl-fn">getRandomValues</span>(b);
-  b[<span class="hl-num">6</span>] = (b[<span class="hl-num">6</span>] &amp; <span class="hl-num">0x0f</span>) | <span class="hl-num">0x40</span>;  <span class="hl-cmt">// version 4</span>
-  b[<span class="hl-num">8</span>] = (b[<span class="hl-num">8</span>] &amp; <span class="hl-num">0x3f</span>) | <span class="hl-num">0x80</span>;  <span class="hl-cmt">// variant</span>
+  b[<span class="hl-num">6</span>] = (b[<span class="hl-num">6</span>] &amp; <span class="hl-num">0x0f</span>) | <span class="hl-num">0x40</span>;
+  b[<span class="hl-num">8</span>] = (b[<span class="hl-num">8</span>] &amp; <span class="hl-num">0x3f</span>) | <span class="hl-num">0x80</span>;
 
   <span class="hl-kw">const</span> h = [...b].<span class="hl-fn">map</span>((x) =&gt; x.<span class="hl-fn">toString</span>(<span class="hl-num">16</span>).<span class="hl-fn">padStart</span>(<span class="hl-num">2</span>, <span class="hl-str">'0'</span>));
   <span class="hl-kw">return</span> <span class="hl-str">`${h[0]}${h[1]}${h[2]}${h[3]}-${h[4]}${h[5]}-${h[6]}${h[7]}-${h[8]}${h[9]}-${h.slice(10).join('')}`</span>;
@@ -479,58 +581,63 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'fetch'</s
     </div>
   </div>
 
-  <!-- 10 — Estratégia de sync -->
+  <!-- ╔══════ 12 — Backend Node (estrutura MVC + Express + better-sqlite3) ═════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh indigo"><h2 class="st">Sync · arquitetura do reencontro</h2><p class="ss">Cliente acumula offline. Servidor reconcilia idempotentemente. Sem locks. Sem janela de conflito.</p></div>
-      <div class="arch">
-        <div class="arch-node client">
-          <h4>📲 PWA</h4>
-          <p>sql.js + IndexedDB<br>fila pending</p>
-        </div>
-        <div class="arch-arrow">→<span>POST /sync/deltas</span></div>
-        <div class="arch-node server">
-          <h4>🖧 Node + SQLite</h4>
-          <p>Express +<br>better-sqlite3</p>
-        </div>
-      </div>
-      <div class="g2">
-        <div class="box ind">
-          <h3>POST /sync/deltas</h3>
-          <p>Body: <code>{ deltas: [{ client_uuid, tipo, data, capataz_id, retiro_id, bovino_id, observacao }] }</code></p>
-          <p>Resposta: <code>{ ok, accepted, skipped, accepted_uuids }</code></p>
-          <p>Servidor faz <code>INSERT OR IGNORE</code> com <code>client_uuid</code> como PK — segundo envio do mesmo evento vira <code>skipped</code>.</p>
-        </div>
-        <div class="box ind">
-          <h3>GET /sync/snapshot</h3>
-          <p>Cliente pede últimos N eventos do servidor para conferir consistência. Útil quando entra em rede e quer "olhar o que perdi".</p>
-          <p>Para o MVP, o foco é <strong>push offline → pull online</strong>. Conflitos verdadeiros (mesmo bovino, dois capatazes) ficam para uma aula futura.</p>
-        </div>
-      </div>
+      <div class="sh node"><h2 class="st">Backend Node · Models + Controller + Routes</h2><p class="ss">O mesmo SQLite da aula 4, agora do <em>outro lado</em> da rede. Síncrono, simples, &lt; 80 linhas.</p></div>
+<pre class="codeblock"><span class="hl-cmt">// evento.model.js · MODEL</span>
+<span class="hl-kw">const</span> Database = <span class="hl-fn">require</span>(<span class="hl-str">'better-sqlite3'</span>);
+<span class="hl-kw">const</span> db = <span class="hl-kw">new</span> <span class="hl-fn">Database</span>(<span class="hl-str">'brpec-server.db'</span>);
+db.<span class="hl-fn">pragma</span>(<span class="hl-str">'journal_mode = WAL'</span>);
+db.<span class="hl-fn">exec</span>(<span class="hl-str">`CREATE TABLE IF NOT EXISTS evento_recebido ( client_uuid TEXT PRIMARY KEY, tipo TEXT, data TEXT, capataz_id INT, retiro_id INT, bovino_id INT, observacao TEXT );`</span>);
+<span class="hl-kw">const</span> stmtInsert = db.<span class="hl-fn">prepare</span>(<span class="hl-str">`INSERT OR IGNORE INTO evento_recebido (client_uuid,tipo,data,capataz_id,retiro_id,bovino_id,observacao) VALUES (@client_uuid,@tipo,@data,@capataz_id,@retiro_id,@bovino_id,@observacao);`</span>);
+<span class="hl-kw">function</span> <span class="hl-fn">insertMany</span>(deltas) { <span class="hl-kw">return</span> db.<span class="hl-fn">transaction</span>((items) =&gt; items.<span class="hl-fn">map</span>((d) =&gt; stmtInsert.<span class="hl-fn">run</span>(d).changes))(deltas); }
+module.exports = { insertMany };
+
+<span class="hl-cmt">// sync.controller.js · CONTROLLER</span>
+<span class="hl-kw">const</span> { insertMany } = <span class="hl-fn">require</span>(<span class="hl-str">'./evento.model'</span>);
+<span class="hl-kw">function</span> <span class="hl-fn">postDeltas</span>(req, res) {
+  <span class="hl-kw">const</span> deltas = req.body?.deltas;
+  <span class="hl-kw">if</span> (!Array.<span class="hl-fn">isArray</span>(deltas)) <span class="hl-kw">return</span> res.<span class="hl-fn">status</span>(<span class="hl-num">400</span>).<span class="hl-fn">json</span>({ ok: <span class="hl-kw">false</span> });
+  <span class="hl-kw">const</span> changes = <span class="hl-fn">insertMany</span>(deltas);
+  <span class="hl-kw">const</span> accepted = changes.<span class="hl-fn">filter</span>((c) =&gt; c === <span class="hl-num">1</span>).length;
+  res.<span class="hl-fn">json</span>({ ok: <span class="hl-kw">true</span>, accepted, skipped: deltas.length - accepted });
+}
+module.exports = { postDeltas };
+
+<span class="hl-cmt">// server.js · ROUTES</span>
+<span class="hl-kw">const</span> express = <span class="hl-fn">require</span>(<span class="hl-str">'express'</span>);
+<span class="hl-kw">const</span> cors = <span class="hl-fn">require</span>(<span class="hl-str">'cors'</span>);
+<span class="hl-kw">const</span> { postDeltas } = <span class="hl-fn">require</span>(<span class="hl-str">'./sync.controller'</span>);
+<span class="hl-kw">const</span> app = <span class="hl-fn">express</span>();
+app.<span class="hl-fn">use</span>(<span class="hl-fn">cors</span>()); app.<span class="hl-fn">use</span>(express.<span class="hl-fn">json</span>());
+app.<span class="hl-fn">post</span>(<span class="hl-str">'/sync/deltas'</span>, postDeltas);
+app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</pre>
+      <p class="hint nod"><strong>Por que síncrono (better-sqlite3 vs sqlite3 async)?</strong> 30k inserts/s, sem callback hell, leitura linear — ideal para a turma ler. Express absorve a I/O do HTTP; o SQL fica simples.</p>
     </div>
   </div>
 
-  <!-- 11 — Idempotência -->
+  <!-- ╔══════ 13 — Sync + Idempotência (combinado) ═════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh red"><h2 class="st">Idempotência · "fazer X duas vezes vira fazer X uma vez"</h2><p class="ss">A propriedade que torna o sync robusto a falhas de rede.</p></div>
+      <div class="sh red"><h2 class="st">Sync + Idempotência · "fazer X duas vezes vira fazer X uma vez"</h2><p class="ss">A propriedade que torna o sync robusto a falhas de rede.</p></div>
       <div class="g2">
         <div class="box red">
-          <h3>O cenário sem idempotência</h3>
+          <h3>Sem idempotência</h3>
           <p>Capataz registra pesagem · clica sync · servidor recebe e insere · resposta se perde no caminho.</p>
           <p>Cliente acha que falhou · tenta de novo · servidor insere <strong>de novo</strong>.</p>
           <p>Boletim sai com 2 pesagens para o mesmo bovino no mesmo dia.</p>
         </div>
         <div class="box grn">
-          <h3>O cenário com idempotência</h3>
+          <h3>Com idempotência</h3>
           <p>Mesma sequência, mas <code>client_uuid</code> é PK no servidor.</p>
-          <p>Segundo INSERT: <code>changes = 0</code>. Vira <code>skipped</code> na resposta.</p>
+          <p>Segundo <code>INSERT OR IGNORE</code>: <code>changes = 0</code>. Vira <code>skipped</code> na resposta.</p>
           <p>Cliente confia: "o servidor já tem isso". Boletim mostra 1 pesagem.</p>
         </div>
       </div>
-<pre class="codeblock"><span class="hl-cmt">-- schema do servidor</span>
+<pre class="codeblock"><span class="hl-cmt">-- contrato do servidor (no Model)</span>
 <span class="hl-kw">CREATE TABLE</span> evento_recebido (
-  client_uuid  <span class="hl-kw">TEXT PRIMARY KEY</span>,         <span class="hl-cmt">-- a mágica</span>
+  client_uuid  <span class="hl-kw">TEXT PRIMARY KEY</span>,         <span class="hl-cmt">-- a mágica · veio do cliente</span>
   tipo         <span class="hl-kw">TEXT NOT NULL</span>,
   data         <span class="hl-kw">TEXT NOT NULL</span>,
   capataz_id   <span class="hl-kw">INTEGER NOT NULL</span>,
@@ -539,61 +646,25 @@ self.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'fetch'</s
   observacao   <span class="hl-kw">TEXT</span>,
   received_at  <span class="hl-kw">TEXT NOT NULL DEFAULT</span> (datetime(<span class="hl-str">'now'</span>))
 );
-<span class="hl-cmt">-- a operação:</span>
-<span class="hl-kw">INSERT OR IGNORE INTO</span> evento_recebido (...) <span class="hl-kw">VALUES</span> (...);</pre>
+<span class="hl-kw">INSERT OR IGNORE INTO</span> evento_recebido (...) <span class="hl-kw">VALUES</span> (...);  <span class="hl-cmt">-- segundo POST: changes=0</span></pre>
     </div>
   </div>
 
-  <!-- 12 — Backend Node -->
+  <!-- ╔══════ 14 — TDD: Red → Green → Refactor (com node:test) ═════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh teal"><h2 class="st">Backend Node · 60 linhas de Express</h2><p class="ss"><code>better-sqlite3</code> · CORS · um statement por endpoint · uma transação por payload.</p></div>
-<pre class="codeblock"><span class="hl-kw">const</span> express  = <span class="hl-fn">require</span>(<span class="hl-str">'express'</span>);
-<span class="hl-kw">const</span> Database = <span class="hl-fn">require</span>(<span class="hl-str">'better-sqlite3'</span>);
-<span class="hl-kw">const</span> cors     = <span class="hl-fn">require</span>(<span class="hl-str">'cors'</span>);
-
-<span class="hl-kw">const</span> db = <span class="hl-kw">new</span> <span class="hl-fn">Database</span>(<span class="hl-str">'brpec-server.db'</span>);
-db.<span class="hl-fn">pragma</span>(<span class="hl-str">'journal_mode = WAL'</span>);
-db.<span class="hl-fn">exec</span>(<span class="hl-str">`CREATE TABLE IF NOT EXISTS evento_recebido ( client_uuid TEXT PRIMARY KEY, ... );`</span>);
-
-<span class="hl-kw">const</span> stmt = db.<span class="hl-fn">prepare</span>(
-  <span class="hl-str">`INSERT OR IGNORE INTO evento_recebido (client_uuid, tipo, data, capataz_id, retiro_id, bovino_id, observacao)
-      VALUES (@client_uuid, @tipo, @data, @capataz_id, @retiro_id, @bovino_id, @observacao);`</span>
-);
-
-<span class="hl-kw">const</span> app = <span class="hl-fn">express</span>();
-app.<span class="hl-fn">use</span>(<span class="hl-fn">cors</span>());
-app.<span class="hl-fn">use</span>(express.<span class="hl-fn">json</span>());
-
-app.<span class="hl-fn">post</span>(<span class="hl-str">'/sync/deltas'</span>, (req, res) =&gt; {
-  <span class="hl-kw">const</span> deltas = req.body?.deltas;
-  <span class="hl-kw">if</span> (!Array.<span class="hl-fn">isArray</span>(deltas)) <span class="hl-kw">return</span> res.<span class="hl-fn">status</span>(<span class="hl-num">400</span>).<span class="hl-fn">json</span>({ ok: <span class="hl-kw">false</span> });
-
-  <span class="hl-kw">const</span> tx = db.<span class="hl-fn">transaction</span>((items) =&gt; {
-    <span class="hl-kw">const</span> accepted_uuids = []; <span class="hl-kw">let</span> skipped = <span class="hl-num">0</span>;
-    <span class="hl-kw">for</span> (<span class="hl-kw">const</span> d <span class="hl-kw">of</span> items) {
-      <span class="hl-kw">const</span> info = stmt.<span class="hl-fn">run</span>(d);
-      <span class="hl-kw">if</span> (info.changes === <span class="hl-num">1</span>) accepted_uuids.<span class="hl-fn">push</span>(d.client_uuid);
-      <span class="hl-kw">else</span>                    skipped++;
-    }
-    <span class="hl-kw">return</span> { accepted: accepted_uuids.length, skipped, accepted_uuids };
-  });
-
-  res.<span class="hl-fn">json</span>({ ok: <span class="hl-kw">true</span>, ...<span class="hl-fn">tx</span>(deltas) });
-});
-
-app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</pre>
-      <p class="hint"><strong>Por que síncrono (better-sqlite3 vs sqlite3)?</strong> 30k inserts/s, sem callback hell, leitura linear — ideal para a turma ler.</p>
-    </div>
-  </div>
-
-  <!-- 13 — Spec mínimo -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh dark"><h2 class="st">"Todo código nasce de um teste que falha" · spec mínimo</h2><p class="ss">Mantemos a cultura de TDD, mas com 1 teste-âncora — o contrato de idempotência.</p></div>
+      <div class="sh dark"><h2 class="st">Test-Driven Development · Red → Green → Refactor</h2><p class="ss">Antes do código, o teste. O teste é o <em>contrato</em>; a implementação é só uma forma de cumpri-lo.</p></div>
+      <div class="tdd-ring">
+        <div class="tdd-step red"><h4>🔴 RED</h4><p>Escrever o teste que falha. Ele descreve o comportamento desejado.</p></div>
+        <div class="tdd-arrow">→</div>
+        <div class="tdd-step green"><h4>🟢 GREEN</h4><p>Mínimo de código para passar. <em>Não</em> resolva problemas futuros.</p></div>
+        <div class="tdd-arrow">→</div>
+        <div class="tdd-step refac"><h4>🔵 REFACTOR</h4><p>Reorganize sem mudar comportamento. Teste verde garante a rede.</p></div>
+        <div class="tdd-arrow">↻</div>
+      </div>
       <div class="g2">
         <div>
-<pre class="codeblock"><span class="hl-cmt">// server.test.js</span>
+<pre class="codeblock"><span class="hl-cmt">// server.test.js · 1º teste-âncora</span>
 <span class="hl-kw">const</span> test   = <span class="hl-fn">require</span>(<span class="hl-str">'node:test'</span>);
 <span class="hl-kw">const</span> assert = <span class="hl-fn">require</span>(<span class="hl-str">'node:assert/strict'</span>);
 <span class="hl-kw">const</span> request = <span class="hl-fn">require</span>(<span class="hl-str">'supertest'</span>);
@@ -601,134 +672,149 @@ app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</pre>
 
 <span class="hl-fn">test</span>(<span class="hl-str">'reenviar não duplica (idempotência)'</span>, <span class="hl-kw">async</span> () =&gt; {
   <span class="hl-kw">const</span> { app, close } = <span class="hl-fn">createServer</span>({ dbPath: <span class="hl-str">':memory:'</span> });
-
-  <span class="hl-kw">const</span> delta = {
-    client_uuid: <span class="hl-str">'fixed-A'</span>, tipo: <span class="hl-str">'pesagem'</span>,
-    data: <span class="hl-str">'2026-05-14'</span>,
-    capataz_id: <span class="hl-num">1</span>, retiro_id: <span class="hl-num">1</span>, bovino_id: <span class="hl-num">1</span>
-  };
+  <span class="hl-kw">const</span> delta = { client_uuid: <span class="hl-str">'fixed-A'</span>, tipo: <span class="hl-str">'pesagem'</span>, data: <span class="hl-str">'2026-05-14'</span>, capataz_id: <span class="hl-num">1</span>, retiro_id: <span class="hl-num">1</span>, bovino_id: <span class="hl-num">1</span> };
 
   <span class="hl-kw">const</span> r1 = <span class="hl-kw">await</span> <span class="hl-fn">request</span>(app).<span class="hl-fn">post</span>(<span class="hl-str">'/sync/deltas'</span>).<span class="hl-fn">send</span>({ deltas: [delta] });
   assert.<span class="hl-fn">equal</span>(r1.body.accepted, <span class="hl-num">1</span>);
-  assert.<span class="hl-fn">equal</span>(r1.body.skipped,  <span class="hl-num">0</span>);
 
   <span class="hl-kw">const</span> r2 = <span class="hl-kw">await</span> <span class="hl-fn">request</span>(app).<span class="hl-fn">post</span>(<span class="hl-str">'/sync/deltas'</span>).<span class="hl-fn">send</span>({ deltas: [delta] });
   assert.<span class="hl-fn">equal</span>(r2.body.accepted, <span class="hl-num">0</span>);
   assert.<span class="hl-fn">equal</span>(r2.body.skipped,  <span class="hl-num">1</span>);
-
   <span class="hl-fn">close</span>();
 });</pre>
         </div>
         <div class="box dkb">
-          <h3>Por que <em>esse</em> teste e não outros?</h3>
-          <p>Idempotência é o <strong>contrato pedagógico</strong> da aula. É o que separa "sync ingênuo" de "sync confiável".</p>
-          <p>Outros testes (validação de campo, snapshot vazio, etc.) viram material de leitura no <code>server.test.js</code> entregue.</p>
-          <h3 style="margin-top:14px;">Cultura TDD herdada do Afonso</h3>
-          <ul>
-            <li><strong>RED → GREEN → REFACTOR</strong> continua sendo o ciclo.</li>
-            <li><strong>"Celebrar o vermelho"</strong> — o primeiro <code>npm test</code> falhando é vitória.</li>
-            <li>Aprofundamento de TDD em camadas → <strong>aula 10 (Testes &amp; Automação)</strong>.</li>
-          </ul>
-          <p class="hint"><strong>Rode:</strong> <code>npm install &amp;&amp; npm test</code> dentro de <code>assets/brpec-sync-server/</code>.</p>
+          <h3>Por que <em>esse</em> teste?</h3>
+          <p>Idempotência é o <strong>contrato pedagógico</strong> da aula. Separa "sync ingênuo" de "sync confiável". Outros testes (validação, snapshot vazio) ficam como leitura no <code>server.test.js</code> entregue.</p>
+          <p><strong>Como rodar:</strong></p>
+          <ol>
+            <li><code>cd assets/brpec-sync-server</code></li>
+            <li><code>npm install</code></li>
+            <li><code>npm test</code> → 5 specs verdes.</li>
+          </ol>
+          <p class="hint"><strong>Autoestudo:</strong> <em>"Test-Driven Development"</em> (Beck, capítulos 1–3). Aprofundamento de TDD em camadas: aula 10 (Testes &amp; Automação).</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 14 — Demo -->
+  <!-- ╔══════ 15 — TDD WDIAGW + Spec-Driven Development ═════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh teal"><h2 class="st">Demo · registrar offline → sincronizar</h2><p class="ss">Roteiro em 4 passos, com a PWA do BrPec, no projetor.</p></div>
+      <div class="sh indigo"><h2 class="st">Onde o TDD travou — e o que vem depois (SDD)</h2><p class="ss">2 leituras provocadoras: por que TDD nem sempre funciona, e o que está nascendo no lugar.</p></div>
+      <div class="ref-grid">
+        <div class="ref-card amber">
+          <h4>🔧 TDD, Where Did It All Go Wrong</h4>
+          <div class="meta">Ian Cooper · DevTernity · 2017 · ~1h vídeo</div>
+          <p><strong>Tese:</strong> a maioria das equipes faz TDD <em>errado</em> — testa <em>implementação</em> em vez de <em>comportamento</em>. Resultado: suíte frágil, refactor caro, código preso ao teste.</p>
+          <p><strong>O que mudar:</strong> escrever testes contra <em>portas</em> (entrada do sistema), não contra <em>internals</em>. Cada bug vira 1 teste novo, mas só na borda.</p>
+          <p>No BrPec: nosso teste de idempotência ataca a <em>porta HTTP</em> (POST + body + status), não o Model interno. <strong>Isso é TDD bem feito.</strong></p>
+        </div>
+        <div class="ref-card teal">
+          <h4>📐 Spec-Driven Development</h4>
+          <div class="meta">Kiro (AWS · 2024) · spec-kit (GitHub · 2025) · Tessl (2025)</div>
+          <p><strong>Tese:</strong> a próxima fronteira não é "escrever testes antes" — é <em>declarar a especificação</em> e deixar a IA gerar (1) código, (2) testes, (3) docs em conjunto.</p>
+          <p><strong>3 ferramentas para conhecer:</strong> Kiro (IDE da AWS com spec-mode), spec-kit (CLI open-source do GitHub), Tessl (plataforma SaaS de specs executáveis).</p>
+          <p>No BrPec: o nosso spec ainda é <em>texto + 1 teste-âncora</em>. Em 2 anos, será <code>brpec.spec.md</code> gerando server.js + tests.</p>
+        </div>
+      </div>
+      <blockquote><strong>A mensagem da aula:</strong> testes não são burocracia. São o <em>contrato executável</em> que sobrevive a refactors, mudanças de stack, e até a substituições do autor original do código.</blockquote>
+    </div>
+  </div>
+
+  <!-- ╔══════ 16 — Demo end-to-end ═════╗ -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh teal"><h2 class="st">Demo · evento offline → Node → SQLite (no projetor)</h2><p class="ss">Roteiro em 5 passos. Mostra a stack inteira viva.</p></div>
       <ol style="font-size:1rem; line-height:1.85; padding-left:1.4rem;">
-        <li><strong>Abrir</strong> a PWA em <code>localhost:8765/.../brpec-pwa/index.html?server=http://localhost:3000</code>.</li>
-        <li><strong>Cortar a rede</strong> no DevTools (Network → Offline). Status pill vira <em>offline</em>.</li>
-        <li><strong>Registrar 3 eventos</strong> de pesagem para bovinos diferentes — counter "pendentes" sobe.</li>
-        <li><strong>Religar a rede</strong> + clicar <em>sincronizar</em>. Counter zera; "sincronizados" sobe; <code>GET /sync/snapshot</code> confirma.</li>
+        <li><strong>Subir servidor:</strong> <code>cd assets/brpec-sync-server &amp;&amp; npm start</code> — Node escutando na porta 3000.</li>
+        <li><strong>Abrir PWA:</strong> <code>http://localhost:8765/.../brpec-pwa/index.html?server=http://localhost:3000</code>.</li>
+        <li><strong>Cortar a rede</strong> no DevTools (Network → Offline). Pill vira <em>offline</em>. Registrar 3 eventos.</li>
+        <li><strong>Religar e sincronizar:</strong> counter "pendentes" cai a 0; "sincronizados" sobe a 3.</li>
+        <li><strong>Confirmar no SQLite:</strong> <code>sqlite3 brpec-server.db "SELECT client_uuid, tipo, data FROM evento_recebido;"</code> mostra os 3 eventos com os mesmos UUIDs.</li>
       </ol>
       <div class="box tea">
-        <h3>O que mostrar no inspector</h3>
+        <h3>O que mostrar no inspector enquanto o sync roda</h3>
         <ul>
-          <li><strong>Application → Manifest</strong> → mostra <code>name</code>, ícones, theme color.</li>
-          <li><strong>Application → Service Workers</strong> → mostra <code>sw.js</code> activated.</li>
-          <li><strong>Application → IndexedDB → brpec-pwa → kv</strong> → mostra o blob <code>brpec.db</code> persistido.</li>
-          <li><strong>Network</strong> ao clicar sync → ver o <code>POST /sync/deltas</code> com payload JSON e a resposta com <code>accepted</code>/<code>skipped</code>.</li>
+          <li><strong>Application → Manifest</strong> → nome, ícones, theme.</li>
+          <li><strong>Application → Service Workers</strong> → <code>sw.js</code> activated.</li>
+          <li><strong>Application → IndexedDB → kv</strong> → blob <code>brpec.db</code> persistido.</li>
+          <li><strong>Network → POST /sync/deltas</strong> → payload JSON + resposta <code>{accepted, skipped, accepted_uuids}</code>.</li>
         </ul>
       </div>
     </div>
   </div>
 
-  <!-- 15 — Quiz 1 -->
+  <!-- ╔══════ 17 — Quiz 1 (UUID) ═════╗ -->
   <div class="slide">
     <div class="sc">
       <div class="quiz-stage">
         <div class="quiz-num">Pergunta 1 de 3 · UUID no cliente</div>
-        <h2 class="quiz-q">Por que o <code>client_uuid</code> é gerado no celular do capataz, e não no servidor quando ele recebe o evento?</h2>
+        <h2 class="quiz-q">Por que o <code>client_uuid</code> é gerado no celular do capataz, e não no servidor Node quando ele recebe o evento?</h2>
         <p class="quiz-tag">⏱ 30 segundos · pense no capataz a 4 horas do escritório</p>
         <button class="quiz-btn" id="qb1" onclick="revealQuiz(1)">Revelar resposta-âncora ▾</button>
         <div class="quiz-reveal" id="qr1">
           <h4>Resposta-âncora</h4>
-          <p>Porque, no momento da coleta, o servidor pode estar <em>inacessível</em> — e o evento precisa de uma <strong>identidade estável</strong> mesmo assim. Três consequências práticas:</p>
-          <p>① <strong>Idempotência:</strong> com id estável, reenvios viram no-op naturais. Sem id estável, o servidor não tem como reconhecer "isso já chegou" — daí duplicatas.<br>② <strong>Auditoria local:</strong> o capataz consegue rastrear "eu registrei isso" sem depender do servidor confirmar.<br>③ <strong>Sync de dois sentidos:</strong> quando o servidor mandar um snapshot de volta ("aqui está o que sei dos seus eventos"), o cliente reconhece pelos UUIDs e não cria duplicatas locais.</p>
-          <p><strong>BrPec real:</strong> o capataz pesa 12 bovinos no retiro Cocho Novo na quinta-feira; volta ao escritório na segunda; sincroniza; rede cai no meio; reenvia. Sem UUID no cliente: 24 pesagens. Com UUID: 12.</p>
+          <p>Porque no momento da coleta o servidor pode estar <em>inacessível</em> — e o evento precisa de uma <strong>identidade estável</strong> mesmo assim. Três consequências:</p>
+          <p>① <strong>Idempotência:</strong> com id estável, reenvios viram no-op naturais no servidor (<code>INSERT OR IGNORE</code>).<br>② <strong>Auditoria local:</strong> o capataz rastreia "eu registrei isso" sem depender do servidor.<br>③ <strong>Sync bidirecional:</strong> quando o servidor mandar snapshot de volta, o cliente reconhece pelos UUIDs e não duplica localmente.</p>
+          <p><strong>BrPec real:</strong> o capataz pesa 12 bovinos no retiro Cocho Novo; sincroniza; rede cai no meio; reenvia. Sem UUID no cliente: 24. Com UUID: 12.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 16 — Quiz 2 -->
+  <!-- ╔══════ 18 — Quiz 2 (MVC) ═════╗ -->
   <div class="slide">
     <div class="sc">
       <div class="quiz-stage">
-        <div class="quiz-num">Pergunta 2 de 3 · offline-first vs offline-only</div>
-        <h2 class="quiz-q">A PWA do BrPec é "offline-first" ou "offline-only"? Qual a diferença, e por que escolhemos a primeira?</h2>
-        <p class="quiz-tag">⏱ 30 segundos</p>
+        <div class="quiz-num">Pergunta 2 de 3 · MVC e responsabilidades</div>
+        <h2 class="quiz-q">Por que o Model não deve conhecer <code>req</code> e <code>res</code>? E por que o Controller não deve escrever SQL?</h2>
+        <p class="quiz-tag">⏱ 30 segundos · pense na SWEBOK v4 cap. 2</p>
         <button class="quiz-btn" id="qb2" onclick="revealQuiz(2)">Revelar resposta-âncora ▾</button>
         <div class="quiz-reveal" id="qr2">
           <h4>Resposta-âncora</h4>
-          <p><strong>Offline-only</strong> = o app <em>não</em> conhece servidor. Tudo mora no celular, para sempre. Bom para to-do lists e diários pessoais; péssimo para um ecossistema de fazenda com 1 coordenador + N capatazes.</p>
-          <p><strong>Offline-first</strong> = o app <em>funciona</em> offline (todas as operações principais), mas <em>sabe sincronizar</em> quando online. O caminho online é uma evolução, não uma regressão.</p>
-          <p>Escolhemos offline-first porque:</p>
-          <p>① <strong>Realidade do retiro:</strong> WiFi raro ou nulo. Não dá pra perder coleta esperando sinal.<br>② <strong>Necessidade do coordenador:</strong> dashboard consolidado dos N capatazes. Sem servidor, não tem dashboard.<br>③ <strong>Auditoria:</strong> o SGBD da fazenda é a fonte da verdade, não cada celular individual.</p>
-          <p><strong>Diferença sutil que importa:</strong> em offline-first, "estar online" é uma <em>otimização</em>; em offline-only, é uma <em>limitação</em>. Mude o framing e o produto muda.</p>
+          <p>Porque cada camada tem <em>um motivo para mudar</em> (single responsibility — SWEBOK v4, structural design).</p>
+          <p>① <strong>Model conhece req/res</strong> → quando trocar de HTTP para fila (RabbitMQ, Kafka), tudo quebra. Model fala SQL e regras de negócio, e só.<br>② <strong>Controller escreve SQL</strong> → quando trocar SQLite por Postgres (ou MongoDB), tudo quebra. Controller orquestra, valida, formata resposta.<br>③ <strong>Resultado prático:</strong> dá pra testar Model sem HTTP, Controller sem banco real (mockar Model).</p>
+          <p><strong>BrPec real:</strong> a aula 6 vai adicionar endpoints de leitura. Se respeitarmos MVC, basta criar <code>evento.controller.js</code> novo e reusar o Model. Se misturarmos, vai precisar reescrever tudo.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 17 — Quiz 3 -->
+  <!-- ╔══════ 19 — Quiz 3 (TDD) ═════╗ -->
   <div class="slide">
     <div class="sc">
       <div class="quiz-stage">
-        <div class="quiz-num">Pergunta 3 de 3 · service worker vs app</div>
-        <h2 class="quiz-q">Por que o service worker vive em um arquivo separado da página (<code>sw.js</code>) e roda em uma thread diferente?</h2>
-        <p class="quiz-tag">⏱ 30 segundos · pense no ciclo de vida do app vs do SW</p>
+        <div class="quiz-num">Pergunta 3 de 3 · TDD bem feito</div>
+        <h2 class="quiz-q">Por que nosso teste de idempotência usa <code>supertest</code> + <code>POST</code> em vez de chamar <code>insertMany()</code> direto do Model?</h2>
+        <p class="quiz-tag">⏱ 30 segundos · pense na crítica do Ian Cooper</p>
         <button class="quiz-btn" id="qb3" onclick="revealQuiz(3)">Revelar resposta-âncora ▾</button>
         <div class="quiz-reveal" id="qr3">
           <h4>Resposta-âncora</h4>
-          <p>Três razões — cada uma resolveria um problema sozinha, mas as três juntas <em>definem</em> o que SW é:</p>
-          <p>① <strong>Ciclo de vida independente.</strong> O SW continua existindo depois que a aba fecha. Pode receber push notification, sincronizar em background, lidar com fetch. Se estivesse acoplado à página, tudo morreria com ela.<br>② <strong>Interceptação de requisições.</strong> O browser precisa de uma camada <em>entre</em> a página e a rede. O SW é essa camada. Se vivesse na página, intermediar a si mesmo geraria recursão e ciclos.<br>③ <strong>Thread separada (não bloqueia a UI).</strong> Cache, IndexedDB, criptografia podem ser pesados. Numa thread isolada, a UI segue fluida mesmo com SW trabalhando.</p>
-          <p><strong>Consequência prática:</strong> você atualiza a página, mas o SW antigo continua servindo o cache antigo até <code>skipWaiting() + clients.claim()</code>. É por isso que mudanças em PWA às vezes "demoram" — é o SW antigo ainda no comando. <code>brpec-pwa-v1</code> → <code>brpec-pwa-v2</code> força a virada.</p>
+          <p>Porque queremos testar <strong>comportamento</strong>, não <strong>implementação</strong>. Atacando a porta HTTP (POST + body + status), o teste:</p>
+          <p>① <strong>Sobrevive a refactor.</strong> Se amanhã quebrarmos <code>insertMany</code> em duas funções, o teste continua verde.<br>② <strong>Documenta o contrato real.</strong> Quem lê o teste sabe o que o cliente HTTP vai ver.<br>② <strong>Pega bugs de integração.</strong> Falha de CORS, de middleware, de parsing JSON — tudo dentro do raio do teste.</p>
+          <p><strong>É exatamente o que Ian Cooper defende em <em>"TDD, Where Did It All Go Wrong"</em>:</strong> teste a porta, não as entranhas. Isso é TDD bem feito.</p>
         </div>
       </div>
     </div>
   </div>
 
-  <!-- 18 — Lab -->
+  <!-- ╔══════ 20 — Lab cooperativo ═════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh indigo"><h2 class="st">Lab nos 5 grupos · instalar + registrar + sincronizar</h2><p class="ss">20 minutos · 1 representante por grupo apresenta no fim.</p></div>
+      <div class="sh indigo"><h2 class="st">Lab nos 5 grupos · subir a stack e fazer o evento atravessar</h2><p class="ss">40 minutos · cada grupo pega 1 etapa · representante apresenta no fim.</p></div>
       <div class="g3">
-        <div class="lab-card"><h4>Grupo 1 · Cabeceira</h4><p>Subir <code>npm install &amp;&amp; npm start</code> do sync server na sua máquina. Abrir a PWA. <strong>Instalar como app</strong> (botão "Instalar" do Chrome / "Add to Home Screen" no celular). Print da tela inicial pós-instalação.</p></div>
-        <div class="lab-card"><h4>Grupo 2 · Mata-Burro</h4><p>Com a PWA aberta, <strong>cortar a rede no DevTools</strong>. Registrar 3 eventos (1 pesagem, 1 vacinação, 1 tratamento) com bovinos diferentes. Print do counter "3 pendentes" + lista local.</p></div>
-        <div class="lab-card"><h4>Grupo 3 · Vargem do Sucuri</h4><p>Religar a rede. Clicar sincronizar. Validar <code>{accepted: 3, skipped: 0}</code> na response. Em seguida, <strong>clicar sincronizar de novo</strong> e mostrar que vira <code>{accepted: 0}</code> — idempotência ao vivo.</p></div>
-        <div class="lab-card"><h4>Grupo 4 · Faxinal</h4><p>Inspecionar o <code>IndexedDB</code> no DevTools (Application → Storage). Mostrar a chave <code>brpec.db</code> e o tamanho do blob. Comparar antes e depois de registrar um evento.</p></div>
-        <div class="lab-card"><h4>Grupo 5 · Cocho Novo</h4><p>No terminal do server: <code>sqlite3 brpec-server.db "SELECT * FROM evento_recebido;"</code>. Mostrar que os UUIDs do cliente bateram com os do servidor. <strong>Bonus:</strong> rodar <code>npm test</code> e mostrar os 5 specs verdes.</p></div>
-        <div class="lab-card" style="border-left-color:var(--am);"><h4 style="color:var(--am);">🏆 Bônus universal</h4><p>Abrir o <strong>Lighthouse</strong> (DevTools → Lighthouse → PWA) e capturar o score. Trazer pra ponderada — é exatamente o que vão entregar.</p></div>
+        <div class="lab-card"><h4>Grupo 1 · Cabeceira</h4><p><strong>Subir o servidor.</strong> <code>cd assets/brpec-sync-server &amp;&amp; npm install &amp;&amp; npm start</code>. Print do log "BrPec rodando em :3000" + <code>curl localhost:3000/sync/snapshot</code> retornando JSON.</p></div>
+        <div class="lab-card"><h4>Grupo 2 · Mata-Burro</h4><p><strong>Subir a PWA + instalar.</strong> Servir <code>brpec-pwa/</code> via <code>npx serve</code> ou Live Server. Clicar "Instalar como app". Print do ícone na home screen / launcher.</p></div>
+        <div class="lab-card"><h4>Grupo 3 · Vargem do Sucuri</h4><p><strong>Registrar offline + sync.</strong> DevTools → Offline. Registrar 3 eventos (pesagem, vacinação, tratamento). Religar. Sync. Print do <code>{accepted:3, skipped:0}</code>.</p></div>
+        <div class="lab-card"><h4>Grupo 4 · Faxinal</h4><p><strong>Provar idempotência.</strong> Disparar sync <em>de novo</em> sem novos eventos. Print do <code>{accepted:0, skipped:3}</code>. Ver no IndexedDB (Application → kv) que o blob foi persistido.</p></div>
+        <div class="lab-card"><h4>Grupo 5 · Cocho Novo</h4><p><strong>Verificar no banco do servidor + rodar TDD.</strong> <code>sqlite3 brpec-server.db "SELECT * FROM evento_recebido"</code> com os UUIDs do cliente. Depois: <code>npm test</code> → 5 specs verdes.</p></div>
+        <div class="lab-card" style="border-left-color:var(--am);"><h4 style="color:var(--am);">🏆 Bônus universal</h4><p>Quem terminar primeiro: ler o <code>sync.controller.js</code> e propor 1 validação adicional (ex.: rejeitar <code>tipo</code> fora de {pesagem, vacinação, ...}). Não implementar — só desenhar.</p></div>
       </div>
       <div class="timer-bar">
         <div>
           <div class="timer-label">Cronômetro · Lab</div>
-          <div class="timer-display" id="t-lab-disp">20:00</div>
+          <div class="timer-display" id="t-lab-disp">40:00</div>
         </div>
         <div class="timer-controls">
           <button class="timer-btn start" onclick="Timer.start('lab')">▶ Iniciar</button>
@@ -739,73 +825,37 @@ app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</pre>
     </div>
   </div>
 
-  <!-- 19 — Ponderada -->
+  <!-- ╔══════ 21 — Síntese ═════╗ -->
   <div class="slide">
     <div class="sc">
-      <div class="sh red"><h2 class="st">Ponderada em sala · Lighthouse PWA ≥ 80</h2><p class="ss">30 minutos · individual · screenshot do Lighthouse + 1 vídeo curto.</p></div>
-      <div class="g2">
-        <div class="box red">
-          <h3>Entrega (via Teams)</h3>
-          <ol>
-            <li><strong>Print do Lighthouse PWA score</strong> da sua PWA rodando local (≥ 80 pontos).</li>
-            <li><strong>Vídeo de 30 s</strong> mostrando: app instalado, registro offline (1 evento), sync, banco do servidor com o evento.</li>
-            <li>Arquivo <code>aula5-ponderada-NOME.md</code> com 3 frases respondendo: <em>"qual foi a decisão de design da minha PWA?"</em>.</li>
-          </ol>
-          <p class="hint"><strong>Critério mínimo:</strong> instalação + 1 evento sincronizado + score ≥ 50.</p>
-        </div>
-        <div class="box dkb">
-          <h3>Como abrir o Lighthouse</h3>
-          <ol>
-            <li>Chrome → F12 → aba <strong>Lighthouse</strong>.</li>
-            <li>Categorias: marque <strong>PWA</strong>.</li>
-            <li>Mode: <em>Navigation</em>. Device: <em>Mobile</em>.</li>
-            <li>Click <strong>Analyze page load</strong>.</li>
-            <li>Screenshot da seção PWA.</li>
-          </ol>
-          <p class="hint"><strong>Score baixo? Verifique:</strong> manifest carregado · SW registrado · start_url cacheado · ícone &gt;= 192px (SVG conta como any) · servido via HTTPS ou localhost.</p>
-        </div>
-      </div>
-      <div class="timer-hero">
-        <div class="timer-label">Ponderada · 30 minutos</div>
-        <div class="timer-display" id="t-pond-disp">30:00</div>
-        <div class="timer-controls">
-          <button class="timer-btn start" onclick="Timer.start('pond')">▶ Iniciar</button>
-          <button class="timer-btn pause" onclick="Timer.pause('pond')">⏸ Pausar</button>
-          <button class="timer-btn reset" onclick="Timer.reset('pond')">↺ Reset</button>
-        </div>
-      </div>
-    </div>
-  </div>
-
-  <!-- 20 — Síntese -->
-  <div class="slide">
-    <div class="sc">
-      <div class="sh teal"><h2 class="st">Síntese · e na semana que vem?</h2><p class="ss">Hoje fechamos a stack offline-first. Na próxima aula, esticamos o back-end.</p></div>
+      <div class="sh teal"><h2 class="st">Síntese · o que vocês acabaram de construir</h2><p class="ss">Uma stack offline-first de ponta a ponta, com cultura de testes e separação clara de camadas.</p></div>
       <div class="g2">
         <div class="box tea">
           <h3>O que levamos da aula 5</h3>
           <ul>
-            <li><strong>3 pilares</strong> da PWA: HTTPS · manifest · service worker.</li>
-            <li><strong>Cache-first</strong> para shell · <strong>network-first</strong> para dados.</li>
-            <li><strong>sql.js + IndexedDB</strong> = banco persistente no celular.</li>
-            <li><strong>UUID v4 no cliente</strong> é a base da idempotência.</li>
-            <li><strong>INSERT OR IGNORE</strong> + UUID PK no servidor = sync robusto sem locks.</li>
-            <li><strong>Spec mínimo</strong> de idempotência sustenta a cultura TDD para a aula 10.</li>
+            <li><strong>Node.js</strong> é JS no servidor — event loop, npm, mesma linguagem da PWA.</li>
+            <li><strong>SWEBOK v4 Cap. 2:</strong> estrutura (camadas) antes do comportamento (fluxos).</li>
+            <li><strong>MVC</strong> = Model (banco + regras) · Controller (orquestra) · Routes (entrada HTTP).</li>
+            <li><strong>better-sqlite3</strong> reusa o motor da aula 4 do lado servidor — mesmo SQL, outra máquina.</li>
+            <li><strong>UUID v4 no cliente</strong> + <code>INSERT OR IGNORE</code> = sync idempotente sem locks.</li>
+            <li><strong>TDD</strong> com <code>node:test</code> + <code>supertest</code>; teste de porta, não de entranha (Ian Cooper).</li>
+            <li><strong>Spec-Driven Development</strong> é a fronteira: Kiro, spec-kit, Tessl.</li>
           </ul>
         </div>
         <div class="box ind">
-          <h3>O que vem na aula 6 (19/05)</h3>
+          <h3>Autoestudos recomendados</h3>
           <ul>
-            <li><strong>Back-End II</strong> — endpoints de leitura e escrita com documentação.</li>
-            <li>CRUD HTTP completo no servidor — POST/PUT/DELETE com validação de payload.</li>
-            <li>Erros estruturados (400/422/404/500) — <code>AppError</code> + middleware.</li>
-            <li>Documentação automática — OpenAPI/Swagger ou alternativa minimalista.</li>
-            <li>Como a PWA consome esses endpoints quando online.</li>
+            <li>📘 <strong>Como sair do zero em Node.js em apenas uma aula</strong> — leitura/vídeo curto antes da aula 6.</li>
+            <li>📘 <strong>Livro Didático — Teste de Unidade</strong> — capítulo introdutório.</li>
+            <li>📘 <strong>SWEBOK v4 · Cap. 2</strong> — Structural and Behavioral Design.</li>
+            <li>🎥 <strong>TDD, Where Did It All Go Wrong</strong> — Ian Cooper (~1 h).</li>
+            <li>📰 <strong>Understanding Spec-Driven Development: Kiro, spec-kit, and Tessl</strong>.</li>
+            <li>📖 <strong>Test-Driven Development</strong> — Kent Beck (caps. 1–3).</li>
           </ul>
-          <p class="hint"><strong>Pré-aula da 6:</strong> deixe o sync server rodando local + listar 3 endpoints que faltam (ex.: <code>DELETE /sync/evento/:uuid</code>, <code>GET /relatorios/aftosa</code>).</p>
+          <p class="hint"><strong>Pré-aula 6 (Back-End II · 19/05):</strong> deixe o sync server rodando + liste 3 endpoints CRUD que faltam (ex.: <code>GET /eventos/:bovino_id</code>, <code>PUT /eventos/:uuid</code>, <code>DELETE /eventos/:uuid</code>).</p>
         </div>
       </div>
-      <blockquote>O capataz registrou ontem no retiro, sem WiFi. Hoje sincronizou na sede em 200ms. O coordenador puxou o dashboard e viu tudo. <strong>É isso que vocês acabaram de construir.</strong></blockquote>
+      <blockquote>O capataz registrou ontem no retiro, sem WiFi. Hoje sincronizou na sede em 200 ms. O servidor Node validou, persistiu no SQLite, devolveu OK. O coordenador puxou o dashboard. <strong>Isso é a stack que vocês acabaram de subir.</strong></blockquote>
     </div>
   </div>
 
@@ -819,7 +869,7 @@ app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</pre>
   </div>
   <div class="nav-wrapper">
     <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
-    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">20</span></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">21</span></div>
     <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
   </div>
   <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>
@@ -859,8 +909,7 @@ function revealQuiz(n) {
 var Timer = (function() {
   var timers = {
     daily: { total: 15 * 60, left: 15 * 60, intv: null, disp: 't-daily-disp' },
-    lab:   { total: 20 * 60, left: 20 * 60, intv: null, disp: 't-lab-disp'   },
-    pond:  { total: 30 * 60, left: 30 * 60, intv: null, disp: 't-pond-disp'  }
+    lab:   { total: 40 * 60, left: 40 * 60, intv: null, disp: 't-lab-disp'   }
   };
   function fmt(s) { var m = Math.floor(s / 60), r = s % 60; return (m < 10 ? '0' : '') + m + ':' + (r < 10 ? '0' : '') + r; }
   function render(key) {
