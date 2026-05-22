@@ -21,7 +21,7 @@ Acesse as aulas pela página inicial: [`index.html`](index.html).
 | 3 | 03 | 05/05/2026 | Banco de Dados II — CRUD |
 | 4 | 04 | 12/05/2026 | Banco de Dados III — Joins |
 | 5 | 04 | 14/05/2026 | Back-End I — Node.js, Models e Controllers |
-| 6 | 05 | 19/05/2026 | Back-End II — Endpoints e Documentação |
+| 6 | 05 | 22/05/2026 | Back-End II — Endpoints de Leitura e Escrita com Documentação Própria |
 | 7 | 06 | 27/05/2026 | Front-End 1 — HTML, DOM e JavaScript |
 | 8 | 07 | 02/06/2026 | Front-End 2 — Assíncrono e Redes |
 | 9 | 08 | 10/06/2026 | Front-End 3 — CSS e JavaScript |

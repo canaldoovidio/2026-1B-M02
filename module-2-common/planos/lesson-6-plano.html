@@ -103,8 +103,8 @@
     <div class="container">
       <span class="mat-badge">Módulo 2 · Ciclo Comum · IN02</span>
       <span class="mat-badge">Plano de Ensino</span>
-      <h1>Aula 6 — Back-End II · Endpoints de leitura e escrita</h1>
-      <p class="subtitle">Plano operacional do dia: fechar o CRUD HTTP com <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">POST/PUT/PATCH/DELETE</code>, validação <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">zod</code>, transações <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">pg</code> e middleware central de erro.</p>
+      <h1>Aula 6 — Back-End II · Endpoints de Leitura e Escrita com Documentação Própria</h1>
+      <p class="subtitle">22/05/2026 · 2 horas em sala · 15 min daily · 20 min recap dos autoestudos · ~85 min Ponderada de Programação II (teste de integração caixa-preta com banco real e <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">jest.mock()</code> nas integrações externas).</p>
       <a href="../../index.html" class="btn btn-outline-light btn-sm">← Voltar ao Módulo</a>
     </div>
   </header>
@@ -132,10 +132,10 @@
         <div class="id-grid">
           <div class="id-cell"><div class="id-lbl">Disciplina</div><div class="id-val">IN02 · Desenvolvimento Web</div></div>
           <div class="id-cell"><div class="id-lbl">Módulo</div><div class="id-val">2 — Ciclo Comum</div></div>
-          <div class="id-cell"><div class="id-lbl">Aula</div><div class="id-val">6 de 11</div></div>
-          <div class="id-cell"><div class="id-lbl">Carga horária do dia</div><div class="id-val">6h (2h + 2h + 2h)</div></div>
+          <div class="id-cell"><div class="id-lbl">Aula</div><div class="id-val">6 de 11 · 22/05/2026</div></div>
+          <div class="id-cell"><div class="id-lbl">Carga horária em sala</div><div class="id-val">2h · 15 min daily + 20 min recap + ~85 min ponderada</div></div>
           <div class="id-cell"><div class="id-lbl">Modalidade</div><div class="id-val">Presencial · Metodologia ativa</div></div>
-          <div class="id-cell"><div class="id-lbl">Pré-aula</div><div class="id-val">Autoestudo guiado</div></div>
+          <div class="id-cell"><div class="id-lbl">Pré-aula</div><div class="id-val">9 autoestudos (REST, JSON, erros, docs, ponderada)</div></div>
         </div>
       </section>
 
@@ -150,12 +150,12 @@
       <section class="mat-section" id="sec-obj">
         <h2>Objetivos de aprendizagem</h2>
         <ul class="obj-list">
-          <li><span class="obj-tag">OA-1</span><span><strong>Implementar</strong> endpoints REST completos (<code>POST</code>/<code>PUT</code>/<code>PATCH</code>/<code>DELETE</code>) por recurso.</span></li>
-          <li><span class="obj-tag">OA-2</span><span><strong>Validar</strong> payload com <code>zod</code> e devolver <code>400</code>/<code>422</code> em payload inválido.</span></li>
-          <li><span class="obj-tag">OA-3</span><span><strong>Aplicar</strong> status codes corretos (<code>201</code>, <code>204</code>, <code>409</code>, <code>404</code>, <code>422</code>, <code>500</code>).</span></li>
-          <li><span class="obj-tag">OA-4</span><span><strong>Usar</strong> transações <code>pg</code> em operações multi-statement (<code>BEGIN/COMMIT/ROLLBACK</code>).</span></li>
-          <li><span class="obj-tag">OA-5</span><span><strong>Centralizar</strong> tratamento de erro com middleware e classes <code>AppError</code>.</span></li>
-          <li><span class="obj-tag">OA-6</span><span><strong>Diferenciar</strong> idempotência de <code>PUT</code>/<code>DELETE</code> vs <code>POST</code>.</span></li>
+          <li><span class="obj-tag">OA-1</span><span><strong>Identificar</strong> um fluxo crítico do projeto BrPec passível de teste de integração caixa-preta.</span></li>
+          <li><span class="obj-tag">OA-2</span><span><strong>Escrever</strong> suite Jest + <code>supertest</code> com os 4 casos obrigatórios: sucesso · RN violada · payload inválido · persistência no banco.</span></li>
+          <li><span class="obj-tag">OA-3</span><span><strong>Configurar</strong> reseed do banco real em <code>beforeEach</code> e mock de integrações externas com <code>jest.mock()</code>.</span></li>
+          <li><span class="obj-tag">OA-4</span><span><strong>Aplicar</strong> status codes corretos (<code>201</code>, <code>204</code>, <code>400</code>, <code>404</code>, <code>409</code>, <code>422</code>, <code>500</code>) e diferenciar idempotência (<code>PUT</code>/<code>DELETE</code>) de <code>POST</code>.</span></li>
+          <li><span class="obj-tag">OA-5</span><span><strong>Documentar</strong> endpoints com <code>swagger-jsdoc</code>/JSDoc, deixando o contrato vivo ao lado do código.</span></li>
+          <li><span class="obj-tag">OA-6</span><span><strong>Construir</strong> matriz RF → RN → Teste como rastreabilidade de cobertura.</span></li>
         </ul>
       </section>
 
@@ -169,73 +169,68 @@
       </section>
 
       <section class="mat-section" id="sec-day">
-        <h2>Cronograma do dia</h2>
+        <h2>Cronograma da aula · 2 horas</h2>
         <div class="day-timeline">
-          <div class="day-block autoest">
-            <div class="blk-head"><h3 class="blk-title">📚 Bloco 1 · Autoestudo</h3><span class="blk-time">08h00 — 10h00</span></div>
-            <p>Estudo individual orientado pelo material da aula 6.</p>
-            <ul>
-              <li>Leitura completa do <strong>Material da Aula 6</strong> (REST, <code>zod</code>, transações, middleware de erro, idempotência).</li>
-              <li>Listar <strong>3 regras de negócio</strong> do projeto que precisam de transação para manter consistência.</li>
-              <li>Validar que as specs Jest da aula 5 (<code>GET</code>) estão verdes — pré-requisito para qualquer escrita.</li>
-              <li>Caderno de bordo: anotar dúvidas sobre quando usar <code>PUT</code> vs <code>PATCH</code>.</li>
-            </ul>
-          </div>
           <div class="day-block pe">
-            <div class="blk-head"><h3 class="blk-title">🎓 Bloco 2 · Instrução PE — Aula em metodologia ativa</h3><span class="blk-time">10h00 — 12h00</span></div>
-            <p>Encontro síncrono com o professor especialista. 15 minutos de daily seguidos de 1h45 de aula.</p>
+            <div class="blk-head"><h3 class="blk-title">⏱️ Bloco 1 · Daily</h3><span class="blk-time">0:00 — 0:15 · 15 min</span></div>
+            <p>Status do back-end BrPec por equipe. Cada aluno em 1 minuto:</p>
             <ul>
-              <li><strong>10h00 — 10h15</strong> · Daily: regras de negócio trazidas do autoestudo.</li>
-              <li><strong>10h15 — 12h00</strong> · REST refresher, <code>zod</code>, transações, <code>AppError</code>, middleware, idempotência.</li>
+              <li>Qual fluxo do projeto vocês escolheram para a ponderada de hoje?</li>
+              <li>O <code>GET</code> dele já responde com banco real?</li>
+              <li>Que integração externa o fluxo dispara (SMS, e-mail, API externa) e precisa virar <code>jest.mock()</code>?</li>
             </ul>
           </div>
-          <div class="day-block lunch">
-            <div class="blk-head"><h3 class="blk-title">🍴 Intervalo · Almoço</h3><span class="blk-time">12h00 — 14h00</span></div>
-            <p>Janela livre.</p>
+          <div class="day-block autoest">
+            <div class="blk-head"><h3 class="blk-title">📚 Bloco 2 · Recap dos autoestudos</h3><span class="blk-time">0:15 — 0:35 · 20 min</span></div>
+            <p>Passagem rápida pelos 9 autoestudos amarrando-os aos slides da aula. Slide de mapeamento serve como bússola.</p>
+            <ul>
+              <li>JSON I/O + REST refresher + status codes (Fielding Cap.5)</li>
+              <li>Tratamento de erros + <code>AppError</code> + middleware (SWEBOK Cap.3 · livro didático)</li>
+              <li>Idempotência (PUT/DELETE vs POST · "REST: I don't Think it Means What You Think it Does")</li>
+              <li>Documentação própria (swagger-jsdoc + JSDoc no controller)</li>
+              <li>HTML básico — preview da Aula 7</li>
+            </ul>
           </div>
           <div class="day-block dev">
-            <div class="blk-head"><h3 class="blk-title">🛠️ Bloco 3 · Desenvolvimento do projeto</h3><span class="blk-time">14h00 — 16h00</span></div>
-            <p>Janela de trabalho da equipe sobre o projeto integrador.</p>
+            <div class="blk-head"><h3 class="blk-title">🧪 Bloco 3 · Ponderada de Programação II</h3><span class="blk-time">0:35 — 2:00 · ~85 min</span></div>
+            <p>Teste de integração caixa-preta de <strong>um fluxo inteiro</strong> do projeto BrPec — req entra no Controller, atravessa Service e Repository, persistência é verificada no banco.</p>
             <ul>
-              <li>Implementar o <strong>CRUD completo</strong> do recurso principal do projeto: <code>POST</code>, <code>PUT</code>, <code>PATCH</code>, <code>DELETE</code>.</li>
-              <li>Validar payload em todos os endpoints com schemas <code>zod</code>.</li>
-              <li>Aplicar transação <code>pg</code> em pelo menos 1 operação multi-statement.</li>
-              <li>Specs Jest + supertest verdes para todos os verbos.</li>
-              <li>Abrir Merge Request <code>feat(api): crud completo do recurso X</code> com evidência de execução.</li>
+              <li>Fluxo documentado com justificativa de escolha</li>
+              <li>Suite Jest com os <strong>4 casos obrigatórios</strong>: sucesso · regra de negócio violada · payload inválido · verificação de persistência no banco</li>
+              <li>Banco <strong>real</strong> em <code>beforeEach</code> reseed · integrações externas com <code>jest.mock()</code></li>
+              <li>Matriz <strong>RF → RN → Teste</strong> preenchida</li>
+              <li>Output de <code>npm test</code> verde anexado ao MR</li>
             </ul>
+            <p style="font-size:.85rem;color:var(--muted);margin-top:8px;">MR sugerido: <code>test(api): integração do fluxo X com 4 casos obrigatórios</code></p>
           </div>
         </div>
       </section>
 
       <section class="mat-section" id="sec-class">
-        <h2>Detalhamento da instrução PE (10h00 — 12h00)</h2>
+        <h2>Detalhamento da aula · 2h</h2>
         <div class="class-line">
-          <div class="cl-time">10h00<br>10h15</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-dy">Daily</span>Daily de abertura</h4><p>Cada aluno apresenta, em 1 minuto, uma regra de negócio do projeto que precisa de transação para não corromper dados.</p></div>
+          <div class="cl-time">0:00<br>0:15</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-dy">Daily</span>Status do back-end BrPec</h4><p>Cada aluno em 1 minuto: fluxo escolhido para a ponderada, status do <code>GET</code> com banco real, integração externa que vira <code>jest.mock()</code>.</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">10h15<br>10h35</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>REST verbos × CRUD × status codes</h4><p>Mapeamento dos verbos HTTP em operações de banco. Quadro com a tabela: <code>POST</code>=201, <code>PUT</code>=200/204, <code>PATCH</code>=200, <code>DELETE</code>=204, <code>409</code> em conflito, <code>404</code> em recurso ausente, <code>422</code> em payload inválido.</p></div>
+          <div class="cl-time">0:15<br>0:25</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>REST refresher · verbos × CRUD × status codes · JSON I/O</h4><p>Tabela verbos→status. <code>POST</code>=201, <code>PUT</code>/<code>PATCH</code>=200, <code>DELETE</code>=204, <code>422</code> em RN violada, <code>400</code> em payload inválido, <code>404</code>, <code>409</code>, <code>500</code>. Conecta com Fielding Cap.5 e "REST: I don't Think it Means What You Think it Does".</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">10h35<br>10h55</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Spec do POST primeiro (RED)</h4><p>Coding em pares: escrever o <code>describe('POST /users')</code> com <code>supertest</code> antes de qualquer implementação. RED forçando design pelo teste. Discussão sobre o status esperado e o shape da resposta.</p></div>
+          <div class="cl-time">0:25<br>0:32</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>Tratamento de erros + documentação própria</h4><p><code>AppError</code> + middleware central (SWEBOK Cap.3, livro didático). <code>swagger-jsdoc</code> + <code>swagger-ui-express</code> servindo <code>/docs</code> a partir de comentários nas rotas.</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">10h55<br>11h15</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Validação com zod — exemplo guiado</h4><p>Em pares, escrever um schema <code>zod</code> para o payload do <code>POST</code>, integrar no controller via <code>schema.safeParse(req.body)</code> e devolver <code>422</code> com a lista de erros. Debate sobre <code>400</code> vs <code>422</code>.</p></div>
+          <div class="cl-time">0:32<br>0:35</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>Briefing da ponderada</h4><p>Regra de ouro: <strong>banco real, integrações externas mockadas</strong>. 4 casos obrigatórios: sucesso · RN violada · payload inválido · persistência. Matriz RF→RN→Teste como entregável.</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">11h15<br>11h35</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Transação no repository (BEGIN/COMMIT/ROLLBACK)</h4><p>Mob programming: refatorar uma operação multi-statement (ex.: criar pedido + itens) usando <code>client = await pool.connect()</code>, <code>BEGIN</code>, dois <code>INSERT</code>, <code>COMMIT</code>, <code>ROLLBACK</code> em catch e <code>client.release()</code> no finally.</p></div>
+          <div class="cl-time">0:35<br>1:50</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Ponderada de Programação II em sala</h4><p>Equipes escolhem fluxo, montam <code>tests/<em>fluxo</em>.int.test.ts</code> com <code>supertest</code>, configuram <code>beforeEach</code> de reseed do banco, mockam integrações externas, escrevem os 4 casos e validam persistência via <code>SELECT</code> no banco real. Professor circula tirando dúvidas.</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">11h35<br>11h50</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>Erros de domínio + middleware central</h4><p>Apresentação das classes <code>AppError</code>, <code>NotFoundError</code>, <code>ConflictError</code>. Wrapper <code>asyncHandler</code> capturando promises rejeitadas. Middleware central <code>(err, req, res, next)</code> mapeando classe → status. Debate sobre por que NUNCA logar <code>err.stack</code> em produção sem sanitizar.</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">11h50<br>12h00</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Síntese + idempotência</h4><p>Cada aluno escreve em 30 segundos a diferença entre <code>POST</code> e <code>PUT</code>. Coletivo: por que retentar um <code>POST</code> pode duplicar e retentar um <code>PUT</code> não. Anúncio da entrega da tarde: CRUD completo + MR.</p></div>
+          <div class="cl-time">1:50<br>2:00</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Apresentação relâmpago + MR</h4><p>Cada equipe mostra em 30 s o output de <code>npm test</code> verde + matriz RF→RN→Teste. MR <code>test(api): integração do fluxo X com 4 casos obrigatórios</code> aberto antes do fim da aula.</p></div>
         </div>
       </section>
 
@@ -265,17 +260,17 @@
       </section>
 
       <section class="mat-section" id="sec-aval">
-        <h2>Verificação de aprendizagem</h2>
+        <h2>Verificação de aprendizagem · Ponderada de Programação II</h2>
         <ul class="crit-list">
-          <li><span class="obj-tag">CR-1</span><span>Spec do <code>POST</code> com <code>supertest</code> verde, devolvendo <code>201</code> e o recurso criado.</span></li>
-          <li><span class="obj-tag">CR-2</span><span>Validação <code>zod</code> retornando <code>422</code> em payload inválido, com lista de erros.</span></li>
-          <li><span class="obj-tag">CR-3</span><span>Transação <code>pg</code> aplicada em pelo menos 1 operação multi-statement com <code>ROLLBACK</code> testado.</span></li>
-          <li><span class="obj-tag">CR-4</span><span><code>AppError</code>/<code>NotFoundError</code>/<code>ConflictError</code> ligados ao middleware central de erro.</span></li>
-          <li><span class="obj-tag">CR-5</span><span>Merge Request <code>feat(api): crud completo do recurso X</code> aberto até as 16h00.</span></li>
+          <li><span class="obj-tag">CR-1</span><span><strong>Fluxo documentado</strong> em Markdown com nome do fluxo, RF + RNs associadas e justificativa de escolha.</span></li>
+          <li><span class="obj-tag">CR-2</span><span><strong>Suite Jest</strong> com os 4 casos: sucesso · RN violada · payload inválido · verificação de persistência no banco.</span></li>
+          <li><span class="obj-tag">CR-3</span><span><strong>Banco real</strong> (SQLite arquivo ou memória) com reseed em <code>beforeEach</code>; integrações externas via <code>jest.mock()</code>.</span></li>
+          <li><span class="obj-tag">CR-4</span><span><strong>Matriz RF → RN → Teste</strong> preenchida amarrando cada caso a uma regra.</span></li>
+          <li><span class="obj-tag">CR-5</span><span><strong>Output de <code>npm test</code></strong> (terminal ou screenshot) com os 4 casos passando, anexado ao MR.</span></li>
         </ul>
         <div class="callout callout-warn">
           <div class="callout-label">Critério mínimo</div>
-          <p>Aluno que sair às 16h sem ao menos <strong>POST + DELETE funcionais com validação <code>zod</code></strong> está em débito técnico para iniciar o front-end na aula 7.</p>
+          <p>Sem os 4 casos verdes + matriz preenchida + evidência de <code>npm test</code>, a ponderada volta para revisão. Banco mockado também invalida a entrega — é teste de integração, não de unidade.</p>
         </div>
       </section>
 

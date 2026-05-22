@@ -4,7 +4,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>📚</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aula 6 — Back-End II — Endpoints de leitura e escrita — Inteli</title>
+  <title>Aula 6 — Back-End II · Endpoints de Leitura e Escrita com Documentação Própria — BrPec — Inteli</title>
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&display=swap" rel="stylesheet">
@@ -137,16 +137,16 @@
   <!-- ====== SLIDE 1: COVER ====== -->
   <div class="slide cover-bg">
     <div class="sc">
-      <div class="cv-badge">Módulo 2 · Ciclo Comum · IN02 · Aula 6 de 11</div>
-      <div class="cv-title">Back-End II<br><span style="font-size:2rem;font-weight:700;opacity:.9;">Endpoints de leitura e escrita</span></div>
-      <div class="cv-sub">Completando o CRUD via HTTP — req → controller → service → repository → DB e volta</div>
+      <div class="cv-badge">Módulo 2 · Aula 6 · Back-End II · 22 / mai / 2026 · BrPec</div>
+      <div class="cv-title">Back-End II<br><span style="font-size:2rem;font-weight:700;opacity:.9;">Endpoints de leitura e escrita · com documentação própria</span></div>
+      <div class="cv-sub">CRUD via HTTP no Express — req → controller → service → repository → DB · documentação que nasce do código · ponderada de testes de integração</div>
       <div class="cv-tags">
-        <div class="cv-tag" id="ct0">📡 REST</div>
+        <div class="cv-tag" id="ct0">📡 REST &amp; JSON I/O</div>
         <div class="cv-tag" id="ct1">✅ Validação (zod)</div>
         <div class="cv-tag" id="ct2">🔢 Status codes</div>
-        <div class="cv-tag" id="ct3">🔁 Idempotência</div>
-        <div class="cv-tag" id="ct4">⛔ Erros de domínio</div>
-        <div class="cv-tag" id="ct5">🔐 Transações</div>
+        <div class="cv-tag" id="ct3">📖 Docs próprias</div>
+        <div class="cv-tag" id="ct4">⛔ Tratamento de erros</div>
+        <div class="cv-tag" id="ct5">🧪 Ponderada · 4 casos</div>
       </div>
     </div>
   </div>
@@ -156,17 +156,17 @@
     <div class="sc" style="text-align:center;">
       <div style="background:rgba(255,255,255,.12);backdrop-filter:blur(12px);border:1px solid rgba(255,255,255,.22);border-radius:20px;padding:28px 32px;">
         <div style="font-size:2rem;font-weight:800;color:white;margin-bottom:6px;">⏱️ Daily — 15 Minutos</div>
-        <div style="font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:18px;">Como ficou o setup TS + Express da aula 5? Os primeiros GETs respondem?</div>
+        <div style="font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:18px;">Como está o back-end do BrPec? GETs já respondem? Qual o fluxo crítico que vai ser testado hoje na ponderada?</div>
         <div class="daily-timer" id="daily-timer">15:00</div>
         <div style="margin-bottom:18px;">
           <button id="daily-start-btn" onclick="startDaily()" style="background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">▶ Iniciar</button>
           <button onclick="resetDaily()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">↺ Reset</button>
         </div>
         <div>
-          <span class="daily-tag" id="dt0">✅ GETs já funcionando</span>
-          <span class="daily-tag" id="dt1">🎯 Vou implementar POST/PUT/DELETE</span>
-          <span class="daily-tag" id="dt2">🚧 Dúvidas em validação</span>
-          <span class="daily-tag" id="dt3">📦 Estrutura MVC consolidada</span>
+          <span class="daily-tag" id="dt0">✅ GETs já respondem</span>
+          <span class="daily-tag" id="dt1">🐄 Fluxo: movimentação de bovinos</span>
+          <span class="daily-tag" id="dt2">🧪 Dúvidas em jest.mock</span>
+          <span class="daily-tag" id="dt3">📖 O que documentar primeiro?</span>
         </div>
       </div>
     </div>
@@ -175,24 +175,48 @@
   <!-- ====== SLIDE 2.5: AGENDA ====== -->
   <div class="slide">
     <div class="sc">
-      <div class="sh dark"><div class="st">📋 Agenda da Aula 6</div><div class="ss">Estrutura e objetivos da aula de hoje</div></div>
+      <div class="sh dark"><div class="st">📋 Agenda da Aula 6 · 2 horas</div><div class="ss">15 min daily · 20 min recap dos autoestudos · ~85 min ponderada em sala</div></div>
       <div class="g2" style="gap:12px;">
         <div id="ag0" class="box" style="opacity:0;">
-          <h3>🕐 Bloco 1 — Autoestudo (revisão e dúvidas)</h3>
-          <p>Recap do material — REST, validação, transações, erros de domínio.</p>
+          <h3>🕐 0:00 — 0:15 · Daily (15 min)</h3>
+          <p>Status do back-end BrPec. Quem já tem GET respondendo? Qual fluxo cada equipe vai testar hoje na ponderada?</p>
         </div>
         <div id="ag1" class="box" style="opacity:0;">
-          <h3>🕑 Bloco 2 — Instrução (Professor)</h3>
-          <p>CRUD HTTP completo: validação com zod, regras de negócio no service, transação no repository e middleware de erros.</p>
+          <h3>🕑 0:15 — 0:35 · Recap dos autoestudos (20 min)</h3>
+          <p>REST &amp; verbos, JSON I/O, tratamento de erros, status codes, documentação própria (swagger/JSDoc), idempotência. Referências: SWEBOK Cap.3, Fielding Cap.5, livro didático.</p>
         </div>
-        <div id="ag2" class="box" style="opacity:0;">
-          <h3>🕒 Bloco 3 — Almoço</h3>
-          <p>Pausa para refeição e respiro antes do trabalho da tarde.</p>
+        <div id="ag2" class="box acc" style="opacity:0;">
+          <h3>🎯 0:35 — 2:00 · Ponderada de Programação II (~85 min)</h3>
+          <p>Teste de integração caixa-preta de <strong>um fluxo inteiro</strong> do projeto BrPec. Banco real, integrações externas mockadas, Jest + supertest, 4 casos obrigatórios.</p>
         </div>
-        <div id="ag3" class="box acc" style="opacity:0;">
-          <h3>🎯 Bloco 4 — Desenvolvimento (Projeto)</h3>
-          <p>Implementar POST/PUT/DELETE da entidade do projeto com validação e tratamento padronizado de erros.</p>
+        <div id="ag3" class="box grn" style="opacity:0;">
+          <h3>📦 Entrega ao fim da aula</h3>
+          <p>Fluxo documentado, suite Jest verde com os 4 casos, matriz RF→RN→Teste e output de <code>npm test</code>.</p>
         </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 2.7: AUTOESTUDOS MAP ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">📚 Autoestudos · 20 min de recap</div><div class="ss">Os 9 materiais da semana mapeados nos slides desta aula</div></div>
+      <table class="vtbl">
+        <thead><tr><th style="width:45%;">Autoestudo</th><th>Onde aparece hoje</th></tr></thead>
+        <tbody>
+          <tr><td><strong>Entrada e saída de dados com JSON</strong></td><td>Slide REST · validação <code>zod</code> · resposta JSON</td></tr>
+          <tr><td><strong>Endpoints de leitura e escrita com documentação própria</strong></td><td>Toda a aula · slide específico de docs</td></tr>
+          <tr><td><strong>Livro Didático — Tratamento de Erros</strong></td><td>Slide <code>AppError</code> + middleware central</td></tr>
+          <tr><td><strong>SWEBOK v4 · Cap.3 (Software Construction / Error Handling)</strong></td><td>Slide de erros · referência no rodapé do material</td></tr>
+          <tr><td><strong>Fielding · Cap.5 — REST (dissertação original)</strong></td><td>REST refresher · idempotência · status codes</td></tr>
+          <tr><td><strong>"REST: I don't Think it Means What You Think it Does"</strong></td><td>Slide de idempotência — REST é mais que <em>verbos sobre tabelas</em></td></tr>
+          <tr><td><strong>HTML básico</strong></td><td>Conexão com Aula 7 (Front-End I · SSR EJS)</td></tr>
+          <tr><td><strong>Criando Endpoints, Controllers e Models com Testes</strong></td><td>Recap MVC · ponderada · 4 casos Jest</td></tr>
+          <tr><td><strong>Ponderada de Programação II</strong></td><td>~85 min finais · entrega em sala</td></tr>
+        </tbody>
+      </table>
+      <div class="box acc" style="margin-top:8px;">
+        <p>💡 <strong>Como vamos rodar:</strong> recap rápido até o slide de Documentação Própria, depois mergulho na ponderada. Use estes slides como referência durante o teste.</p>
       </div>
     </div>
   </div>
@@ -492,6 +516,63 @@
     </div>
   </div>
 
+  <!-- ====== SLIDE 13.7: DOCUMENTAÇÃO PRÓPRIA ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">📖 Documentação própria — nasce do código</div><div class="ss">Endpoint sem doc é endpoint que ninguém usa · OpenAPI/Swagger ao lado da rota</div></div>
+      <div class="g2" style="gap:12px;align-items:start;">
+        <div class="term" style="height:340px;">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">routes/movimentacaoRoutes.ts · com swagger-jsdoc</div></div>
+          <div class="term-body">
+<div class="tl vis"><span class="cmt">/**</span></div>
+<div class="tl vis"><span class="cmt"> * @openapi</span></div>
+<div class="tl vis"><span class="cmt"> * /movimentacoes:</span></div>
+<div class="tl vis"><span class="cmt"> *   post:</span></div>
+<div class="tl vis"><span class="cmt"> *     summary: Registra movimentação de bovino entre retiros</span></div>
+<div class="tl vis"><span class="cmt"> *     requestBody:</span></div>
+<div class="tl vis"><span class="cmt"> *       required: true</span></div>
+<div class="tl vis"><span class="cmt"> *       content:</span></div>
+<div class="tl vis"><span class="cmt"> *         application/json:</span></div>
+<div class="tl vis"><span class="cmt"> *           schema:</span></div>
+<div class="tl vis"><span class="cmt"> *             $ref: '#/components/schemas/CreateMovimentacao'</span></div>
+<div class="tl vis"><span class="cmt"> *     responses:</span></div>
+<div class="tl vis"><span class="cmt"> *       201: { description: Criada · header Location }</span></div>
+<div class="tl vis"><span class="cmt"> *       409: { description: Bovino já no retiro destino }</span></div>
+<div class="tl vis"><span class="cmt"> *       422: { description: Payload inválido }</span></div>
+<div class="tl vis"><span class="cmt"> */</span></div>
+<div class="tl vis"><span class="txt">router.</span><span class="jb">post</span><span class="txt">(</span><span class="js">'/movimentacoes'</span><span class="txt">, </span><span class="jb">asyncHandler</span><span class="txt">(controller.</span><span class="jb">create</span><span class="txt">));</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="box grn" style="margin-bottom:10px;">
+            <h3>🛠️ Stack mínima</h3>
+            <ul>
+              <li><code>swagger-jsdoc</code> — lê os comentários <code>@openapi</code> e gera o JSON</li>
+              <li><code>swagger-ui-express</code> — serve <code>/docs</code> com a UI navegável</li>
+              <li>Fonte da verdade: o próprio código · sem doc paralela que envelhece</li>
+            </ul>
+          </div>
+          <div class="box amr" style="margin-bottom:10px;">
+            <h3>🧠 Por que documentar agora?</h3>
+            <ul>
+              <li>O front da Aula 7 vai consumir esses endpoints — precisa do contrato</li>
+              <li>Ponderada exige "fluxo documentado com justificativa de escolha"</li>
+              <li>JSDoc também serve para <code>services/</code> e <code>helpers/</code></li>
+            </ul>
+          </div>
+          <div class="box acc">
+            <h3>✅ Checklist por endpoint</h3>
+            <ul>
+              <li>Verbo + rota + resumo de 1 linha</li>
+              <li>Schema do body e dos params</li>
+              <li>Status codes possíveis com descrição curta</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ====== SLIDE 13.5: RM-ODP — AS 5 VISÕES ====== -->
   <div class="slide">
     <div class="sc">
@@ -539,27 +620,312 @@
     </div>
   </div>
 
+  <!-- ====== SLIDE PND-1: ABERTURA DA PONDERADA ====== -->
+  <div class="slide cover-bg" style="background:linear-gradient(135deg,#0d9488 0%,#2e2640 60%,#1f2937 100%)!important;">
+    <div class="sc" style="text-align:center;">
+      <div class="cv-badge" style="margin-bottom:14px;">🧪 Ponderada de Programação II · ~85 min em sala</div>
+      <div class="cv-title" style="font-size:2.7rem;">Testar um fluxo inteiro como <span style="color:#a7f3d0;">caixa-preta</span></div>
+      <div class="cv-sub" style="margin-bottom:22px;">Você já tem endpoints. Agora prove que o sistema atende ao negócio — req entra no Controller, atravessa Service e Repository, e o efeito persiste no banco.</div>
+      <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:16px 22px;display:inline-block;text-align:left;color:white;font-size:.92rem;max-width:780px;">
+        <div style="font-weight:800;margin-bottom:6px;">🎯 Regra de ouro</div>
+        <div>Integrações externas (e-mail, storage, APIs de terceiros) viram <code style="background:rgba(255,255,255,.18);padding:1px 6px;border-radius:5px;color:white;">jest.mock()</code>. O <strong>banco de dados NÃO é mockado</strong> — persistência é real.</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE PND-2: FLUXO ESCOLHIDO ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">🐄 Passo 1 · Escolher e documentar um fluxo</div><div class="ss">Caixa-preta de ponta a ponta · Controller → Service → Repository → DB</div></div>
+      <div class="flow">
+        <div class="fl-step vis"><div class="fl-icon">📨</div><div class="fl-title">1. POST recebido</div><div class="fl-desc">supertest dispara <code>POST /movimentacoes</code> com body real</div></div>
+        <div class="fl-step vis"><div class="fl-icon">🎮</div><div class="fl-title">2. Controller</div><div class="fl-desc">zod valida payload<br>chama service</div></div>
+        <div class="fl-step vis"><div class="fl-icon">⚙️</div><div class="fl-title">3. Service (RN)</div><div class="fl-desc">"bovino existe no retiro origem"<br>"retiro destino ≠ origem"</div></div>
+        <div class="fl-step vis"><div class="fl-icon">🗄️</div><div class="fl-title">4. Repository</div><div class="fl-desc">INSERT em <code>movimentacoes</code><br>UPDATE em <code>bovinos.retiro_id</code></div></div>
+        <div class="fl-step vis"><div class="fl-icon">🔎</div><div class="fl-title">5. Verificação</div><div class="fl-desc">SELECT no banco real<br>confirma o efeito</div></div>
+      </div>
+      <div class="g2" style="margin-top:8px;gap:10px;">
+        <div class="box grn">
+          <h3>📝 Fluxo documentado (exemplo BrPec)</h3>
+          <p><strong>"Mover bovino entre retiros"</strong> — capataz registra movimentação, sistema atualiza o retiro atual do bovino e grava o histórico.</p>
+          <ul>
+            <li><strong>RF:</strong> registrar movimentação de bovino</li>
+            <li><strong>RN-1:</strong> bovino precisa estar no retiro origem</li>
+            <li><strong>RN-2:</strong> retiro destino ≠ retiro origem</li>
+          </ul>
+        </div>
+        <div class="box amr">
+          <h3>💡 Justificativa de escolha</h3>
+          <ul>
+            <li>Fluxo <strong>crítico</strong> para o negócio do parceiro</li>
+            <li>Toca <strong>2 tabelas</strong> — bom para verificar persistência</li>
+            <li>Tem <strong>regra de negócio observável</strong> — caso de violação fácil de simular</li>
+          </ul>
+          <p style="font-size:.8rem;color:#64748b;margin-top:6px;">Cada equipe escolhe um fluxo do seu projeto que satisfaça esses 3 critérios.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE PND-3: 4 CASOS OBRIGATÓRIOS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">🎯 Passo 2 · Os 4 casos obrigatórios da suite</div><div class="ss">Mínimo da entrega · cubra os 4 antes de adicionar variações</div></div>
+      <div class="g2" style="gap:10px;">
+        <div class="box grn">
+          <h3>✅ Caso 1 · Sucesso (golden path)</h3>
+          <ul>
+            <li>POST com payload válido</li>
+            <li>Espera <code>201 Created</code> + Location</li>
+            <li>Response body com o recurso criado</li>
+          </ul>
+        </div>
+        <div class="box red">
+          <h3>⛔ Caso 2 · Regra de negócio violada</h3>
+          <ul>
+            <li>Payload válido <em>sintaticamente</em>, mas viola RN</li>
+            <li>Ex.: bovino que não está no retiro origem</li>
+            <li>Espera <code>422</code> com mensagem clara</li>
+          </ul>
+        </div>
+        <div class="box amr">
+          <h3>📛 Caso 3 · Payload inválido</h3>
+          <ul>
+            <li>Campos faltando, tipos errados, valores fora do enum</li>
+            <li>Espera <code>400</code> ou <code>422</code> do <code>zod</code></li>
+            <li>Confirma que erro vem com lista de issues</li>
+          </ul>
+        </div>
+        <div class="box acc">
+          <h3>🔎 Caso 4 · Persistência no banco</h3>
+          <ul>
+            <li>Após sucesso, faz <code>SELECT</code> direto no banco</li>
+            <li>Confirma que registro foi gravado em <strong>cada</strong> tabela tocada</li>
+            <li>Confirma também o que NÃO deve gravar em caso de erro (rollback)</li>
+          </ul>
+        </div>
+      </div>
+      <div class="box" style="margin-top:8px;border-left-color:var(--dk);font-size:.86rem;">
+        <p>⚠️ <strong>Os 4 são piso, não teto.</strong> Quanto mais casos relevantes a suite cobrir (idempotência, concorrência, edge cases de RN), melhor. Mas <strong>sem os 4 a entrega não fecha</strong>.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE PND-4: BANCO REAL + MOCK EXTERNO ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">🗄️ Passo 3 · Banco real, integração externa mockada</div><div class="ss">A linha que define "teste de integração" nesta ponderada</div></div>
+      <div class="g2" style="gap:12px;align-items:start;">
+        <div class="term" style="height:380px;">
+          <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">tests/movimentacao.int.test.ts</div></div>
+          <div class="term-body">
+<div class="tl vis"><span class="kw">import</span><span class="txt"> request </span><span class="kw">from</span><span class="txt"> </span><span class="js">'supertest'</span><span class="txt">;</span></div>
+<div class="tl vis"><span class="kw">import</span><span class="txt"> { app } </span><span class="kw">from</span><span class="txt"> </span><span class="js">'../src/app'</span><span class="txt">;</span></div>
+<div class="tl vis"><span class="kw">import</span><span class="txt"> { db, resetAndSeed } </span><span class="kw">from</span><span class="txt"> </span><span class="js">'./helpers/db'</span><span class="txt">;</span></div>
+<div class="tl vis"><span class="cmt">// integração externa: SMS de notificação</span></div>
+<div class="tl vis"><span class="jb">jest</span><span class="txt">.</span><span class="jb">mock</span><span class="txt">(</span><span class="js">'../src/services/smsClient'</span><span class="txt">, () =&gt; ({</span></div>
+<div class="tl vis"><span class="txt">  </span><span class="jb">enviar</span><span class="txt">: </span><span class="jb">jest</span><span class="txt">.</span><span class="jb">fn</span><span class="txt">().</span><span class="jb">mockResolvedValue</span><span class="txt">({ ok: </span><span class="kw">true</span><span class="txt"> }),</span></div>
+<div class="tl vis"><span class="txt">}));</span></div>
+<div class="tl vis"><span class="txt"> </span></div>
+<div class="tl vis"><span class="jb">beforeEach</span><span class="txt">(</span><span class="kw">async</span><span class="txt"> () =&gt; { </span><span class="kw">await</span><span class="txt"> </span><span class="jb">resetAndSeed</span><span class="txt">(); });</span></div>
+<div class="tl vis"><span class="jb">afterAll</span><span class="txt">(</span><span class="kw">async</span><span class="txt"> () =&gt; { </span><span class="kw">await</span><span class="txt"> db.</span><span class="jb">close</span><span class="txt">(); });</span></div>
+<div class="tl vis"><span class="txt"> </span></div>
+<div class="tl vis"><span class="jb">describe</span><span class="txt">(</span><span class="js">'POST /movimentacoes'</span><span class="txt">, () =&gt; {</span></div>
+<div class="tl vis"><span class="txt">  </span><span class="jb">it</span><span class="txt">(</span><span class="js">'cria movimentação e persiste no banco'</span><span class="txt">, </span><span class="kw">async</span><span class="txt"> () =&gt; {</span></div>
+<div class="tl vis"><span class="txt">    </span><span class="kw">const</span><span class="txt"> r = </span><span class="kw">await</span><span class="txt"> </span><span class="jb">request</span><span class="txt">(app).</span><span class="jb">post</span><span class="txt">(</span><span class="js">'/movimentacoes'</span><span class="txt">)</span></div>
+<div class="tl vis"><span class="txt">      .</span><span class="jb">send</span><span class="txt">({ bovino_id: </span><span class="jn">1</span><span class="txt">, origem_id: </span><span class="jn">1</span><span class="txt">, destino_id: </span><span class="jn">2</span><span class="txt"> });</span></div>
+<div class="tl vis"><span class="txt">    </span><span class="jb">expect</span><span class="txt">(r.status).</span><span class="jb">toBe</span><span class="txt">(</span><span class="jn">201</span><span class="txt">);</span></div>
+<div class="tl vis"><span class="txt">    </span><span class="kw">const</span><span class="txt"> row = db.</span><span class="jb">prepare</span><span class="txt">(</span><span class="js">'SELECT retiro_id FROM bovinos WHERE id=1'</span><span class="txt">).</span><span class="jb">get</span><span class="txt">();</span></div>
+<div class="tl vis"><span class="txt">    </span><span class="jb">expect</span><span class="txt">(row.retiro_id).</span><span class="jb">toBe</span><span class="txt">(</span><span class="jn">2</span><span class="txt">);</span></div>
+<div class="tl vis"><span class="txt">  });</span></div>
+<div class="tl vis"><span class="txt">});</span></div>
+          </div>
+        </div>
+        <div>
+          <div class="box grn" style="margin-bottom:8px;">
+            <h3>✅ É banco REAL</h3>
+            <ul>
+              <li>SQLite em arquivo de teste ou em memória</li>
+              <li><code>beforeEach</code> dropa &amp; reseed</li>
+              <li>Schema idêntico ao de produção</li>
+            </ul>
+          </div>
+          <div class="box red" style="margin-bottom:8px;">
+            <h3>⛔ NÃO mockar o banco</h3>
+            <p>Mocar <code>better-sqlite3</code> ou o pool <code>pg</code> derrota o objetivo da prova. Quebra invariantes que só aparecem no SQL real (UNIQUE, FK, transação).</p>
+          </div>
+          <div class="box amr">
+            <h3>📨 Mockar SÓ o que sai da fronteira</h3>
+            <p>SMS, e-mail, storage S3, APIs de terceiros. Tudo via <code>jest.mock()</code>.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE PND-5: MATRIZ RF→RN→TESTE ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">📊 Passo 4 · Matriz RF → RN → Teste</div><div class="ss">Rastreabilidade · cada caso de teste amarrado em uma regra</div></div>
+      <table class="vtbl">
+        <thead><tr><th style="width:18%;">RF</th><th style="width:32%;">RN</th><th style="width:30%;">Caso de Teste (Jest)</th><th style="width:20%;">Status code</th></tr></thead>
+        <tbody>
+          <tr>
+            <td>RF-01 · Registrar movimentação</td>
+            <td>— (caminho feliz)</td>
+            <td><code>cria movimentação e persiste no banco</code></td>
+            <td><span class="sccode cre">201</span></td>
+          </tr>
+          <tr>
+            <td>RF-01</td>
+            <td>RN-1 · bovino precisa estar no retiro origem</td>
+            <td><code>recusa se bovino não está na origem</code></td>
+            <td><span class="sccode un">422</span></td>
+          </tr>
+          <tr>
+            <td>RF-01</td>
+            <td>RN-2 · destino ≠ origem</td>
+            <td><code>recusa se destino == origem</code></td>
+            <td><span class="sccode un">422</span></td>
+          </tr>
+          <tr>
+            <td>RF-01</td>
+            <td>Validação de schema</td>
+            <td><code>recusa payload sem bovino_id</code></td>
+            <td><span class="sccode bad">400</span></td>
+          </tr>
+          <tr>
+            <td>RF-01</td>
+            <td>Persistência</td>
+            <td><code>SELECT confirma novo retiro_id</code></td>
+            <td>—</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="box acc" style="margin-top:10px;">
+        <p>📌 <strong>Para que serve:</strong> mostra ao revisor que cada teste existe por <em>uma razão de negócio</em>. Também ajuda você a perceber RNs sem teste e testes sem RN.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE PND-6: NPM TEST OUTPUT ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">🟢 Passo 5 · Output esperado de <code>npm test</code></div><div class="ss">Evidência de que os 4 casos passam · cole no MR ou screenshot</div></div>
+      <div class="term" style="height:380px;">
+        <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">terminal · jest --runInBand</div></div>
+        <div class="term-body">
+<div class="tl vis"><span class="pth">$</span><span class="txt"> npm test</span></div>
+<div class="tl vis"><span class="txt"> </span></div>
+<div class="tl vis"><span class="cmt">&gt; brpec-api@0.1.0 test</span></div>
+<div class="tl vis"><span class="cmt">&gt; jest --runInBand</span></div>
+<div class="tl vis"><span class="txt"> </span></div>
+<div class="tl vis"><span class="hok">PASS</span><span class="txt"> </span><span class="pth">tests/movimentacao.int.test.ts</span></div>
+<div class="tl vis"><span class="txt">  POST /movimentacoes</span></div>
+<div class="tl vis"><span class="hok">    ✓</span><span class="txt"> cria movimentação e persiste no banco (78 ms)</span></div>
+<div class="tl vis"><span class="hok">    ✓</span><span class="txt"> recusa se bovino não está na origem (22 ms)</span></div>
+<div class="tl vis"><span class="hok">    ✓</span><span class="txt"> recusa se destino == origem (18 ms)</span></div>
+<div class="tl vis"><span class="hok">    ✓</span><span class="txt"> recusa payload sem bovino_id (15 ms)</span></div>
+<div class="tl vis"><span class="hok">    ✓</span><span class="txt"> SELECT confirma novo retiro_id (24 ms)</span></div>
+<div class="tl vis"><span class="txt"> </span></div>
+<div class="tl vis"><span class="txt">Test Suites: </span><span class="hok">1 passed</span><span class="txt">, 1 total</span></div>
+<div class="tl vis"><span class="txt">Tests:       </span><span class="hok">5 passed</span><span class="txt">, 5 total</span></div>
+<div class="tl vis"><span class="txt">Snapshots:   0 total</span></div>
+<div class="tl vis"><span class="txt">Time:        2.314 s</span></div>
+<div class="tl vis"><span class="txt"> </span></div>
+<div class="tl vis"><span class="hok">Ran all test suites.</span><span class="tcur"></span></div>
+        </div>
+      </div>
+      <div class="g2" style="margin-top:8px;gap:10px;">
+        <div class="box grn"><h3>📷 Como entregar</h3><p>Cole o output <strong>completo</strong> no MR ou anexe screenshot. Verde de "5 passed" precisa estar visível.</p></div>
+        <div class="box amr"><h3>💡 <code>--runInBand</code></h3><p>Roda os specs em série · evita race condition sobre o mesmo banco de teste. Use quando a suite ainda é pequena.</p></div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE PND-7: CHECKLIST DE ENTREGA ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">📦 Checklist de entrega · ponderada</div><div class="ss">5 itens · sem um deles a atividade não fecha</div></div>
+      <div class="g2" style="gap:10px;">
+        <div class="box grn">
+          <h3>✅ 1. Fluxo documentado</h3>
+          <p>Markdown curto: nome do fluxo, RF + RNs associadas, justificativa de escolha (por que é crítico, quais tabelas toca, qual RN é fácil de violar).</p>
+        </div>
+        <div class="box grn">
+          <h3>✅ 2. Suite Jest com 4 casos</h3>
+          <p>Sucesso · regra violada · payload inválido · persistência no banco. Mais casos são bem-vindos, mas estes 4 são piso.</p>
+        </div>
+        <div class="box grn">
+          <h3>✅ 3. Banco real · integrações mockadas</h3>
+          <p>SQLite (arquivo ou memória) em <code>beforeEach</code> reseed. SMS/e-mail/APIs externas via <code>jest.mock()</code>.</p>
+        </div>
+        <div class="box grn">
+          <h3>✅ 4. Matriz RF → RN → Teste</h3>
+          <p>Tabela mostrando que cada teste cobre uma RN ou um RF. Ajuda revisor e ajuda você.</p>
+        </div>
+      </div>
+      <div class="box acc" style="margin-top:10px;">
+        <h3>✅ 5. Output de <code>npm test</code></h3>
+        <p>Cole o terminal ou screenshot com os 4+ casos passando. Sem esse evidence, a entrega volta.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE PND-8: DICAS RÁPIDAS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">⚡ Dicas rápidas · armadilhas comuns</div><div class="ss">O que costuma quebrar na primeira tentativa</div></div>
+      <div class="g3" style="gap:10px;">
+        <div class="box amr">
+          <h3>🧹 Não esqueça do <code>afterAll</code></h3>
+          <p>Sem fechar o pool/conexão, o Jest reclama "open handles" e não termina. <code>await db.close()</code> ou <code>await pool.end()</code>.</p>
+        </div>
+        <div class="box amr">
+          <h3>🔁 <code>beforeEach</code> reseta tudo</h3>
+          <p>Cada teste começa do mesmo seed. Senão o caso 2 pode passar só porque o caso 1 deixou estado. Falsos positivos.</p>
+        </div>
+        <div class="box amr">
+          <h3>📦 <code>jest.mock</code> antes dos imports</h3>
+          <p>Coloque o <code>jest.mock(...)</code> no topo do arquivo. Jest "hoista" a chamada — funciona mesmo parecendo fora de ordem.</p>
+        </div>
+        <div class="box red">
+          <h3>⛔ Não logar credenciais</h3>
+          <p>Banco de teste tem dado seedado · seguro. Mas nunca commite <code>.env</code> com URL de banco real.</p>
+        </div>
+        <div class="box red">
+          <h3>⛔ Não testar via curl</h3>
+          <p>O caso 4 (persistência) precisa de SELECT no banco real, não inspeção da response. A response pode mentir; o banco não.</p>
+        </div>
+        <div class="box grn">
+          <h3>✅ Rode antes de pedir review</h3>
+          <p><code>npm test</code> verde local antes de abrir MR. Output preso ao MR economiza ciclo de revisão.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ====== SLIDE 14: ENCERRAMENTO + ENTREGA ====== -->
   <div class="slide cover-bg" style="background:linear-gradient(135deg,#12082c 0%,#0d9488 55%,#10b981 100%)!important;">
     <div class="sc" style="text-align:center;">
-      <div style="font-size:2.8rem;margin-bottom:10px;">📡</div>
-      <div style="font-size:2.1rem;font-weight:800;color:white;margin-bottom:8px;">CRUD via HTTP entregue!</div>
-      <div style="font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:24px;max-width:680px;margin-left:auto;margin-right:auto;">
-        Hoje você completa POST/PUT/PATCH/DELETE com validação, status codes corretos, transações no <code>pg</code> e middleware de erro. Na <strong>aula 7</strong> a view EJS começa a renderizar essas respostas no servidor.
+      <div style="font-size:2.8rem;margin-bottom:10px;">🧪</div>
+      <div style="font-size:2.1rem;font-weight:800;color:white;margin-bottom:8px;">Ponderada entregue · CRUD provado!</div>
+      <div style="font-size:1rem;color:rgba(255,255,255,.85);margin-bottom:24px;max-width:720px;margin-left:auto;margin-right:auto;">
+        Você fechou o CRUD HTTP, documentou o contrato e <strong>provou com testes</strong> que o fluxo crítico do BrPec atende ao negócio. Na <strong>Aula 7</strong> o front-end começa a consumir esses endpoints documentados.
       </div>
       <div style="display:flex;flex-wrap:wrap;gap:8px;justify-content:center;margin-bottom:22px;">
-        <div class="cv-tag" id="rt0">✅ Roteamento modular</div>
-        <div class="cv-tag" id="rt1">✅ zod nos payloads</div>
-        <div class="cv-tag" id="rt2">✅ Status codes corretos</div>
-        <div class="cv-tag" id="rt3">✅ AppError + middleware</div>
-        <div class="cv-tag" id="rt4">✅ asyncHandler</div>
-        <div class="cv-tag" id="rt5">✅ Transações pg</div>
-        <div class="cv-tag" id="rt6">✅ Idempotência</div>
+        <div class="cv-tag" id="rt0">✅ Endpoints com zod</div>
+        <div class="cv-tag" id="rt1">✅ Status codes corretos</div>
+        <div class="cv-tag" id="rt2">✅ AppError + middleware</div>
+        <div class="cv-tag" id="rt3">✅ Doc própria (swagger)</div>
+        <div class="cv-tag" id="rt4">✅ Banco real nos testes</div>
+        <div class="cv-tag" id="rt5">✅ 4 casos Jest verdes</div>
+        <div class="cv-tag" id="rt6">✅ Matriz RF→RN→Teste</div>
       </div>
-      <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:14px 22px;display:inline-block;text-align:left;color:white;font-size:.88rem;max-width:680px;">
-        <strong>📦 Entrega da tarde (14h–16h):</strong> CRUD completo de 1 recurso + middleware de erro + 1 transação. MR <code>feat(api): crud completo recurso X</code>.
+      <div style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);border-radius:14px;padding:14px 22px;display:inline-block;text-align:left;color:white;font-size:.88rem;max-width:720px;">
+        <strong>📦 Entrega da ponderada (ao fim da aula):</strong> fluxo documentado · suite Jest com 4 casos · matriz RF→RN→Teste · output de <code>npm test</code> verde. MR <code>test(api): integração do fluxo X</code>.
       </div>
-      <div style="margin-top:18px;font-size:.84rem;color:rgba(255,255,255,.6);">Módulo 2 · Ciclo Comum · Aula 6 de 11</div>
+      <div style="margin-top:18px;font-size:.84rem;color:rgba(255,255,255,.6);">Módulo 2 · Ciclo Comum · Aula 6 de 11 · 22/05/2026</div>
     </div>
   </div>
 
@@ -849,11 +1215,17 @@ function animRfRnf() {
   });
 }
 
+function nop() { /* slide já estático · sem animação */ }
+
 // ── DISPATCH ─────────────────────────────────────────────────────────────
 var animMap = [
-  animCover, animDaily, animAgenda, animRoadmap, animLayers, animRest,
+  animCover, animDaily, animAgenda, nop /* autoestudos */, animRoadmap, animLayers, animRest,
   animZod, animHelpers, animService, animRepo, animErrors,
-  animAsyncH, animFlow, animIdem, animRmOdp, animRfRnf, animRecap
+  animAsyncH, animFlow, animIdem, nop /* doc própria */, animRmOdp, animRfRnf,
+  nop /* ponderada abertura */, nop /* ponderada fluxo */, nop /* ponderada 4 casos */,
+  nop /* ponderada banco/mock */, nop /* ponderada matriz */, nop /* ponderada npm test */,
+  nop /* ponderada checklist */, nop /* ponderada dicas */,
+  animRecap
 ];
 
 function runAnim(idx) {
