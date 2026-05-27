@@ -150,21 +150,24 @@
     <aside class="mat-sidebar">
       <div class="mat-toc">
         <h4>Neste material</h4>
-        <a href="#sec-ssr-csr">1. SSR vs CSR vs Hydration</a>
-        <a href="#sec-setup">2. Setup do EJS no Express</a>
-        <a href="#sec-views">3. Estrutura de views/ e partials</a>
-        <a href="#sec-syntax">4. Sintaxe EJS — as 4 tags</a>
-        <a href="#sec-render">5. Controller chamando res.render</a>
-        <a href="#sec-semantic">6. HTML semântico</a>
-        <a href="#sec-forms">7. Forms tradicionais</a>
-        <a href="#sec-static">8. Static files</a>
-        <a href="#sec-dom">9. DOM essencial</a>
-        <a href="#sec-events">10. Eventos no DOM</a>
-        <a href="#sec-server-script">11. Passando dados server → script</a>
-        <a href="#sec-validation">12. Validação dupla</a>
-        <a href="#sec-xss">13. Segurança · XSS</a>
-        <a href="#sec-helpers">14. Helpers EJS via app.locals</a>
-        <a href="#sec-checklist">15. Checklist</a>
+        <a href="#sec-sebok">1. Stakeholder Needs — SEBoK Pt. 3</a>
+        <a href="#sec-ssr-csr">2. SSR vs CSR vs Hydration</a>
+        <a href="#sec-setup">3. Setup do EJS no Express</a>
+        <a href="#sec-views">4. Estrutura de views/ e partials</a>
+        <a href="#sec-syntax">5. Sintaxe EJS — as 4 tags</a>
+        <a href="#sec-render">6. Controller chamando res.render</a>
+        <a href="#sec-mermaid">7. Mermaid — Arquitetura as Code</a>
+        <a href="#sec-semantic">8. HTML semântico</a>
+        <a href="#sec-forms">9. Forms tradicionais</a>
+        <a href="#sec-static">10. Static files</a>
+        <a href="#sec-dom">11. DOM essencial</a>
+        <a href="#sec-events">12. Eventos no DOM</a>
+        <a href="#sec-server-script">13. Passando dados server → script</a>
+        <a href="#sec-validation">14. Validação dupla</a>
+        <a href="#sec-xss">15. Segurança · XSS</a>
+        <a href="#sec-helpers">16. Helpers EJS via app.locals</a>
+        <a href="#sec-swebok">17. Testing &amp; Traceability — SWEBOK v4</a>
+        <a href="#sec-checklist">18. Checklist</a>
         <a href="#sec-refs">Referências</a>
       </div>
     </aside>
@@ -172,9 +175,56 @@
     <!-- ── Article ── -->
     <article class="mat-article">
 
-      <!-- ════════ 1. SSR vs CSR ════════ -->
+      <!-- ════════ 1. Stakeholder Needs — SEBoK Pt. 3 ════════ -->
+      <section class="mat-section" id="sec-sebok">
+        <h2>1. Stakeholder Needs — SEBoK Parte 3</h2>
+
+        <p>Antes de escrever uma linha de HTML, precisamos entender <strong>por que</strong> aquela tela existe. O <em>Systems Engineering Body of Knowledge</em> (SEBoK, Parte 3 — Systems Engineering and Management) formaliza essa cadeia: toda funcionalidade de um sistema nasce de uma <strong>necessidade de um stakeholder</strong>. A engenharia de sistemas converte essa necessidade em <strong>requisitos funcionais</strong> (RFs), e os RFs se materializam em telas, formulários e relatórios. Sem essa rastreabilidade, construímos funcionalidades que ninguém pediu, ou deixamos de construir o que realmente importa.</p>
+
+        <p>No projeto BrPec Agropecuária, identificamos três personas centrais, cada uma com necessidades distintas que se traduzem diretamente em RFs e, por consequência, em telas da aplicação:</p>
+
+        <table class="mat-table sr">
+          <thead>
+            <tr>
+              <th>Persona</th>
+              <th>Necessidade</th>
+              <th>Requisito Funcional (RF)</th>
+              <th>Tela correspondente</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td><strong>Capataz</strong><br><small>Registra pesagens no curral</small></td>
+              <td>"Preciso lançar o peso de cada bovino no campo, sem digitar muito nem precisar de internet boa."</td>
+              <td>RF-01 — Registro rápido de pesagem: formulário mínimo (brinco + peso + data), com sugestão de valor anterior.</td>
+              <td><code>GET /pesagens/nova</code> — formulário SSR de lançamento</td>
+            </tr>
+            <tr>
+              <td><strong>Gerente</strong><br><small>Acompanha desempenho do rebanho</small></td>
+              <td>"Quero ver o ganho de peso por lote no mês, para decidir qual confinamento está performando melhor."</td>
+              <td>RF-02 — Relatório de GMD (Ganho Médio Diário): listagem por lote com GMD calculado e filtro de período.</td>
+              <td><code>GET /relatorios/gmd</code> — tabela SSR com dados agregados</td>
+            </tr>
+            <tr>
+              <td><strong>Veterinário</strong><br><small>Acompanha saúde individual dos animais</small></td>
+              <td>"Preciso do histórico sanitário completo de um animal antes de qualquer procedimento."</td>
+              <td>RF-03 — Ficha do bovino: página de detalhe com vacinas, vermifugações e ocorrências anteriores.</td>
+              <td><code>GET /bovinos/:id</code> — ficha SSR do animal</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <p>A cadeia é sempre a mesma: <strong>persona → necessidade → RF → tela</strong>. Cada RF deve ser rastreável desde a necessidade do stakeholder até o teste que o valida. Essa rastreabilidade é formalizada no <strong>RTM</strong> (Requirements Traceability Matrix), que construiremos na Aula 8 como Ponderada III. Por isso, ao implementar cada tela nesta aula, já anote o RF correspondente — você precisará dele em breve.</p>
+
+        <div class="callout callout-deep sr">
+          <div class="callout-label">SEBoK na prática</div>
+          <p>O SEBoK não é burocracia acadêmica — é um guia para não perder o fio de ouro entre "o que o cliente precisa" e "o que o código entrega". Em projetos reais, o custo de descobrir tarde que uma tela foi construída errada é muito maior do que o esforço de rastrear o RF desde o início. A Ponderada III (Aula 8) formaliza isso no RTM; esta aula é onde o RF se materializa em HTML.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 2. SSR vs CSR ════════ -->
       <section class="mat-section" id="sec-ssr-csr">
-        <h2>1. SSR vs CSR vs Hydration — quem monta o HTML?</h2>
+        <h2>2. SSR vs CSR vs Hydration — quem monta o HTML?</h2>
 
         <p>Toda página web exibida no navegador é, no fim, uma string de HTML. A diferença entre as estratégias modernas de front-end está em <strong>quem</strong> produz essa string e <strong>quando</strong>. As três abordagens dominantes hoje são: Server-Side Rendering (SSR), Client-Side Rendering (CSR) e a abordagem híbrida com hydration. Entender as diferenças não é trivia acadêmica — a escolha define a complexidade da sua build, o tempo de primeiro paint, o comportamento em buscadores e a dificuldade de fazer SEO e acessibilidade.</p>
 
@@ -215,9 +265,9 @@
         </div>
       </section>
 
-      <!-- ════════ 2. Setup ════════ -->
+      <!-- ════════ 3. Setup ════════ -->
       <section class="mat-section" id="sec-setup">
-        <h2>2. Setup do EJS no Express</h2>
+        <h2>3. Setup do EJS no Express</h2>
 
         <p>Configurar o EJS é uma operação de duas linhas. O Express tem suporte built-in para template engines via <code>app.set('view engine', ...)</code>; basta instalar o pacote correspondente e apontar para o diretório de views. A partir desse ponto, qualquer chamada a <code>res.render('caminho/template')</code> dentro de um controller fará o Express procurar <code>views/caminho/template.ejs</code>, executar o template com os dados fornecidos e enviar o HTML resultante como resposta.</p>
 
@@ -253,9 +303,9 @@ app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</code><
         </div>
       </section>
 
-      <!-- ════════ 3. Estrutura de views ════════ -->
+      <!-- ════════ 4. Estrutura de views ════════ -->
       <section class="mat-section" id="sec-views">
-        <h2>3. Estrutura de <code>views/</code> e partials</h2>
+        <h2>4. Estrutura de <code>views/</code> e partials</h2>
 
         <p>Templates EJS, assim como qualquer estrutura de código, beneficiam-se de uma organização clara. A convenção que usaremos no projeto integrador segue dois princípios: <strong>organização por recurso</strong> (cada entidade do domínio tem sua própria pasta) e <strong>composição via partials</strong> (header, footer, navegação são reusados em todas as páginas). Isso evita o problema clássico de copiar e colar o mesmo <code>&lt;header&gt;</code> em vinte arquivos e ter que atualizar todos quando o logo muda.</p>
 
@@ -300,9 +350,9 @@ app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</code><
         <p>O EJS puro não tem o conceito de "layout" como o Pug ou o Handlebars têm — você precisa replicar o <code>&lt;html&gt;...&lt;/html&gt;</code> em cada template ou usar partials para o cabeçalho e rodapé. Para projetos pequenos isso é aceitável; para projetos maiores, o pacote <code>express-ejs-layouts</code> resolve, permitindo declarar um layout único e cada view só fornecer o conteúdo do <code>&lt;main&gt;</code>.</p>
       </section>
 
-      <!-- ════════ 4. Sintaxe ════════ -->
+      <!-- ════════ 5. Sintaxe ════════ -->
       <section class="mat-section" id="sec-syntax">
-        <h2>4. Sintaxe EJS — as 4 tags principais</h2>
+        <h2>5. Sintaxe EJS — as 4 tags principais</h2>
 
         <p>A sintaxe do EJS é minimalista. São, na prática, quatro tags que cobrem 95% dos casos. Todas elas são delimitadas por <code>&lt;%</code> e <code>%&gt;</code> — qualquer coisa fora desses delimitadores é HTML cru, copiado para a saída sem modificação. Dentro deles, JavaScript puro.</p>
 
@@ -369,9 +419,9 @@ app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</code><
         </table>
       </section>
 
-      <!-- ════════ 5. res.render ════════ -->
+      <!-- ════════ 6. res.render ════════ -->
       <section class="mat-section" id="sec-render">
-        <h2>5. Controller chamando <code>res.render</code></h2>
+        <h2>6. Controller chamando <code>res.render</code></h2>
 
         <p>O ponto onde a arquitetura MVC encontra o template engine é a chamada a <code>res.render</code> dentro do controller. O controller é responsável por orquestrar: receber a requisição HTTP, delegar a lógica de negócio ao service (que por sua vez chama o repository), receber os dados, e <em>escolher qual template renderizar com quais dados</em>. O template engine assume daí em diante e produz o HTML.</p>
 
@@ -423,9 +473,37 @@ app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</code><
         </div>
       </section>
 
-      <!-- ════════ 6. HTML semântico ════════ -->
+      <!-- ════════ 7. Mermaid — Arquitetura as Code ════════ -->
+      <section class="mat-section" id="sec-mermaid">
+        <h2>7. Mermaid — Arquitetura as Code</h2>
+
+        <p>Diagramas de arquitetura costumam viver em slides ou arquivos de imagem soltos — e por isso envelhecem rapidamente. Quando o código muda e o diagrama não, a documentação vira desinformação. A solução é tratar a arquitetura como código: diagramas em texto, versionados no repositório, revisáveis em pull request. O <strong>Mermaid</strong> permite exatamente isso: você descreve um diagrama em sintaxe de texto dentro de um arquivo <code>.md</code> ou <code>.html</code>, e ferramentas como o GitHub, o VS Code (com extensão) e o Docusaurus o renderizam automaticamente como imagem.</p>
+
+        <p>A vantagem prática é enorme. Um diagrama em imagem PNG não passa por code review — ninguém consegue fazer diff de um PNG. Um diagrama Mermaid dentro do <code>README.md</code> é examinável linha a linha, comentável, e atualizável com um simples <code>git commit</code>. No contexto do projeto BrPec, mantemos o diagrama de fluxo da requisição versionado junto ao código, para que qualquer alteração na arquitetura (ex.: novo middleware, nova camada de cache) seja imediatamente visível no histórico do repositório.</p>
+
+        <p>O diagrama abaixo descreve o fluxo completo de uma requisição <code>GET /bovinos</code> na arquitetura SSR com Express + EJS + SQLite:</p>
+
+        <div class="code-wrap">
+          <div class="code-label">Mermaid — fluxo de requisição SSR (BrPec) <button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <pre class="code-block"><code>flowchart LR
+  Browser --&gt;|GET /bovinos| Controller
+  Controller --&gt; Model
+  Model --&gt; DB[(SQLite)]
+  Controller --&gt;|res.render| View[EJS]
+  View --&gt; Browser</code></pre>
+        </div>
+
+        <p>Lendo o diagrama da esquerda para a direita: o <strong>Browser</strong> faz uma requisição <code>GET /bovinos</code>; o roteador do Express direciona ao <strong>Controller</strong>; o controller chama o <strong>Model</strong> (repository/service); o model consulta o <strong>DB</strong> (SQLite); os dados voltam ao controller que chama <code>res.render</code>, passando os dados para a <strong>View</strong> (template EJS); a view gera o HTML e o Express devolve ao <strong>Browser</strong>. Esse fluxo é exatamente o que implementamos nas seções 3 a 6 deste material.</p>
+
+        <div class="callout callout-info sr">
+          <div class="callout-label">Como usar Mermaid no seu projeto</div>
+          <p>No GitHub, basta escrever o bloco dentro de <code>```mermaid ... ```</code> em qualquer arquivo <code>.md</code> — o GitHub renderiza automaticamente. No VS Code, instale a extensão <em>Markdown Preview Mermaid Support</em>. Para embutir em HTML, use a biblioteca JS do Mermaid: <code>&lt;script type="module" src="https://cdn.jsdelivr.net/npm/mermaid/dist/mermaid.esm.min.mjs"&gt;&lt;/script&gt;</code> e marque o bloco com <code>&lt;pre class="mermaid"&gt;...&lt;/pre&gt;</code>. A documentação oficial está em <a href="https://mermaid.js.org" target="_blank" rel="noopener noreferrer">mermaid.js.org</a>.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 8. HTML semântico ════════ -->
       <section class="mat-section" id="sec-semantic">
-        <h2>6. HTML semântico</h2>
+        <h2>8. HTML semântico</h2>
 
         <p>HTML semântico é o uso de tags que <strong>descrevem o significado</strong> do conteúdo, não a sua aparência. Em vez de envolver tudo em <code>&lt;div&gt;</code> com classes (a famosa "div soup"), você usa <code>&lt;header&gt;</code> para o cabeçalho, <code>&lt;nav&gt;</code> para a navegação, <code>&lt;main&gt;</code> para o conteúdo principal, <code>&lt;article&gt;</code> para uma unidade autônoma de conteúdo, <code>&lt;section&gt;</code> para agrupamentos temáticos, <code>&lt;aside&gt;</code> para conteúdo lateral e <code>&lt;footer&gt;</code> para o rodapé. Visualmente, um <code>&lt;header&gt;</code> é igual a uma <code>&lt;div&gt;</code> — a diferença está no <em>significado</em> que essa tag carrega.</p>
 
@@ -450,9 +528,9 @@ app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</code><
         </div>
       </section>
 
-      <!-- ════════ 7. Forms ════════ -->
+      <!-- ════════ 9. Forms ════════ -->
       <section class="mat-section" id="sec-forms">
-        <h2>7. Forms tradicionais — POST direto para o servidor</h2>
+        <h2>9. Forms tradicionais — POST direto para o servidor</h2>
 
         <p>Antes de qualquer fetch ou AJAX, o jeito original e ainda perfeitamente válido de enviar dados para o servidor é o <strong>form HTML tradicional</strong>. O <code>&lt;form method="POST" action="/users"&gt;</code> faz o navegador enviar uma requisição POST para a URL indicada, com os campos do formulário codificados como <code>application/x-www-form-urlencoded</code>. Após a resposta, o navegador <em>recarrega a página</em> com o novo HTML. É simples, funciona sem JavaScript e cobre 80% dos casos de aplicações CRUD.</p>
 
@@ -484,9 +562,9 @@ app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</code><
         <p>Forms tradicionais não substituem fetch (que veremos na aula 8). São complementares: forms são ótimos para create/update simples e quando JavaScript pode falhar; fetch é melhor para experiências sem reload, listas com filtros dinâmicos e UIs mais ricas.</p>
       </section>
 
-      <!-- ════════ 8. Static files ════════ -->
+      <!-- ════════ 10. Static files ════════ -->
       <section class="mat-section" id="sec-static">
-        <h2>8. Static files — CSS, JS e imagens</h2>
+        <h2>10. Static files — CSS, JS e imagens</h2>
 
         <p>Templates EJS produzem o HTML. Mas o HTML referencia arquivos externos: folhas de estilo CSS, scripts JavaScript de cliente e imagens. Esses arquivos precisam ser servidos pelo Express, e o middleware <code>express.static</code> resolve isso em uma linha: <code>app.use(express.static('public'))</code>. A partir desse ponto, qualquer arquivo dentro de <code>public/</code> é acessível por uma URL relativa.</p>
 
@@ -520,9 +598,9 @@ app.<span class="hl-fn">listen</span>(<span class="hl-num">3000</span>);</code><
         </div>
       </section>
 
-      <!-- ════════ 9. DOM essencial ════════ -->
+      <!-- ════════ 11. DOM essencial ════════ -->
       <section class="mat-section" id="sec-dom">
-        <h2>9. DOM essencial — JavaScript no navegador</h2>
+        <h2>11. DOM essencial — JavaScript no navegador</h2>
 
         <p>O HTML que chega no navegador é parseado e transformado em uma árvore de objetos: o <strong>DOM</strong> (Document Object Model). Cada tag vira um nó dessa árvore, com propriedades, métodos e relações pai/filho. O JavaScript de cliente — aquele rodando no <code>&lt;script&gt;</code> da página — manipula essa árvore para mudar conteúdo, alterar estilos, adicionar elementos, escutar eventos do usuário.</p>
 
@@ -563,9 +641,9 @@ document.<span class="hl-fn">querySelectorAll</span>(<span class="hl-str">'.tab'
         </table>
       </section>
 
-      <!-- ════════ 10. Eventos ════════ -->
+      <!-- ════════ 12. Eventos ════════ -->
       <section class="mat-section" id="sec-events">
-        <h2>10. Eventos no DOM — bubbling e preventDefault</h2>
+        <h2>12. Eventos no DOM — bubbling e preventDefault</h2>
 
         <p>Eventos são a forma como o navegador comunica ao seu JS que algo aconteceu: o usuário clicou, digitou, redimensionou a janela, terminou de carregar uma imagem. O método <code>addEventListener</code> conecta uma função ("handler") ao evento de um elemento. Quando o evento dispara, o handler é chamado com um objeto <code>Event</code> contendo metadados.</p>
 
@@ -595,9 +673,9 @@ form.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'submit'</
         </div>
       </section>
 
-      <!-- ════════ 11. Server → Script ════════ -->
+      <!-- ════════ 13. Server → Script ════════ -->
       <section class="mat-section" id="sec-server-script">
-        <h2>11. Passando dados do servidor para o script de cliente</h2>
+        <h2>13. Passando dados do servidor para o script de cliente</h2>
 
         <p>Em SSR puro, há momentos em que o JS de cliente precisa de dados que o servidor já tem em mão. Você poderia fazer um fetch separado (e veremos isso na aula 8), mas para dados pequenos e que já chegaram com a renderização inicial, a estratégia mais eficiente é <strong>injetar os dados em uma variável global JavaScript dentro do próprio template EJS</strong>. Isso evita uma round-trip extra ao servidor.</p>
 
@@ -627,9 +705,9 @@ form.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'submit'</
         </div>
       </section>
 
-      <!-- ════════ 12. Validação dupla ════════ -->
+      <!-- ════════ 14. Validação dupla ════════ -->
       <section class="mat-section" id="sec-validation">
-        <h2>12. Validação dupla — cliente para UX, servidor para segurança</h2>
+        <h2>14. Validação dupla — cliente para UX, servidor para segurança</h2>
 
         <p>Toda aplicação web séria tem validação em <strong>duas camadas</strong>: no navegador e no servidor. Elas servem propósitos diferentes e nenhuma substitui a outra. A validação no <strong>cliente</strong> existe para UX — feedback rápido, antes mesmo de fazer a requisição. A validação no <strong>servidor</strong> existe para segurança e integridade — é a única que tem valor real, porque a do cliente pode ser desabilitada com 3 cliques no DevTools.</p>
 
@@ -665,9 +743,9 @@ form.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'submit'</
         </table>
       </section>
 
-      <!-- ════════ 13. XSS ════════ -->
+      <!-- ════════ 15. XSS ════════ -->
       <section class="mat-section" id="sec-xss">
-        <h2>13. Segurança · XSS e o uso correto de <code>&lt;%= %&gt;</code></h2>
+        <h2>15. Segurança · XSS e o uso correto de <code>&lt;%= %&gt;</code></h2>
 
         <p>XSS (Cross-Site Scripting) é uma das vulnerabilidades mais comuns da web. Acontece quando um atacante consegue injetar JavaScript malicioso na página exibida para outro usuário. Em uma aplicação SSR com EJS, o vetor clássico é o <strong>conteúdo do usuário renderizado sem escape</strong>. Imagine um campo de comentário onde o atacante envia <code>&lt;script&gt;alert(document.cookie)&lt;/script&gt;</code> — se o template imprime isso com <code>&lt;%- %&gt;</code> (raw), o script roda no navegador da próxima vítima.</p>
 
@@ -697,9 +775,9 @@ form.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'submit'</
         </div>
       </section>
 
-      <!-- ════════ 14. Helpers ════════ -->
+      <!-- ════════ 16. Helpers ════════ -->
       <section class="mat-section" id="sec-helpers">
-        <h2>14. Helpers EJS via <code>app.locals</code> e <code>res.locals</code></h2>
+        <h2>16. Helpers EJS via <code>app.locals</code> e <code>res.locals</code></h2>
 
         <p>A 6ª camada da arquitetura do projeto — Helpers — comporta funções utilitárias reusadas em vários lugares. Algumas dessas funções são úteis dentro dos templates: formatar datas, formatar moeda, pluralizar palavras, gerar URLs canônicas. EJS aceita funções como variáveis: se você passar uma função no objeto de <code>res.render</code>, ela fica disponível para chamada no template.</p>
 
@@ -729,9 +807,76 @@ app.locals.formatDate = formatDate;</code></pre>
         <p>A diferença prática entre <code>app.locals</code> e <code>res.locals</code>: o primeiro é setado uma única vez ao iniciar o servidor e vale para todas as requisições; o segundo é setado dentro de um middleware (típico para o usuário logado, flash messages, configs por requisição) e vale só para aquela requisição. O EJS vê os dois como variáveis disponíveis no template — a fonte é transparente.</p>
       </section>
 
-      <!-- ════════ 15. Checklist ════════ -->
+      <!-- ════════ 17. Testing & Traceability — SWEBOK v4 ════════ -->
+      <section class="mat-section" id="sec-swebok">
+        <h2>17. Testing &amp; Traceability — SWEBOK v4 Capítulos 4 e 8</h2>
+
+        <p>O <em>Software Engineering Body of Knowledge</em> (SWEBOK v4) é o guia de referência profissional da IEEE para engenharia de software. Dois capítulos são diretamente relevantes para o que estamos construindo neste módulo.</p>
+
+        <h3>Capítulo 4 — Software Testing</h3>
+
+        <p>O SWEBOK v4, Capítulo 4, define testing como a atividade de executar um produto de software com o objetivo de encontrar defeitos e avaliar a qualidade. Um ponto frequentemente subestimado: <strong>o front-end também se testa</strong>. Telas, formulários, e manipulação de DOM têm comportamentos verificáveis da mesma forma que lógica de negócio no back-end.</p>
+
+        <p>No contexto desta aula, os targets de teste do front-end incluem:</p>
+        <ul>
+          <li><strong>Validação de formulários</strong>: testar que um campo <code>required</code> rejeita submissão vazia, que <code>type="email"</code> rejeita strings sem <code>@</code>, que a lógica de <code>preventDefault</code> é chamada corretamente.</li>
+          <li><strong>Manipulação de DOM</strong>: verificar que um clique em <code>#menu-btn</code> adiciona a classe <code>open</code> ao <code>.menu</code>, ou que a lista de bovinos é renderizada com o número correto de <code>&lt;li&gt;</code> após uma operação.</li>
+          <li><strong>Integração SSR</strong>: testar que <code>res.render('bovinos/index', { bovinos })</code> produz o HTML esperado, com todos os <code>data-id</code> corretos.</li>
+        </ul>
+
+        <p>Na Aula 10 implementaremos testes de front-end com <strong>Jest</strong> e <strong>Testing Library</strong>. O capítulo 4 do SWEBOK fornece o vocabulário: testes unitários (uma função isolada), testes de integração (componente + DOM juntos) e testes de sistema (fluxo completo via Playwright/Cypress). Começar a pensar em testabilidade agora — ao escrever o HTML desta aula — facilita muito o trabalho na Aula 10.</p>
+
+        <div class="callout callout-tip sr">
+          <div class="callout-label">Dica: HTML testável</div>
+          <p>Adicione <code>data-testid</code> nos elementos-chave dos seus formulários e listas: <code>&lt;button data-testid="submit-pesagem"&gt;</code>, <code>&lt;ul data-testid="lista-bovinos"&gt;</code>. Isso desacopla os seletores de teste dos seletores de CSS — você pode refatorar a classe visual sem quebrar os testes.</p>
+        </div>
+
+        <h3>Capítulo 8 — Models, Methods e Traceability</h3>
+
+        <p>O Capítulo 8 do SWEBOK v4 aborda modelos e métodos de engenharia de software, com ênfase em <strong>rastreabilidade</strong> (traceability): a capacidade de seguir a vida de um requisito desde sua origem (necessidade do stakeholder) até sua implementação e verificação (teste). Essa é a ponte direta com o SEBoK Parte 3 que vimos na Seção 1.</p>
+
+        <p>A rastreabilidade é formalizada no <strong>RTM — Requirements Traceability Matrix</strong>. O RTM é uma tabela que mapeia cada RF para: o stakeholder que originou a necessidade, a(s) tela(s) que o implementam, o(s) teste(s) que o verificam. Na Ponderada III (Aula 8), você construirá o RTM do projeto BrPec. Os dados desta aula já alimentam esse RTM:</p>
+
+        <table class="mat-table sr">
+          <thead>
+            <tr>
+              <th>RF</th>
+              <th>Origem (Stakeholder)</th>
+              <th>Implementação (tela)</th>
+              <th>Teste (Aula 10)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>RF-01 — Registro de pesagem</td>
+              <td>Capataz (Seção 1)</td>
+              <td><code>GET /pesagens/nova</code> (EJS form)</td>
+              <td>Jest: form submit com brinco + peso válidos</td>
+            </tr>
+            <tr>
+              <td>RF-02 — Relatório GMD</td>
+              <td>Gerente (Seção 1)</td>
+              <td><code>GET /relatorios/gmd</code> (tabela EJS)</td>
+              <td>Jest: tabela renderiza N linhas para N registros</td>
+            </tr>
+            <tr>
+              <td>RF-03 — Ficha do bovino</td>
+              <td>Veterinário (Seção 1)</td>
+              <td><code>GET /bovinos/:id</code> (detalhe EJS)</td>
+              <td>Jest: ficha exibe histórico sanitário correto</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-deep sr">
+          <div class="callout-label">Por que rastreabilidade importa</div>
+          <p>Sem rastreabilidade, não há como saber se um requisito foi esquecido, se uma tela foi construída sem RF correspondente, ou se todos os RFs têm cobertura de teste. O RTM responde às três perguntas de uma vez. Em projetos reais, o RTM é exigido em auditorias, em contratos governamentais e em processos de certificação de software crítico. No Inteli, é a Ponderada III — mas o hábito de traçar necessidade → implementação → teste é para a vida toda.</p>
+        </div>
+      </section>
+
+      <!-- ════════ 18. Checklist ════════ -->
       <section class="mat-section" id="sec-checklist">
-        <h2>15. Checklist de Estudo</h2>
+        <h2>18. Checklist de Estudo</h2>
         <p>Clique nos itens à medida que dominar cada conceito:</p>
         <ul class="checklist" id="checklist">
           <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Consigo explicar a diferença entre SSR, CSR e hydration com um exemplo concreto.</span></li>
@@ -754,13 +899,27 @@ app.locals.formatDate = formatDate;</code></pre>
 
       <!-- ════════ Referências ════════ -->
       <section class="mat-section" id="sec-refs">
-        <h2>Referências</h2>
+        <h2>Referências e Autoestudos</h2>
+        <p style="font-size:.88rem; color:var(--muted); margin-bottom:16px;">Itens marcados com <span class="tag tag-purple">complementar</span> são leituras opcionais sem slide correspondente; os demais compõem os autoestudos obrigatórios da Aula 7.</p>
         <ul>
+          <li><strong>Front-End 1 — HTML, DOM e JavaScript</strong> — material base desta aula, cobre HTML semântico, DOM e eventos</li>
+          <li><strong>SWEBOK v4: Capítulo 4 &amp; 8 — Software Testing &amp; Traceability</strong> — fundamentos de teste de software e rastreabilidade de requisitos (Seção 17 deste material)</li>
+          <li><strong>SEBoK: Parte 3 — Systems Engineering: Stakeholder Needs</strong> — cadeia necessidade → RF → tela; base para o RTM da Ponderada III (Seção 1 deste material)</li>
+          <li><strong>KLM and GOMS Models for HCI</strong> — modelos de análise de tempo de interação humano-computador <span class="tag tag-purple">complementar — sem slide</span></li>
+          <li><strong>State of the Art User Interfaces with State Machines</strong> — padrões de UI baseados em máquinas de estado finito <span class="tag tag-purple">complementar — sem slide</span></li>
+          <li><strong>HTML e suas estruturas</strong> — introdução às tags e à estrutura de um documento HTML</li>
+          <li><strong>Boas práticas para escrever um HTML profissional</strong> — semântica, acessibilidade e organização do markup</li>
+          <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/API/Document_Object_Model/Introduction" target="_blank" rel="noopener noreferrer">Document Object Model (DOM)</a> — visão geral da árvore DOM e APIs principais</li>
+          <li><strong>Aprofundamentos sobre Document Object Model (DOM)</strong> — eventos, traversal, manipulação de nós</li>
+          <li><strong>jQuery (ou "Jim Carrey")</strong> — biblioteca clássica de manipulação de DOM <span class="tag tag-purple">complementar — sem slide</span></li>
+          <li><strong>Aprofundamentos sobre jQuery</strong> — plugins, AJAX e animações com jQuery <span class="tag tag-purple">complementar — sem slide</span></li>
+          <li><strong>Views com EJS</strong> — sintaxe EJS, partials e integração com Express (Seções 3 a 6 deste material)</li>
+          <li><strong>How the Model View Controller Architecture Works – MVC Explained</strong> — visão geral do padrão MVC aplicado a aplicações web</li>
+          <li><strong>Mermaid e Arquiteturas Visuais As a Code</strong> — diagramas versionáveis em repositório com sintaxe Mermaid (Seção 7 deste material)</li>
           <li><a href="https://ejs.co/" target="_blank" rel="noopener noreferrer">EJS · Documentação Oficial</a> — sintaxe, includes, options e API completa</li>
           <li><a href="https://expressjs.com/en/guide/using-template-engines.html" target="_blank" rel="noopener noreferrer">Express · Using Template Engines</a> — guia oficial sobre <code>res.render</code> e setup de engines</li>
           <li><a href="https://expressjs.com/en/starter/static-files.html" target="_blank" rel="noopener noreferrer">Express · Serving Static Files</a> — middleware <code>express.static</code></li>
           <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/HTML/Element" target="_blank" rel="noopener noreferrer">MDN · HTML Element Reference</a> — referência completa de tags HTML, semântica e atributos</li>
-          <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/API/Document_Object_Model/Introduction" target="_blank" rel="noopener noreferrer">MDN · Introduction to the DOM</a> — visão geral da árvore DOM e APIs principais</li>
           <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/API/EventTarget/addEventListener" target="_blank" rel="noopener noreferrer">MDN · addEventListener</a> — assinaturas, fases capture/bubbling e options</li>
           <li><a href="https://owasp.org/www-community/attacks/xss/" target="_blank" rel="noopener noreferrer">OWASP · Cross-Site Scripting (XSS)</a> — fundamentos da vulnerabilidade e como evitar</li>
           <li><a href="https://web.dev/articles/rendering-on-the-web" target="_blank" rel="noopener noreferrer">web.dev · Rendering on the Web</a> — artigo do Google sobre SSR, CSR, hydration e static rendering</li>

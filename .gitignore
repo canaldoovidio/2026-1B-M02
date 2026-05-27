@@ -1,0 +1,5 @@
+# Specs/planos internos de desenvolvimento (não versionar)
+docs/superpowers/
+
+# Node / tooling
+node_modules/

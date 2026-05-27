@@ -168,22 +168,25 @@
         <h4>Neste material</h4>
         <a href="#sec-intro">1. De SSR estático para UI viva</a>
         <a href="#sec-eventloop">2. Event loop e tarefas</a>
-        <a href="#sec-promises">3. Promises</a>
-        <a href="#sec-async">4. async / await</a>
-        <a href="#sec-fetch-get">5. fetch() — GET</a>
-        <a href="#sec-fetch-post">6. fetch() — POST com JSON</a>
-        <a href="#sec-errors">7. Erro de rede vs erro HTTP</a>
-        <a href="#sec-abort">8. AbortController</a>
-        <a href="#sec-states">9. Loading / Empty / Error</a>
-        <a href="#sec-dual">10. Backend dual HTML+JSON</a>
-        <a href="#sec-cors">11. CORS resumido</a>
-        <a href="#sec-headers">12. Headers comuns</a>
-        <a href="#sec-cookies">13. Cookies e SameSite</a>
-        <a href="#sec-network">14. Network tab</a>
-        <a href="#sec-favoritar">15. Exemplo end-to-end</a>
-        <a href="#sec-redes">16. TCP/IP, DNS e HTTPS (intro)</a>
-        <a href="#sec-checklist">17. Checklist da aula</a>
-        <a href="#sec-refs">18. Referências</a>
+        <a href="#sec-concurrency">3. Concorrência &amp; Design Assíncrono (SWEBOK v4)</a>
+        <a href="#sec-lamport">4. Ordem dos eventos — Lamport</a>
+        <a href="#sec-promises">5. Promises</a>
+        <a href="#sec-async">6. async / await</a>
+        <a href="#sec-fetch-get">7. fetch() — GET</a>
+        <a href="#sec-fetch-post">8. fetch() — POST com JSON</a>
+        <a href="#sec-errors">9. Erro de rede vs erro HTTP</a>
+        <a href="#sec-abort">10. AbortController</a>
+        <a href="#sec-states">11. Loading / Empty / Error</a>
+        <a href="#sec-dual">12. Backend dual HTML+JSON</a>
+        <a href="#sec-cors">13. CORS resumido</a>
+        <a href="#sec-headers">14. Headers comuns</a>
+        <a href="#sec-cookies">15. Cookies e SameSite</a>
+        <a href="#sec-network">16. Network tab</a>
+        <a href="#sec-favoritar">17. Exemplo end-to-end</a>
+        <a href="#sec-redes">18. TCP/IP, DNS e HTTPS (intro)</a>
+        <a href="#sec-ponderada3">19. Ponderada III — RTM completo</a>
+        <a href="#sec-checklist">20. Checklist da aula</a>
+        <a href="#sec-refs">21. Referências &amp; Autoestudos</a>
       </div>
     </aside>
 
@@ -242,9 +245,94 @@
         </div>
       </section>
 
+      <!-- ════════ CONCURRENCY (SWEBOK v4) ════════ -->
+      <section class="mat-section sr" id="sec-concurrency">
+        <h2>3. Concorrência &amp; Design Assíncrono (SWEBOK v4 · Cap. 2)</h2>
+        <p>O SWEBOK v4 (Guide to the Software Engineering Body of Knowledge) dedica o capítulo 2 ao design de software, incluindo aspectos de <strong>concorrência</strong>. Dois conceitos precisam estar claros antes de escrever qualquer código assíncrono sério:</p>
+
+        <h3>Concorrência ≠ Paralelismo</h3>
+        <table class="mat-table">
+          <thead><tr><th>Conceito</th><th>O que significa</th><th>JavaScript</th></tr></thead>
+          <tbody>
+            <tr>
+              <td><strong>Concorrência</strong></td>
+              <td>Múltiplas tarefas em progresso ao mesmo tempo — não necessariamente executando simultaneamente. Uma pode pausar enquanto a outra avança.</td>
+              <td><span class="tag tag-green">SIM</span> — o event loop intercala tasks. Um fetch "em voo" coexiste com eventos do usuário na mesma thread.</td>
+            </tr>
+            <tr>
+              <td><strong>Paralelismo</strong></td>
+              <td>Múltiplas tarefas executando <em>exatamente ao mesmo tempo</em> em núcleos físicos distintos.</td>
+              <td><span class="tag tag-amber">LIMITADO</span> — só via <code>Worker</code> threads. O código de UI roda sempre em uma única thread.</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Macrotasks vs Microtasks — o que o event loop drena</h3>
+        <p>Revisitando a estrutura da seção 2, agora com o vocabulário SWEBOK: o event loop é a implementação concreta do <strong>modelo de concorrência cooperativa</strong> do JS. Cada passagem do loop é chamada de <em>tick</em>. Em cada tick:</p>
+        <ol>
+          <li><strong>Macrotask</strong> selecionada da fila (timers, I/O, eventos) é executada até o fim.</li>
+          <li>A fila de <strong>microtasks</strong> é <em>completamente drenada</em> — uma nova microtask pode enfileirar outra microtask; o loop não avança para a próxima macrotask enquanto houver microtasks pendentes.</li>
+          <li>O browser pode renderizar o frame (pintura na tela) entre macrotasks.</li>
+        </ol>
+
+        <div class="callout callout-deep">
+          <div class="callout-label">Por que isso importa no design</div>
+          <p>Promises (<code>.then</code>, <code>await</code>) são microtasks. <code>setTimeout</code>, <code>setInterval</code>, callbacks de <code>fetch</code> resolvido pelo browser são macrotasks. Se você encadeia muitas Promises em série, elas drenam antes de qualquer render — isso pode ser desejável (evitar flash de conteúdo) ou problemático (atrasar feedback visual).</p>
+        </div>
+
+        <h3>Design assíncrono = não bloquear a thread única</h3>
+        <p>O princípio central do SWEBOK para ambientes single-threaded é: <strong>a thread principal nunca deve ser bloqueada por I/O</strong>. Qualquer operação que depende de rede, disco ou timer deve ser assíncrona — seu resultado chega via callback/Promise, e a thread fica livre para responder ao usuário enquanto espera.</p>
+
+        <div class="callout callout-warn">
+          <div class="callout-label">BrPec — UI de pesagem no campo</div>
+          <p>O capataz registra pesagens em um dispositivo móvel com sinal instável. A UI de pesagem <strong>não pode congelar</strong> enquanto o <code>fetch</code> para o servidor trafega pela rede rural — o usuário precisa continuar navegando, digitando e selecionando o próximo animal. O design correto: <code>fetch</code> assíncrono com estado "salvando…", permitindo que a UI permaneça responsiva. Qualquer cálculo pesado (validação de lote) vai para um <code>Worker</code> se precisar de CPU, não para a thread principal.</p>
+        </div>
+      </section>
+
+      <!-- ════════ LAMPORT ════════ -->
+      <section class="mat-section sr" id="sec-lamport">
+        <h2>4. Ordem dos eventos — Lamport (Time, Clocks &amp; Ordering)</h2>
+        <p>Em sistemas distribuídos — e um app com cliente offline + servidor remoto é um sistema distribuído — a ordem dos eventos <strong>não pode ser determinada pelos relógios de máquina</strong>. Leslie Lamport formalizou isso em 1978 no artigo seminal <em>"Time, Clocks, and the Ordering of Events in a Distributed System"</em>.</p>
+
+        <h3>O problema dos relógios físicos</h3>
+        <p>Relógios de hardware derivam: um celular rodando sem sincronização NTP por horas pode estar minutos adiantado ou atrasado. Se você usa o <code>timestamp</code> do cliente para ordenar eventos, corre o risco de:</p>
+        <ul>
+          <li>Pesagem registrada às 14:03 (relógio do celular) parecer posterior a uma registrada às 14:05 (servidor) — mesmo que a do celular tenha acontecido <em>antes</em>.</li>
+          <li>Dois eventos simultâneos terem o mesmo timestamp, sem forma de desempatar deterministicamente.</li>
+        </ul>
+
+        <h3>Relação <em>happened-before</em> e ordem causal</h3>
+        <p>Lamport definiu a relação <strong>happened-before</strong> (→): o evento <em>a</em> → <em>b</em> se:</p>
+        <ol>
+          <li><em>a</em> e <em>b</em> ocorrem no mesmo processo e <em>a</em> vem antes de <em>b</em>; ou</li>
+          <li><em>a</em> é o envio de uma mensagem e <em>b</em> é o recebimento da mesma mensagem; ou</li>
+          <li>existe <em>c</em> tal que <em>a</em> → <em>c</em> e <em>c</em> → <em>b</em> (transitividade).</li>
+        </ol>
+        <p>Se dois eventos não têm relação happened-before em nenhuma direção, são <strong>concorrentes</strong> — e nenhum sistema pode afirmar qual veio primeiro sem informação adicional.</p>
+
+        <div class="callout callout-deep">
+          <div class="callout-label">Relógios Lógicos de Lamport</div>
+          <p>A solução é usar <strong>relógios lógicos</strong> (contadores inteiros): cada evento incrementa o contador; mensagens carregam o contador do emissor, e o receptor atualiza o seu para <code>max(local, recebido) + 1</code>. A ordem causal é preservada sem depender de relógio de hardware.</p>
+        </div>
+
+        <h3>Ligação com o sync offline da Aula 5 — BrPec</h3>
+        <p>Quando o capataz sincroniza pesagens dias depois de registrá-las offline, o servidor recebe um lote de eventos com timestamps do celular. Esses timestamps <strong>não são confiáveis</strong> para ordenação:</p>
+        <ul>
+          <li>O relógio pode ter derivado durante o período offline.</li>
+          <li>O usuário pode ter ajustado manualmente o horário do dispositivo.</li>
+          <li>Dois capatazes podem ter sincronizado ao mesmo tempo com pesagens conflitantes do mesmo animal.</li>
+        </ul>
+        <p>Por isso, a Aula 5 introduziu a combinação de <strong>UUID como identidade única</strong> (imutável, gerado no cliente) + <strong>ordem causal</strong> (sequência de eventos dentro da sessão de pesagem), e não o timestamp como chave de ordenação. O timestamp pode ser armazenado como metadado informativo, mas a <em>ordem de aplicação</em> no servidor deve respeitar a causalidade, não o relógio do celular.</p>
+
+        <div class="callout callout-info">
+          <div class="callout-label">Referência</div>
+          <p>Lamport, L. (1978). <em>Time, Clocks, and the Ordering of Events in a Distributed System.</em> Communications of the ACM, 21(7), 558–565. Um dos artigos mais citados em ciência da computação. Leitura recomendada nos autoestudos desta aula.</p>
+        </div>
+      </section>
+
       <!-- ════════ PROMISES ════════ -->
       <section class="mat-section sr" id="sec-promises">
-        <h2>3. Promises</h2>
+        <h2>5. Promises</h2>
         <p>Uma <strong>Promise</strong> é um objeto que representa um valor que ainda não chegou — um contrato do tipo "vou te entregar este resultado depois, ou te avisar que falhou". Tem três estados:</p>
 
         <div class="pdiag">
@@ -315,7 +403,7 @@
 
       <!-- ════════ ASYNC/AWAIT ════════ -->
       <section class="mat-section sr" id="sec-async">
-        <h2>4. async / await</h2>
+        <h2>6. async / await</h2>
         <p><code>async/await</code> é <em>açúcar sintático</em> em cima de Promises. Não substitui Promise — apenas escreve o mesmo código de uma forma que se lê como código síncrono.</p>
 
         <h3>Regras de ouro</h3>
@@ -374,7 +462,7 @@
 
       <!-- ════════ FETCH GET ════════ -->
       <section class="mat-section sr" id="sec-fetch-get">
-        <h2>5. fetch() — GET</h2>
+        <h2>7. fetch() — GET</h2>
         <p>A <strong>Fetch API</strong> é a interface moderna do navegador para fazer requests HTTP. Substitui <code>XMLHttpRequest</code>. Está disponível em todos os navegadores modernos e também no Node.js 18+.</p>
         <p>Forma básica:</p>
         <div class="code-wrap">
@@ -404,7 +492,7 @@
 
       <!-- ════════ FETCH POST ════════ -->
       <section class="mat-section sr" id="sec-fetch-post">
-        <h2>6. fetch() — POST com JSON</h2>
+        <h2>8. fetch() — POST com JSON</h2>
         <p>Para enviar dados ao servidor, passamos um segundo argumento ao <code>fetch</code> com método, headers e body:</p>
 
         <div class="code-wrap">
@@ -441,7 +529,7 @@
 
       <!-- ════════ ERRORS ════════ -->
       <section class="mat-section sr" id="sec-errors">
-        <h2>7. Erro de rede vs erro HTTP — o pulo do gato</h2>
+        <h2>9. Erro de rede vs erro HTTP — o pulo do gato</h2>
         <p>Aqui está o detalhe que mais derruba quem está começando: <strong><code>fetch()</code> NÃO rejeita por status 4xx ou 5xx</strong>. A Promise resolve com a Response, e o status apenas indica que algo deu errado no servidor.</p>
 
         <table class="mat-table">
@@ -476,7 +564,7 @@
 
       <!-- ════════ ABORT ════════ -->
       <section class="mat-section sr" id="sec-abort">
-        <h2>8. AbortController — cancelando requests</h2>
+        <h2>10. AbortController — cancelando requests</h2>
         <p>Imagine um campo de busca que dispara um <code>fetch</code> a cada tecla. O usuário digita "afo", "afon", "afons", "afonso". Cinco requests viajam pela rede em ordem, mas a <strong>resposta</strong> pode chegar fora de ordem. Você acaba mostrando resultados de uma busca antiga em cima da nova — bug clássico.</p>
         <p>A solução é <strong><code>AbortController</code></strong>: gerar um signal que pode ser usado para cancelar requests pendentes.</p>
 
@@ -512,7 +600,7 @@ input.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'input'</
 
       <!-- ════════ STATES ════════ -->
       <section class="mat-section sr" id="sec-states">
-        <h2>9. Loading / Empty / Error / Success</h2>
+        <h2>11. Loading / Empty / Error / Success</h2>
         <p>Toda UI que depende de uma resposta assíncrona vive em <strong>quatro</strong> estados. Esquecer um deles é a fonte mais comum de UI quebrada na vida real.</p>
 
         <div class="card-grid">
@@ -570,7 +658,7 @@ input.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'input'</
 
       <!-- ════════ DUAL ════════ -->
       <section class="mat-section sr" id="sec-dual">
-        <h2>10. Backend dual — HTML + JSON reusando o service</h2>
+        <h2>12. Backend dual — HTML + JSON reusando o service</h2>
         <p>O segredo de manter o código limpo é não duplicar lógica. O mesmo <code>UserService</code> que serve a página EJS também serve o endpoint JSON. O que muda é apenas o <strong>controller</strong>: um chama <code>res.render</code>, o outro chama <code>res.json</code>.</p>
 
         <div class="code-wrap">
@@ -629,7 +717,7 @@ router.<span class="hl-fn">post</span>(<span class="hl-str">'/api/users'</span>,
 
       <!-- ════════ CORS ════════ -->
       <section class="mat-section sr" id="sec-cors">
-        <h2>11. CORS resumido</h2>
+        <h2>13. CORS resumido</h2>
         <p>CORS (<em>Cross-Origin Resource Sharing</em>) é um mecanismo do navegador que bloqueia requests entre <strong>origens diferentes</strong>, a menos que o servidor diga explicitamente "tudo bem".</p>
         <p>Origem = protocolo + host + porta. Por exemplo:</p>
         <ul>
@@ -649,7 +737,7 @@ router.<span class="hl-fn">post</span>(<span class="hl-str">'/api/users'</span>,
 
       <!-- ════════ HEADERS ════════ -->
       <section class="mat-section sr" id="sec-headers">
-        <h2>12. Headers comuns</h2>
+        <h2>14. Headers comuns</h2>
         <table class="mat-table">
           <thead><tr><th>Header</th><th>Direção</th><th>Função</th></tr></thead>
           <tbody>
@@ -689,7 +777,7 @@ router.<span class="hl-fn">post</span>(<span class="hl-str">'/api/users'</span>,
 
       <!-- ════════ COOKIES ════════ -->
       <section class="mat-section sr" id="sec-cookies">
-        <h2>13. Cookies de sessão e SameSite</h2>
+        <h2>15. Cookies de sessão e SameSite</h2>
         <p>Quando o servidor cria uma sessão (login, carrinho), ele responde com um <code>Set-Cookie: session=abc123; HttpOnly; Secure; SameSite=Lax</code>. O navegador armazena. A partir daí, todo request para o mesmo domínio anexa o cookie automaticamente — inclusive os <code>fetch()</code>.</p>
         <ul>
           <li><strong>HttpOnly</strong> — JS não consegue ler (proteção contra XSS).</li>
@@ -710,7 +798,7 @@ router.<span class="hl-fn">post</span>(<span class="hl-str">'/api/users'</span>,
 
       <!-- ════════ NETWORK ════════ -->
       <section class="mat-section sr" id="sec-network">
-        <h2>14. Network tab do DevTools</h2>
+        <h2>16. Network tab do DevTools</h2>
         <p>F12 &rarr; <strong>Network</strong>. É onde você diagnostica 90% dos problemas de integração front/back.</p>
         <ul>
           <li><strong>URL e método</strong> — confirma para onde foi e como.</li>
@@ -728,10 +816,10 @@ router.<span class="hl-fn">post</span>(<span class="hl-str">'/api/users'</span>,
 
       <!-- ════════ END-TO-END ════════ -->
       <section class="mat-section sr" id="sec-favoritar">
-        <h2>15. Exemplo end-to-end &mdash; botão "Favoritar"</h2>
+        <h2>17. Exemplo end-to-end &mdash; botão "Favoritar"</h2>
         <p>Vamos juntar todo o conhecimento da aula em um caso real: a página <code>users/show.ejs</code> mostra um usuário com um botão "Favoritar". Clique aciona <code>POST /api/users/:id/favorite</code>, atualiza o estado no servidor e a UI muda sem recarregar.</p>
 
-        <h3>15.1 — A view EJS (carga inicial)</h3>
+        <h3>17.1 — A view EJS (carga inicial)</h3>
         <div class="code-wrap">
           <div class="code-label"><span>views/users/show.ejs</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code><span class="hl-kw">&lt;article</span> <span class="hl-typ">class=</span><span class="hl-str">"user-card"</span> <span class="hl-typ">data-user-id=</span><span class="hl-str">"&lt;%= user.id %&gt;"</span><span class="hl-kw">&gt;</span>
@@ -745,7 +833,7 @@ router.<span class="hl-fn">post</span>(<span class="hl-str">'/api/users'</span>,
 <span class="hl-kw">&lt;script</span> <span class="hl-typ">type=</span><span class="hl-str">"module"</span> <span class="hl-typ">src=</span><span class="hl-str">"/js/favorite.js"</span><span class="hl-kw">&gt;&lt;/script&gt;</span></code></pre>
         </div>
 
-        <h3>15.2 — O JS do cliente</h3>
+        <h3>17.2 — O JS do cliente</h3>
         <div class="code-wrap">
           <div class="code-label"><span>public/js/favorite.js</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code><span class="hl-kw">import</span> { postJSON } <span class="hl-kw">from</span> <span class="hl-str">'./api.js'</span>;
@@ -772,7 +860,7 @@ btn.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'click'</sp
 });</code></pre>
         </div>
 
-        <h3>15.3 — O endpoint no servidor</h3>
+        <h3>17.3 — O endpoint no servidor</h3>
         <div class="code-wrap">
           <div class="code-label"><span>src/controllers/UserController.ts</span><button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code>apiToggleFavorite = <span class="hl-kw">async</span> (req: <span class="hl-typ">Request</span>, res: <span class="hl-typ">Response</span>) =&gt; {
@@ -794,7 +882,7 @@ btn.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'click'</sp
 
       <!-- ════════ REDES ════════ -->
       <section class="mat-section sr" id="sec-redes">
-        <h2>16. Intro a TCP/IP, DNS e HTTPS</h2>
+        <h2>18. Intro a TCP/IP, DNS e HTTPS</h2>
         <p>Quando você escreve <code>fetch('/api/users')</code>, uma cascata acontece por baixo. Vamos vê-la em alto nível agora — a aula 11 abre cada caixa-preta dessa.</p>
 
         <div class="net-flow">
@@ -836,10 +924,170 @@ btn.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'click'</sp
         </div>
       </section>
 
+      <!-- ════════ PONDERADA III ════════ -->
+      <section class="mat-section sr" id="sec-ponderada3">
+        <h2>19. Ponderada de Programação III — RTM completo</h2>
+
+        <div class="callout callout-warn">
+          <div class="callout-label">Atividade avaliativa em sala — entrega obrigatória</div>
+          <p>Esta é a atividade ponderada da semana, realizada durante a aula. Leia toda a seção antes de começar a preencher os documentos.</p>
+        </div>
+
+        <h3>Contexto</h3>
+        <p>Nas Ponderadas I e II você construiu o back-end (rotas, controllers, services, repositórios, banco de dados) e integrou o front-end ao servidor usando SSR (EJS) e <code>fetch()</code>. Há testes Jest cobrindo as camadas principais. O sistema está funcionando.</p>
+        <p>A Ponderada III é o <strong>fechamento documental</strong> desse ciclo. O RTM (<em>Requirements Traceability Matrix</em> — Matriz de Rastreabilidade de Requisitos) é a prova formal de que cada necessidade das personas do projeto BrPec tem um Requisito Funcional correspondente, que esse requisito foi implementado, testado e tem evidências verificáveis.</p>
+        <p>Rastreabilidade não é burocracia: é a capacidade de responder à pergunta "o que mudaria no código se essa regra de negócio mudasse?" de forma imediata e precisa.</p>
+
+        <h3>As 4 entregas mínimas</h3>
+        <ol>
+          <li><strong>RTM principal</strong> — pelo menos 3 personas distintas (capataz, gerente, veterinário) e pelo menos 5 RFs cobertos, sem células vazias na trilha principal (Persona → Regra de Negócio → RF → Evidência). Se não há evidência ainda, escreva <em>"pendente — [justificativa]"</em>.</li>
+          <li><strong>Tabela de RNF (8 eixos)</strong> — para cada eixo não-funcional, descrever concretamente como o projeto o atende (ou planeja atender), referenciando os RNFs levantados na Ponderada I. Os 8 eixos estão detalhados na subseção abaixo.</li>
+          <li><strong>Registro de mudanças de contrato</strong> — lista tudo que foi alterado em relação ao que estava especificado nas Ponderadas I e II: rotas renomeadas, campos removidos, regras de negócio ajustadas, decisões de tecnologia revertidas. Pelo menos 1 entrada. Se genuinamente nada mudou, escreva uma justificativa explícita de ausência.</li>
+          <li><strong>Índice de evidências</strong> — localização de cada artefato referenciado no RTM (arquivo de teste, rota no router, screenshot da Network tab, etc.), organizado de forma que um revisor possa encontrá-lo sem perguntar.</li>
+        </ol>
+
+        <h3>Como preencher o RTM</h3>
+        <p>Uma linha por combinação <strong>RF + Regra de Negócio</strong>. Um RF pode aparecer em múltiplas linhas se atende regras de mais de uma persona. As colunas obrigatórias são:</p>
+        <ul>
+          <li><strong>Persona</strong> — quem tem a necessidade (capataz, gerente, veterinário).</li>
+          <li><strong>Regra de Negócio</strong> — a regra em linguagem de negócio, não de código. Ex.: "toda pesagem deve ser persistida com o ID do animal e a data".</li>
+          <li><strong>RF</strong> — o requisito funcional que implementa a regra (rota + método HTTP, ou nome do caso de uso).</li>
+          <li><strong>Evidência</strong> — onde provar que está implementado e testado. Pode ser um arquivo de teste + número do teste, uma screenshot da Network tab mostrando status 201, um trecho de código referenciado por path.</li>
+        </ul>
+        <p>Exemplo de RTM para o BrPec (três linhas ilustrativas):</p>
+
+        <table class="mat-table">
+          <thead>
+            <tr>
+              <th>Persona</th>
+              <th>Regra de Negócio</th>
+              <th>RF (rota / caso de uso)</th>
+              <th>Evidência (localização)</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Capataz</td>
+              <td>Toda pesagem deve ser persistida com ID do animal, peso em kg e data/hora do registro.</td>
+              <td><code>POST /pesagens</code></td>
+              <td><code>test/pesagens.test.js</code> — teste "cria pesagem válida" + screenshot Network 201</td>
+            </tr>
+            <tr>
+              <td>Gerente</td>
+              <td>O gerente pode consultar o histórico de pesagens de qualquer animal do rebanho.</td>
+              <td><code>GET /animais/:id/pesagens</code></td>
+              <td><code>test/animais.test.js</code> — teste "retorna histórico paginado" + resposta JSON em <code>docs/evidencias/get-historico.png</code></td>
+            </tr>
+            <tr>
+              <td>Veterinário</td>
+              <td>O veterinário deve poder registrar ocorrências de saúde vinculadas a um animal.</td>
+              <td><code>POST /animais/:id/ocorrencias</code></td>
+              <td><code>test/ocorrencias.test.js</code> — teste "cria ocorrência com tipo e descrição" + pendente: screenshot Network</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <div class="callout callout-tip">
+          <div class="callout-label">Regra de ouro do RTM</div>
+          <p>Se você não consegue preencher a coluna "Evidência", isso significa que o requisito não está testado — o que é informação valiosa, não vergonhosa. Escreva "pendente" com uma justificativa honesta: é melhor rastrear a lacuna do que fingir que não existe.</p>
+        </div>
+
+        <h3>Tabela de RNF — os 8 eixos</h3>
+        <p>Para cada eixo abaixo, descreva <strong>como</strong> o seu projeto atende ao RNF correspondente levantado na Ponderada I, com uma evidência concreta (não apenas "sim, atendemos").</p>
+
+        <table class="mat-table">
+          <thead>
+            <tr>
+              <th>#</th>
+              <th>Eixo RNF</th>
+              <th>Pergunta-guia</th>
+              <th>Exemplo de evidência aceitável</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>1</td>
+              <td><strong>Desempenho</strong></td>
+              <td>As rotas principais respondem em menos de quanto? Sob qual carga?</td>
+              <td>Resultado de <code>autocannon</code> ou <code>k6</code>; ou tempo médio visível no Network tab.</td>
+            </tr>
+            <tr>
+              <td>2</td>
+              <td><strong>Segurança</strong></td>
+              <td>Quais medidas evitam acesso não autorizado ou injeção?</td>
+              <td>Middleware de autenticação no router; validação Zod rejeitando payload malformado; header <code>HttpOnly</code> no cookie de sessão.</td>
+            </tr>
+            <tr>
+              <td>3</td>
+              <td><strong>Disponibilidade</strong></td>
+              <td>O sistema se recupera de falhas transitórias? Há retry ou graceful degradation?</td>
+              <td>Bloco <code>try/catch</code> nos controllers retornando 503 em vez de crash; UI mostrando estado de erro com botão "tentar novamente".</td>
+            </tr>
+            <tr>
+              <td>4</td>
+              <td><strong>Manutenibilidade</strong></td>
+              <td>A estrutura de pastas e separação de responsabilidades facilita mudanças?</td>
+              <td>Diagrama de camadas controller/service/repository; comentários JSDoc nas interfaces principais.</td>
+            </tr>
+            <tr>
+              <td>5</td>
+              <td><strong>Testabilidade</strong></td>
+              <td>Qual percentual de cobertura? Quais camadas têm testes unitários vs integração?</td>
+              <td>Saída de <code>jest --coverage</code>; lista de test suites passando.</td>
+            </tr>
+            <tr>
+              <td>6</td>
+              <td><strong>Usabilidade</strong></td>
+              <td>A interface guia o usuário em estados de loading, erro e vazio?</td>
+              <td>Screenshots das 4 telas de estado (loading, empty, error, success) para o fluxo principal.</td>
+            </tr>
+            <tr>
+              <td>7</td>
+              <td><strong>Portabilidade</strong></td>
+              <td>O projeto funciona em outros ambientes além do da sua máquina?</td>
+              <td><code>README</code> com passos de setup; <code>.env.example</code>; script <code>npm run setup</code>; compatibilidade com Node LTS.</td>
+            </tr>
+            <tr>
+              <td>8</td>
+              <td><strong>Conformidade</strong></td>
+              <td>O projeto respeita restrições legais, éticas ou de padrão do Inteli?</td>
+              <td>Dados sensíveis de animais armazenados apenas no servidor (não localStorage); licença de software declarada; sem dependências com vulnerabilidades críticas (<code>npm audit</code>).</td>
+            </tr>
+          </tbody>
+        </table>
+
+        <h3>Registro de mudanças de contrato</h3>
+        <p>Liste aqui tudo que foi alterado em relação ao que estava especificado nas Ponderadas I e II. O objetivo é <strong>rastreabilidade</strong>, não punição — mudanças de contrato são normais e esperadas em qualquer projeto ágil real.</p>
+        <p>Formato sugerido para cada entrada:</p>
+        <ul>
+          <li><strong>Data</strong> da mudança (aproximada se necessário).</li>
+          <li><strong>O que mudou</strong> — rota, campo, regra, tecnologia.</li>
+          <li><strong>Por que mudou</strong> — descoberta técnica, feedback do parceiro, limitação de tempo.</li>
+          <li><strong>Impacto</strong> — quais testes, personas ou RFs foram afetados.</li>
+        </ul>
+        <p>Exemplos válidos: rota <code>POST /pesagens</code> renomeada para <code>POST /registros/pesagem</code>; campo <code>observacoes</code> removido por falta de tempo; banco SQLite substituído por PostgreSQL. Se nada mudou, escreva: <em>"Nenhuma mudança de contrato identificada entre as entregas — a especificação das Ponderadas I e II foi implementada como acordado."</em></p>
+
+        <h3>Índice de evidências</h3>
+        <p>Liste cada evidência citada no RTM com a localização exata (caminho de arquivo relativo ao repositório, URL, ou nome do screenshot). Organize por tipo:</p>
+        <ul>
+          <li><strong>Testes automatizados</strong> — path do arquivo + nome do <code>it()</code> ou <code>describe()</code>.</li>
+          <li><strong>Screenshots</strong> — pasta <code>docs/evidencias/</code> + nome do arquivo + o que ele mostra.</li>
+          <li><strong>Trechos de código</strong> — path do arquivo + linha(s) relevantes.</li>
+          <li><strong>Saídas de terminal</strong> — se incluídas, em que arquivo ou seção do <code>README</code>.</li>
+        </ul>
+
+        <div class="callout callout-deep">
+          <div class="callout-label">Por que o RTM importa além do Inteli</div>
+          <p>Em projetos reais, a rastreabilidade de requisitos é obrigatória em setores regulados (saúde, financeiro, agronegócio de exportação). O BrPec lida com dados de rastreabilidade pecuária — o mesmo conceito do RTM está em jogo quando um frigorífico precisa provar para o MAPA que cada boi abatido teve seu histórico sanitário rastreado desde o nascimento. O hábito de rastrear requisitos → implementação → evidência que você pratica aqui é transferível diretamente para esse contexto.</p>
+        </div>
+      </section>
+
       <!-- ════════ CHECKLIST ════════ -->
       <section class="mat-section sr" id="sec-checklist">
-        <h2>17. Checklist da aula</h2>
+        <h2>20. Checklist da aula</h2>
         <ul class="checklist">
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei distinguir concorrência de paralelismo no contexto do JavaScript single-threaded.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei explicar por que relógios físicos não são confiáveis para ordenar eventos distribuídos (Lamport, 1978).</span></li>
           <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei diferenciar microtasks (Promises) de macrotasks (setTimeout) e prever a ordem de execução.</span></li>
           <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Conheço os três estados de uma Promise e os métodos <code>.then</code>, <code>.catch</code>, <code>.finally</code>.</span></li>
           <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei usar <code>Promise.all</code>, <code>Promise.allSettled</code> e <code>Promise.race</code>.</span></li>
@@ -852,12 +1100,31 @@ btn.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'click'</sp
           <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Tenho o mesmo controller respondendo HTML (res.render) e JSON (res.json), reusando o service.</span></li>
           <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Sei abrir o Network tab e diagnosticar status, headers e payload.</span></li>
           <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Tenho um helper <code>api.js</code> com <code>getJSON</code> e <code>postJSON</code> reusáveis.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Tenho o RTM preenchido com ≥3 personas e ≥5 RFs, sem células vazias na trilha principal.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Tenho a tabela de RNF com os 8 eixos preenchidos, com evidências concretas.</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Tenho o registro de mudanças de contrato (≥1 entrada ou justificativa de ausência).</span></li>
+          <li onclick="toggleCk(this)"><div class="ck-box">&#10003;</div><span class="ck-text">Tenho o índice de evidências com localização de cada artefato referenciado no RTM.</span></li>
         </ul>
       </section>
 
       <!-- ════════ REFS ════════ -->
       <section class="mat-section sr" id="sec-refs">
-        <h2>18. Referências</h2>
+        <h2>21. Referências &amp; Autoestudos</h2>
+        <h3>Autoestudos desta aula (slides Prof. Ovidio)</h3>
+        <ul>
+          <li><strong>Front-End 2</strong> — slides da aula 8 (disponíveis no portal Inteli).</li>
+          <li><strong>SWEBOK v4 Cap. 2 — Concurrency &amp; Async Design</strong> — IEEE Software Engineering Body of Knowledge v4. Seção de design de software com foco em concorrência.</li>
+          <li><strong>Time, Clocks, and the Ordering of Events in a Distributed System</strong> — Lamport, L. (1978). Communications of the ACM, 21(7), 558–565. Artigo original sobre relógios lógicos e happened-before.</li>
+          <li><strong>What the heck is the event loop anyway?</strong> — Philip Roberts, JSConf EU 2014. Palestra clássica, visualização animada do event loop.</li>
+          <li><strong>O que é e como funciona a Fetch API</strong> — artigo/vídeo indicado no portal.</li>
+          <li><strong>Requisições assíncronas com Controllers</strong> — material do portal Inteli sobre AbortController e cancelamento de requests.</li>
+          <li><strong>Fundamentos de redes — protocolos de rede</strong> — leitura base sobre o modelo de camadas TCP/IP.</li>
+          <li><strong>Internet Protocol (IP)</strong> — especificação ou artigo introdutório sobre endereçamento IPv4/IPv6.</li>
+          <li><strong>Formulários e rotas</strong> — material do portal sobre integração de formulários HTML com rotas Express.</li>
+          <li><strong>Ponderada de Programação III</strong> — enunciado oficial da atividade avaliativa (portal Inteli — seção de atividades da Aula 8).</li>
+        </ul>
+
+        <h3>Referências técnicas complementares</h3>
         <ul>
           <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/Fetch_API" target="_blank" rel="noopener noreferrer">MDN — Fetch API</a> — referência oficial.</li>
           <li><a href="https://developer.mozilla.org/en-US/docs/Web/API/AbortController" target="_blank" rel="noopener noreferrer">MDN — AbortController</a> — cancelamento de requests.</li>

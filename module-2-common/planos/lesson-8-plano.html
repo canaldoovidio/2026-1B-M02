@@ -156,6 +156,7 @@
           <li><span class="obj-tag">OA-4</span><span><strong>Cancelar</strong> requisições em voo com <code>AbortController</code>.</span></li>
           <li><span class="obj-tag">OA-5</span><span><strong>Implementar</strong> os estados de UI <em>loading / empty / error</em> em toda interação assíncrona.</span></li>
           <li><span class="obj-tag">OA-6</span><span><strong>Expor</strong> endpoints duplos (HTML + JSON) reusando o <em>service</em> no backend TypeScript + Express + <code>pg</code>.</span></li>
+          <li><span class="obj-tag">OA-7</span><span><strong>Construir</strong> um RTM (Requirement Traceability Matrix) completo provando que cada persona tem necessidades rastreadas da origem (RN) ao artefato de evidência, passando pelos RFs implementados e testados — rastreabilidade persona → RN → RF → evidência.</span></li>
         </ul>
       </section>
 
@@ -194,13 +195,13 @@
             <p>Janela livre.</p>
           </div>
           <div class="day-block dev">
-            <div class="blk-head"><h3 class="blk-title">🛠️ Bloco 3 · Desenvolvimento do projeto</h3><span class="blk-time">14h00 — 16h00</span></div>
-            <p>Janela de trabalho da equipe sobre o projeto integrador.</p>
+            <div class="blk-head"><h3 class="blk-title">🛠️ Bloco 3 · Desenvolvimento do projeto + Ponderada III</h3><span class="blk-time">14h00 — 16h00</span></div>
+            <p>Janela de trabalho da equipe sobre o projeto integrador. <strong>Atividade avaliativa presencial: Ponderada de Programação III — RTM completo.</strong></p>
             <ul>
-              <li>Implementar <strong>2 interações dinâmicas</strong> com <code>fetch()</code> (ex.: favoritar item, busca live).</li>
-              <li>Cada interação deve renderizar os 3 estados: <strong>loading</strong> (spinner/placeholder), <strong>empty</strong> (mensagem amigável) e <strong>error</strong> (callback de retry).</li>
-              <li>Adicionar um endpoint dual no back: o mesmo controller deve responder em HTML (<code>res.render</code>) e JSON (<code>res.json</code>) reusando o mesmo <em>service</em>.</li>
-              <li>Abrir Merge Request <code>feat(ui): interações dinâmicas X e Y</code> com evidência (gif/print) das 2 interações até as 16h00.</li>
+              <li><strong>14h00 — 14h15</strong> · Kickoff da Ponderada III: o professor apresenta os 4 blocos de entrega e o critério de aceitação de cada célula do RTM.</li>
+              <li><strong>14h15 — 15h45</strong> · Construção individual/dupla do RTM completo: mapear cada persona às suas necessidades (RNs), aos RFs implementados na sprint, às evidências de teste (prints, logs, links de MR) e ao índice de artefatos. A tabela de RNFs (8 eixos) deve referenciar a Ponderada 1. Registrar pelo menos 1 entrada no log de mudanças de contrato (ou justificar ausência).</li>
+              <li><strong>15h45 — 16h00</strong> · Revisão cruzada em pares: checar células vazias e consistência entre persona→RN→RF→evidência. Entregar o artefato no portal antes das 16h00.</li>
+              <li>Paralelamente, equipes que já concluírem o RTM podem implementar as <strong>interações dinâmicas</strong> com <code>fetch()</code> (favoritar item, busca live) com estados <strong>loading / empty / error</strong> e o endpoint dual no back (<code>res.render</code> + <code>res.json</code>).</li>
             </ul>
           </div>
         </div>
@@ -262,6 +263,9 @@
             <tr><td>Cliente HTTP</td><td>REST Client (<code>.http</code>)</td><td>Testar endpoints GET/JSON e POST/JSON</td></tr>
             <tr><td>Repositório</td><td><code>public/js/</code></td><td>Scripts client-side com <code>fetch</code> e estados</td></tr>
             <tr><td>Backend</td><td><code>src/controllers/</code> + <code>src/services/</code></td><td>Endpoint dual (HTML + JSON) reusando service</td></tr>
+            <tr><td>Autoestudo</td><td>SWEBOK v4 Cap. 2 — Concurrency &amp; Async Design</td><td>Fundamentos de concorrência e design assíncrono</td></tr>
+            <tr><td>Autoestudo</td><td>Lamport — Time, Clocks and the Ordering of Events in a Distributed System</td><td>Ordenação de eventos; contexto para async e estados</td></tr>
+            <tr><td>Atividade avaliativa</td><td>Ponderada de Programação III — RTM completo</td><td>Construção do RTM: personas → RNs → RFs → evidências</td></tr>
           </tbody>
         </table>
       </section>
@@ -275,9 +279,17 @@
           <li><span class="obj-tag">CR-4</span><span>Aplicou <code>AbortController</code> em uma busca/digitação com <em>debounce</em>.</span></li>
           <li><span class="obj-tag">CR-5</span><span>Abriu Merge Request <code>feat(ui): interações dinâmicas X e Y</code> até as 16h00 com evidência das 2 interações.</span></li>
         </ul>
+
+        <h3>Ponderada de Programação III — Critérios de aceitação do RTM</h3>
+        <ul class="crit-list">
+          <li><span class="obj-tag">CR-P1</span><span>RTM com <strong>≥ 3 personas</strong> e <strong>≥ 5 RFs</strong> sem células vazias na trilha principal (persona → RN → RF → evidência).</span></li>
+          <li><span class="obj-tag">CR-P2</span><span>Tabela de RNFs com os <strong>8 eixos</strong> preenchidos, referenciando explicitamente os artefatos da <strong>Ponderada 1</strong>.</span></li>
+          <li><span class="obj-tag">CR-P3</span><span>Registro de mudanças de contrato com <strong>≥ 1 entrada</strong> documentada (ou justificativa formal de ausência de mudanças na sprint).</span></li>
+          <li><span class="obj-tag">CR-P4</span><span>Índice de evidências com a localização de cada artefato (link de MR, caminho de arquivo ou print identificado) para todos os RFs listados no RTM.</span></li>
+        </ul>
         <div class="callout callout-warn">
           <div class="callout-label">Critério mínimo</div>
-          <p>Aluno que sair às 16h sem ao menos <strong>1 interação dinâmica funcional</strong> com fetch + estados loading/empty/error está em débito técnico para a aula 9 — sem isso, BEM e tema escuro não terão UI viva onde aplicar.</p>
+          <p>Aluno que sair às 16h sem ao menos <strong>1 interação dinâmica funcional</strong> com fetch + estados loading/empty/error está em débito técnico para a aula 9 — sem isso, BEM e tema escuro não terão UI viva onde aplicar. A Ponderada III precisa ser entregue até as 16h00 do dia da aula.</p>
         </div>
       </section>
 

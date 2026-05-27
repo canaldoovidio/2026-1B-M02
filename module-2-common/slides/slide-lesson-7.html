@@ -217,6 +217,46 @@
     </div>
   </div>
 
+  <!-- ====== SLIDE A: STAKEHOLDER NEEDS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">Stakeholder Needs — de quem precisa, para o que construir</div><div class="ss">SEBoK Pt. 3 · Personas → Necessidades → Requisitos Funcionais</div></div>
+      <div class="box acc" style="margin-bottom:12px;">
+        <h3>🔗 A cadeia que conecta a realidade ao código</h3>
+        <p><strong>Persona</strong> (quem usa) → <strong>Necessidade</strong> (o que precisa fazer) → <strong>RF</strong> (o que o sistema deve implementar)</p>
+      </div>
+      <table style="width:100%;border-collapse:separate;border-spacing:0 8px;">
+        <thead>
+          <tr>
+            <th style="text-align:left;padding:6px 12px;font-size:.83rem;color:#64748b;font-weight:700;width:22%;">Persona</th>
+            <th style="text-align:left;padding:6px 12px;font-size:.83rem;color:#64748b;font-weight:700;width:46%;">Necessidade</th>
+            <th style="text-align:left;padding:6px 12px;font-size:.83rem;color:#64748b;font-weight:700;">RF (Requisito Funcional)</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td style="padding:8px 12px;background:white;border:1px solid #dfe5ec;border-radius:8px 0 0 8px;border-right:none;font-size:.86rem;font-weight:700;color:var(--dk);">🤠 Capataz</td>
+            <td style="padding:8px 12px;background:white;border-top:1px solid #dfe5ec;border-bottom:1px solid #dfe5ec;font-size:.84rem;color:#374151;">"registrar pesagem no curral sem digitar muito"</td>
+            <td style="padding:8px 12px;background:white;border:1px solid #dfe5ec;border-radius:0 8px 8px 0;border-left:none;font-size:.84rem;"><code>RF-01</code> Registro rápido de pesagem</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px;background:white;border:1px solid #dfe5ec;border-radius:8px 0 0 8px;border-right:none;font-size:.86rem;font-weight:700;color:var(--dk);">📊 Gerente</td>
+            <td style="padding:8px 12px;background:white;border-top:1px solid #dfe5ec;border-bottom:1px solid #dfe5ec;font-size:.84rem;color:#374151;">"ver ganho de peso por lote"</td>
+            <td style="padding:8px 12px;background:white;border:1px solid #dfe5ec;border-radius:0 8px 8px 0;border-left:none;font-size:.84rem;"><code>RF-02</code> Relatório de GMD (ganho médio diário)</td>
+          </tr>
+          <tr>
+            <td style="padding:8px 12px;background:white;border:1px solid #dfe5ec;border-radius:8px 0 0 8px;border-right:none;font-size:.86rem;font-weight:700;color:var(--dk);">🩺 Veterinário</td>
+            <td style="padding:8px 12px;background:white;border-top:1px solid #dfe5ec;border-bottom:1px solid #dfe5ec;font-size:.84rem;color:#374151;">"histórico sanitário do animal"</td>
+            <td style="padding:8px 12px;background:white;border:1px solid #dfe5ec;border-radius:0 8px 8px 0;border-left:none;font-size:.84rem;"><code>RF-03</code> Ficha do bovino</td>
+          </tr>
+        </tbody>
+      </table>
+      <div class="box grn" style="margin-top:12px;">
+        <p>Personas viram RFs; RFs viram telas — e isso será rastreado no <strong>RTM</strong> (aula 8).</p>
+      </div>
+    </div>
+  </div>
+
   <!-- ====== SLIDE 4: SSR vs CSR ====== -->
   <div class="slide">
     <div class="sc">
@@ -376,6 +416,47 @@
     </div>
   </div>
 
+  <!-- ====== SLIDE B: MERMAID ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">Mermaid — o diagrama que mora no repositório</div><div class="ss">Arquitetura como código · versionável, revisável em PR, nunca fica desatualizado</div></div>
+      <div class="g2" style="gap:12px;align-items:start;">
+        <div>
+          <div class="box acc" style="margin-bottom:10px;">
+            <h3>💡 Por que diagramas como código?</h3>
+            <ul>
+              <li>Vive junto com o código no Git — sem imagens soltas</li>
+              <li>Revisável em Pull Request como qualquer <code>.md</code></li>
+              <li>Renderizado automaticamente pelo GitHub e GitLab</li>
+              <li>Diff legível: você vê exatamente o que mudou</li>
+            </ul>
+          </div>
+          <div class="box grn">
+            <h3>🔧 Como usar</h3>
+            <p>Coloque o bloco em qualquer <code>.md</code> do repo:</p>
+            <p><code>```mermaid</code><br>… diagrama …<br><code>```</code></p>
+          </div>
+        </div>
+        <div>
+          <div class="term">
+            <div class="term-bar"><div class="dot r"></div><div class="dot y"></div><div class="dot g"></div><div class="term-ttl">docs/architecture.md — fluxo MVC BrPec</div></div>
+            <div class="term-body" style="font-size:.78rem;line-height:1.7;">
+              <div class="tl vis"><span class="cmt">flowchart LR</span></div>
+              <div class="tl vis"><span class="txt">  Browser </span><span class="kw">--&gt;</span><span class="js">|GET /bovinos|</span><span class="txt"> Controller</span></div>
+              <div class="tl vis"><span class="txt">  Controller </span><span class="kw">--&gt;</span><span class="txt"> Model</span></div>
+              <div class="tl vis"><span class="txt">  Model </span><span class="kw">--&gt;</span><span class="txt"> </span><span class="jn">DB[(SQLite)]</span></div>
+              <div class="tl vis"><span class="txt">  Controller </span><span class="kw">--&gt;</span><span class="js">|res.render|</span><span class="txt"> </span><span class="pth">View[EJS]</span></div>
+              <div class="tl vis"><span class="txt">  </span><span class="pth">View[EJS]</span><span class="txt"> </span><span class="kw">--&gt;</span><span class="txt"> Browser</span></div>
+            </div>
+          </div>
+          <div class="box red" style="margin-top:10px;">
+            <p>Diagrama versionado e revisável em PR — não uma imagem solta que apodrece.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ====== SLIDE 9: HTML SEMANTICO ====== -->
   <div class="slide">
     <div class="sc">
@@ -516,6 +597,44 @@
     </div>
   </div>
 
+  <!-- ====== SLIDE C: TESTAR E RASTREAR ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">Testar e Rastrear</div><div class="ss">SWEBOK v4 · Cap. 4 — Software Testing · Cap. 8 — Models &amp; Methods / Traceability</div></div>
+      <div class="g2" style="gap:12px;">
+        <div class="vs-card" style="--vc:#0d9488;">
+          <h3>🧪 Cap. 4 — Software Testing</h3>
+          <div class="vs-sub">O front-end também se testa.</div>
+          <ul>
+            <li><strong>Validação de formulários</strong> — campos obrigatórios, formatos, limites</li>
+            <li><strong>Manipulação de DOM</strong> — elementos aparecem/somem corretamente</li>
+            <li><strong>Eventos</strong> — clique, submit, input se comportam como esperado</li>
+            <li>Ferramentas: <code>Jest</code> + <code>jsdom</code> (aula 10)</li>
+          </ul>
+          <div style="margin-top:8px;padding:6px 10px;background:#f0fdf4;border-radius:6px;font-size:.8rem;color:#166534;">
+            Aula 10: você escreverá testes unitários para as funções de DOM e validação do projeto.
+          </div>
+        </div>
+        <div class="vs-card" style="--vc:#4b5563;">
+          <h3>🗂️ Cap. 8 — Traceability</h3>
+          <div class="vs-sub">Cada RF rastreável da necessidade até o teste.</div>
+          <ul>
+            <li><strong>Necessidade</strong> (persona) → <strong>RF</strong> → <strong>Tela EJS</strong> → <strong>Teste</strong></li>
+            <li>RTM (Requirements Traceability Matrix) documenta esse elo</li>
+            <li>Permite auditoria: "qual teste cobre este RF?"</li>
+            <li>Reduz regressões quando o código muda</li>
+          </ul>
+          <div style="margin-top:8px;padding:6px 10px;background:#f8fafc;border-radius:6px;font-size:.8rem;color:#475569;">
+            Prepara a <strong>Ponderada III</strong>: construção do RTM do projeto BrPec.
+          </div>
+        </div>
+      </div>
+      <div class="box acc" style="margin-top:12px;">
+        <p>Na aula 8 você prova essa rastreabilidade construindo o <strong>RTM</strong>.</p>
+      </div>
+    </div>
+  </div>
+
   <!-- ====== SLIDE 12.5: RM-ODP — AS 5 VISÕES ====== -->
   <div class="slide">
     <div class="sc">
@@ -599,7 +718,7 @@
   </div>
   <div class="nav-wrapper">
     <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
-    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">13</span></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">19</span></div>
     <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
   </div>
   <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>
@@ -788,7 +907,7 @@ function animStatic() {
   d = typeLine('sd2',[{c:'tag',v:'    <li>'},{c:'cmt',v:'<%= u.nome %>'},{c:'tag',v:'</li>'}],d)+G;
   d = typeLine('sd3',[{c:'cmt',v:'  <% }) %>'}],d)+G;
   d = typeLine('sd4',[{c:'tag',v:'</ul>'}],d)+G;
-  d = typeLine('sd5',[{c:'tag',v:'<script>'},{c:'txt',v:' '},{c:'kw',v:'const'},{c:'txt',v:' DATA = '},{c:'cmt',v:'<%- JSON.stringify(users) %>'},{c:'txt',v:'; '},{c:'tag',v:'</script>'}],d)+G;
+  d = typeLine('sd5',[{c:'tag',v:'<script>'},{c:'txt',v:' '},{c:'kw',v:'const'},{c:'txt',v:' DATA = '},{c:'cmt',v:'<%- JSON.stringify(users) %>'},{c:'txt',v:'; '},{c:'tag',v:'<\/script>'}],d)+G;
   d = typeLine('sd6',[{c:'cmt',v:'// agora window.DATA está disponível em /js/app.js'}],d);
 }
 
@@ -829,9 +948,9 @@ function animRfRnf() {
 }
 
 var animMap = [
-  animCover, animDaily, animAgenda, animRoadmap, animVS, animSetup,
-  null, animEjs, animMvc, null, animDom,
-  animStatic, null, animRmOdp, animRfRnf, animRecap
+  animCover, animDaily, animAgenda, animRoadmap, null, animVS, animSetup,
+  null, animEjs, animMvc, null, null, animDom,
+  animStatic, null, null, animRmOdp, animRfRnf, animRecap
 ];
 
 function runAnim(idx) {
@@ -843,5 +962,6 @@ function runAnim(idx) {
 
 showSlide(0);
 </script>
+<script src="../js/slide-print.js"></script>
 </body>
 </html>

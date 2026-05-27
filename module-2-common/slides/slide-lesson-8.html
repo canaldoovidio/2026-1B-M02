@@ -290,6 +290,47 @@
     </div>
   </div>
 
+  <!-- ====== SLIDE 4b: CONCURRENCY & ASYNC DESIGN (SWEBOK v4 Cap. 2) ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">🔀 Concorrência &amp; Design Assíncrono — SWEBOK v4 · Cap. 2</div><div class="ss">O que o event loop realmente implementa — e por que importa no BrPec</div></div>
+      <div class="g2" style="align-items:start;margin-bottom:12px;">
+        <div>
+          <div class="box bl" style="margin-bottom:10px;">
+            <h3>Concorrência ≠ Paralelismo</h3>
+            <ul>
+              <li><strong>Paralelismo</strong> — duas tarefas rodam <em>simultaneamente</em> em núcleos distintos.</li>
+              <li><strong>Concorrência</strong> — uma única thread <em>intercala</em> tarefas, progredindo em todas sem bloquear.</li>
+              <li>JavaScript no browser é <strong>single-threaded</strong>: só há concorrência, nunca paralelismo real (sem Web Workers).</li>
+            </ul>
+          </div>
+          <div class="box acc">
+            <h3>Modelo de tarefas do loop</h3>
+            <ul>
+              <li><strong>Macrotasks</strong> (fila de tarefas): <code>setTimeout</code>, I/O, eventos DOM — o loop pega <em>uma por vez</em>.</li>
+              <li><strong>Microtasks</strong> (fila de microtarefas): callbacks de Promises (<code>.then</code>, <code>await resume</code>) — o loop drena <em>todas</em> antes de pegar a próxima macrotask.</li>
+              <li>Resultado: Promises têm prioridade sobre <code>setTimeout</code>.</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="box grn" style="margin-bottom:10px;">
+            <h3>Design assíncrono = não bloquear a thread única</h3>
+            <p>Um código síncrono que demora (loop pesado, processamento de imagem) <strong>congela toda a UI</strong> — nenhum click responde, nenhum frame é desenhado.</p>
+            <p style="margin-top:6px;">A regra de ouro: <em>saia da thread o mais rápido possível</em>. Delegue I/O (rede, disco) ao browser/Node; volte pelo mecanismo de callback/Promise.</p>
+          </div>
+          <div class="box amr">
+            <h3>🐄 Conexão BrPec</h3>
+            <p>A tela de registro de pesagem do <strong>capataz</strong> não pode congelar enquanto espera a rede confirmar o envio. Design assíncrono garante que o formulário continue responsivo — o fetch roda "em background" e a UI atualiza quando a resposta chega.</p>
+          </div>
+        </div>
+      </div>
+      <div class="box" style="border-left-color:var(--bl);font-size:.82rem;">
+        <strong>SWEBOK v4 · Capítulo 2 — Software Design:</strong> a decomposição em tarefas assíncronas é um padrão arquitetural de concorrência; o design deve explicitar <em>quem espera o quê</em> e <em>como o estado é compartilhado</em> com segurança.
+      </div>
+    </div>
+  </div>
+
   <!-- ====== SLIDE 5: PROMISES ====== -->
   <div class="slide">
     <div class="sc">
@@ -631,6 +672,227 @@
     </div>
   </div>
 
+  <!-- ====== SLIDE 13b: LAMPORT — ORDEM DOS EVENTOS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh dark"><div class="st">🕰️ Ordem dos Eventos — Lamport, 1978</div><div class="ss">"Time, Clocks, and the Ordering of Events in a Distributed System" · Comm. ACM</div></div>
+      <div class="g2" style="align-items:start;margin-bottom:12px;">
+        <div>
+          <div class="box red" style="margin-bottom:10px;">
+            <h3>O problema: relógios de máquinas não são confiáveis</h3>
+            <ul>
+              <li>Relógios físicos <em>derivam</em> — dois dispositivos nunca estão perfeitamente sincronizados.</li>
+              <li>O horário do celular do capataz no campo pode estar minutos à frente ou atrás do servidor.</li>
+              <li><strong>Não dá para ordenar eventos em sistemas distribuídos usando apenas timestamps de relógio físico.</strong></li>
+            </ul>
+          </div>
+          <div class="box bl">
+            <h3>Relação "happened-before" (→)</h3>
+            <ul>
+              <li>Se <em>A</em> ocorreu antes de <em>B</em> na mesma thread: <em>A → B</em>.</li>
+              <li>Se <em>A</em> é o envio de uma mensagem e <em>B</em> é o recebimento: <em>A → B</em>.</li>
+              <li>Se <em>A → B</em> e <em>B → C</em>, então <em>A → C</em> (transitivo).</li>
+              <li>Se nem <em>A → B</em> nem <em>B → A</em>: eventos são <strong>concorrentes</strong> — sem ordem causal.</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="box grn" style="margin-bottom:10px;">
+            <h3>Ordem causal, não temporal</h3>
+            <p>Lamport propõe <strong>relógios lógicos</strong>: contadores monotônicos que avançam com cada evento e são sincronizados nas mensagens. A ordem que importa é a <em>causal</em> — o que aconteceu <em>por causa</em> de quê — não o horário do relógio de parede.</p>
+          </div>
+          <div class="box amr">
+            <h3>🐄 Conexão BrPec — sync offline</h3>
+            <p>Quando o <strong>capataz</strong> registra pesagens offline por dias e depois sincroniza, o servidor <strong>não pode confiar no <code>timestamp</code> do celular</strong> para ordenar os lotes.</p>
+            <p style="margin-top:6px;">Por isso usamos <strong>UUID como identidade</strong> (imutável, gerado no cliente) + <strong>ordem causal</strong> derivada da sequência de criação — não o horário do dispositivo. O timestamp serve apenas como metadado informativo, nunca como chave de ordenação.</p>
+          </div>
+          <div class="box acc" style="font-size:.82rem;">
+            <strong>Âncora:</strong> Lamport, L. (1978). "Time, Clocks, and the Ordering of Events in a Distributed System." <em>Communications of the ACM</em>, 21(7), 558–565.
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 14a: PONDERADA III — INTRO (com timer) ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh amber"><div class="st">📋 Ponderada de Programação III — o RTM é o fechamento documental</div><div class="ss">⏱️ Bloco de trabalho em sala — 50 minutos</div></div>
+      <div class="g2" style="align-items:start;margin-bottom:12px;">
+        <div>
+          <div class="box grn" style="margin-bottom:10px;">
+            <h3>Contexto: o projeto já está integrado</h3>
+            <ul>
+              <li>Back-end rodando com endpoints CRUD.</li>
+              <li>Front-end conectado via <code>fetch()</code> com estados de UI.</li>
+              <li>Testes Jest cobrindo os casos principais.</li>
+            </ul>
+            <p style="margin-top:6px;">A Ponderada III não é mais código — é a <strong>prova documental</strong> de que o sistema faz o que foi prometido às personas.</p>
+          </div>
+          <div class="box bl">
+            <h3>O que é o RTM?</h3>
+            <p><strong>Requirements Traceability Matrix</strong> — uma tabela que liga cada <em>necessidade de persona</em> a um <em>Requisito Funcional implementado</em>, com evidência concreta de que funciona.</p>
+            <p style="margin-top:6px;font-style:italic;color:#374151;">"O documento é a prova de que o sistema faz o que foi prometido."</p>
+          </div>
+          <div class="box acc">
+            <h3>Por que RTM fecha o ciclo?</h3>
+            <p>Sem rastreabilidade, um RF pode estar implementado mas ninguém consegue verificar que ele atende a persona. O RTM transforma código + testes em <em>evidência auditável</em>.</p>
+          </div>
+        </div>
+        <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
+          <div style="background:linear-gradient(135deg,#b45309,#f59e0b);border-radius:20px;padding:24px 28px;text-align:center;color:white;width:100%;box-sizing:border-box;">
+            <div style="font-size:1rem;font-weight:700;margin-bottom:10px;opacity:.92;">⏱️ Bloco de Trabalho — Ponderada III</div>
+            <div class="daily-timer" id="pond-timer">50:00</div>
+            <div style="margin-top:12px;">
+              <button id="pond-start-btn" onclick="startPond()" style="background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">▶ Iniciar</button>
+              <button onclick="resetPond()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">↺ Reset</button>
+            </div>
+          </div>
+          <div class="box amr" style="width:100%;box-sizing:border-box;">
+            <h3>🎯 Meta do bloco</h3>
+            <p>Ter o RTM preenchido, as 4 entregas mínimas completas e o índice de evidências apontando para os artefatos reais do repositório.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 14b: PONDERADA III — AS 4 ENTREGAS MÍNIMAS ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh amber"><div class="st">📦 As 4 Entregas Mínimas da Ponderada III</div><div class="ss">Sem nenhuma dessas, o documento está incompleto</div></div>
+      <div style="display:flex;flex-direction:column;gap:12px;">
+        <div class="box grn">
+          <h3>1 · RTM — Requirements Traceability Matrix</h3>
+          <p><strong>≥ 3 personas distintas</strong> (ex.: Capataz, Gerente, Veterinário) e <strong>≥ 5 Requisitos Funcionais cobertos</strong>.</p>
+          <p style="margin-top:4px;color:#374151;font-size:.85rem;">Nenhuma célula vazia na trilha principal: Persona → Necessidade → RN → RF → Implementação → Evidência.</p>
+        </div>
+        <div class="box bl">
+          <h3>2 · Tabela de RNF com os 8 Eixos</h3>
+          <p>Para cada eixo ISO/IEC 25010 (Usabilidade, Confiabilidade, Desempenho, Segurança, Manutenibilidade, Portabilidade, Compatibilidade, Funcionalidade), descrever <strong>como o projeto atende</strong>, referenciando os RNFs da Ponderada 1.</p>
+        </div>
+        <div class="box amr">
+          <h3>3 · Registro de Mudanças de Contrato</h3>
+          <p><strong>≥ 1 entrada</strong> documentando o que mudou em relação às Ponderadas 1 e 2 — com justificativa. Se nada mudou, escreva a justificativa explicitamente: "Nenhuma mudança de contrato — todos os RFs e RNFs da Ponderada 1 foram implementados conforme especificado."</p>
+          <p style="margin-top:4px;color:#374151;font-size:.85rem;">Rastreabilidade real, não punição. Mudanças honestas são esperadas e bem-vindas.</p>
+        </div>
+        <div class="box acc">
+          <h3>4 · Índice de Evidências</h3>
+          <p>Uma lista de cada artefato referenciado no RTM com <strong>onde encontrá-lo</strong>: caminho no repositório, linha do arquivo de teste, URL do screenshot, ou número do commit.</p>
+          <p style="margin-top:4px;color:#374151;font-size:.85rem;">Sem índice, a evidência é inauditável — o avaliador não consegue verificar.</p>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 14c: PONDERADA III — COMO PREENCHER O RTM ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh amber"><div class="st">📝 Como Preencher o RTM — Guia Prático</div><div class="ss">Uma linha por combinação RF + RN · sem células vazias na trilha principal</div></div>
+      <div class="box bl" style="margin-bottom:12px;">
+        <h3>Regras de ouro</h3>
+        <ul>
+          <li>Uma linha por combinação <strong>RF + RN</strong> (Requisito Funcional + Regra de Negócio).</li>
+          <li>Trilha principal: <strong>Persona → Necessidade → RN → RF → Rota/Código → Evidência</strong> — nenhuma célula vazia.</li>
+          <li>Se não há evidência ainda: escreva <code>pendente</code> e justifique na coluna de observações.</li>
+          <li>Evidência = arquivo de teste + nome do <code>it()</code> + screenshot do Network mostrando o status HTTP.</li>
+        </ul>
+      </div>
+      <div class="box grn" style="margin-bottom:12px;">
+        <h3>Exemplo de linha RTM — BrPec</h3>
+        <div style="overflow-x:auto;">
+          <table style="width:100%;border-collapse:collapse;font-size:.78rem;">
+            <thead>
+              <tr style="background:#dcfce7;font-weight:700;">
+                <td style="padding:6px 8px;border:1px solid #a7f3d0;">Persona</td>
+                <td style="padding:6px 8px;border:1px solid #a7f3d0;">Necessidade</td>
+                <td style="padding:6px 8px;border:1px solid #a7f3d0;">RN</td>
+                <td style="padding:6px 8px;border:1px solid #a7f3d0;">RF</td>
+                <td style="padding:6px 8px;border:1px solid #a7f3d0;">Implementação</td>
+                <td style="padding:6px 8px;border:1px solid #a7f3d0;">Evidência</td>
+              </tr>
+            </thead>
+            <tbody>
+              <tr style="background:#f0fdf4;">
+                <td style="padding:6px 8px;border:1px solid #d1fae5;font-weight:700;">Capataz</td>
+                <td style="padding:6px 8px;border:1px solid #d1fae5;">Registrar pesagem de animal no campo</td>
+                <td style="padding:6px 8px;border:1px solid #d1fae5;">Toda pesagem registrada é persistida com UUID e data</td>
+                <td style="padding:6px 8px;border:1px solid #d1fae5;font-family:monospace;">RF-03 POST /pesagens</td>
+                <td style="padding:6px 8px;border:1px solid #d1fae5;font-family:monospace;">src/controllers/PesagemController.ts · create()</td>
+                <td style="padding:6px 8px;border:1px solid #d1fae5;font-size:.74rem;"><code>test/pesagens.test.js</code><br><em>registra e persiste</em><br>screenshot Network 201</td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
+      </div>
+      <div class="g2" style="gap:10px;">
+        <div class="box acc">
+          <h3>✅ Evidência boa</h3>
+          <ul>
+            <li><code>test/pesagens.test.js</code> · linha 42 · <code>it('registra e persiste')</code></li>
+            <li>Screenshot Network: POST 201, body com UUID</li>
+            <li>Commit SHA onde o endpoint foi implementado</li>
+          </ul>
+        </div>
+        <div class="box red">
+          <h3>❌ Evidência insuficiente</h3>
+          <ul>
+            <li>"O código existe no repositório" — sem localização</li>
+            <li>"Funciona no meu computador" — sem artefato auditável</li>
+            <li>Célula em branco sem justificativa</li>
+          </ul>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 14d: PONDERADA III — RNF 8 EIXOS, MUDANÇAS, ÍNDICE ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh amber"><div class="st">⚖️ RNF · Mudanças de Contrato · Índice de Evidências</div><div class="ss">Checklist acionável — marque cada item antes de submeter</div></div>
+      <div class="g2" style="align-items:start;gap:12px;">
+        <div>
+          <div class="box bl" style="margin-bottom:10px;">
+            <h3>RNF — 8 Eixos (ISO/IEC 25010)</h3>
+            <p style="font-size:.81rem;margin-bottom:6px;">Para cada eixo, responda: <em>como o projeto atende este RNF?</em> e cite a evidência concreta.</p>
+            <ul style="font-size:.81rem;">
+              <li><strong>Usabilidade</strong> — estados de UI (loading/empty/error) visíveis?</li>
+              <li><strong>Confiabilidade</strong> — erros de rede tratados com <code>try/catch</code> e mensagem ao usuário?</li>
+              <li><strong>Desempenho</strong> — AbortController evitando requests obsoletos? Tempo de resposta aceitável?</li>
+              <li><strong>Segurança</strong> — CORS configurado? SameSite cookies? Inputs validados (zod)?</li>
+              <li><strong>Manutenibilidade</strong> — cliente API isolado em módulo? Código testável?</li>
+              <li><strong>Portabilidade</strong> — funciona nos browsers alvo? Dependências travadas no package.json?</li>
+              <li><strong>Compatibilidade</strong> — integra sem conflito com o back-end existente?</li>
+              <li><strong>Funcionalidade</strong> — todos os RFs especificados na Ponderada 1 estão implementados?</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="box amr" style="margin-bottom:10px;">
+            <h3>Mudanças de Contrato</h3>
+            <p style="font-size:.82rem;">Liste tudo que mudou vs Ponderadas 1 e 2. Formato sugerido:</p>
+            <ul style="font-size:.81rem;">
+              <li><strong>O que mudou</strong> — RF, RNF, rota, payload, comportamento</li>
+              <li><strong>Por quê</strong> — descoberta técnica, feedback do parceiro, limitação</li>
+              <li><strong>Impacto</strong> — quem é afetado (persona, endpoint, teste)</li>
+            </ul>
+            <p style="font-size:.80rem;margin-top:5px;color:#374151;">Se nada mudou: escreva "Sem mudanças de contrato — todos os itens da Ponderada 1 foram implementados conforme especificado" com assinatura do grupo.</p>
+          </div>
+          <div class="box grn">
+            <h3>Índice de Evidências — checklist</h3>
+            <ul style="font-size:.81rem;">
+              <li>Cada evidência citada no RTM tem <strong>caminho no repo</strong> ou URL?</li>
+              <li>Screenshots estão em pasta <code>docs/evidencias/</code> ou link acessível?</li>
+              <li>Cada teste referenciado tem <strong>nome exato do <code>it()</code></strong>?</li>
+              <li>Commits relevantes têm SHA listado?</li>
+              <li>O índice cobre <strong>100% das linhas do RTM</strong>?</li>
+            </ul>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ====== SLIDE 13.5: RM-ODP — AS 5 VISÕES ====== -->
   <div class="slide">
     <div class="sc">
@@ -730,7 +992,7 @@
   </div>
   <div class="nav-wrapper">
     <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
-    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">14</span></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">23</span></div>
     <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
   </div>
   <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>
@@ -763,6 +1025,34 @@ function resetDaily() {
   dailySeconds = 900;
   updateDailyDisplay();
   document.getElementById('daily-start-btn').textContent = '▶ Iniciar';
+}
+
+// ── PONDERADA TIMER ───────────────────────────────────────────────────────
+var pondInterval = null;
+var pondSeconds = 3000;
+var pondRunning = false;
+function updatePondDisplay() {
+  var m = Math.floor(pondSeconds / 60);
+  var s = pondSeconds % 60;
+  var el = document.getElementById('pond-timer');
+  if (el) el.textContent = (m < 10 ? '0' : '') + m + ':' + (s < 10 ? '0' : '') + s;
+}
+function startPond() {
+  if (pondRunning) { clearInterval(pondInterval); pondRunning = false; document.getElementById('pond-start-btn').textContent = '▶ Continuar'; return; }
+  pondRunning = true;
+  document.getElementById('pond-start-btn').textContent = '⏸ Pausar';
+  pondInterval = setInterval(function() {
+    if (pondSeconds <= 0) { clearInterval(pondInterval); pondRunning = false; document.getElementById('pond-start-btn').textContent = '✅ Fim!'; return; }
+    pondSeconds--;
+    updatePondDisplay();
+  }, 1000);
+}
+function resetPond() {
+  clearInterval(pondInterval);
+  pondRunning = false;
+  pondSeconds = 3000;
+  updatePondDisplay();
+  document.getElementById('pond-start-btn').textContent = '▶ Iniciar';
 }
 
 // ── NAVIGATION ──────────────────────────────────────────────────────────────
@@ -907,21 +1197,27 @@ function animRfRnf() {
 var animMap = [
   animCover,        // 1
   animDaily,        // 2
-  animAgenda,       // 3 NEW
+  animAgenda,       // 3
   animRoadmap,      // 4
   animEventLoop,    // 5
-  animPromises,     // 6
-  animAsyncAwait,   // 7
-  animFetchGet,     // 8
-  animFetchPost,    // 9
-  animErrors,       // 10
-  animAbort,        // 11
-  animUiStates,     // 12
-  animBackendDual,  // 13
-  animHeaders,      // 14
-  animRmOdp,        // 15 NEW
-  animRfRnf,        // 16 NEW
-  animRecap         // 17
+  null,             // 6  SWEBOK Concurrency (static)
+  animPromises,     // 7
+  animAsyncAwait,   // 8
+  animFetchGet,     // 9
+  animFetchPost,    // 10
+  animErrors,       // 11
+  animAbort,        // 12
+  animUiStates,     // 13
+  animBackendDual,  // 14
+  animHeaders,      // 15
+  null,             // 16 Lamport Ordering (static)
+  null,             // 17 Ponderada III intro (static)
+  null,             // 18 4 entregas mínimas (static)
+  null,             // 19 Como preencher RTM (static)
+  null,             // 20 RNF 8 eixos (static)
+  animRmOdp,        // 21
+  animRfRnf,        // 22
+  animRecap         // 23
 ];
 
 function runAnim(idx) {
@@ -931,6 +1227,8 @@ function runAnim(idx) {
   if (fn) T(fn, 150);
 }
 
+updateDailyDisplay();
+updatePondDisplay();
 showSlide(0);
 </script>
 
@@ -941,5 +1239,6 @@ showSlide(0);
     <span>Prof. Afonso Brandão</span>
   </div>
 </footer>
+<script src="../js/slide-print.js"></script>
 </body>
 </html>

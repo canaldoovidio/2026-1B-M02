@@ -156,6 +156,8 @@
           <li><span class="obj-tag">OA-4</span><span><strong>Renderizar</strong> via controller (<code>res.render</code>) reusando services e repositories já criados.</span></li>
           <li><span class="obj-tag">OA-5</span><span><strong>Aplicar</strong> HTML semântico (<code>header</code>, <code>nav</code>, <code>main</code>, <code>section</code>, <code>article</code>, <code>footer</code>).</span></li>
           <li><span class="obj-tag">OA-6</span><span><strong>Manipular</strong> DOM e eventos com JS vanilla; aplicar validação dupla (cliente + servidor).</span></li>
+          <li><span class="obj-tag">OA-7</span><span><strong>Relacionar</strong> necessidades de persona (SEBoK Pt.3) a requisitos funcionais rastreáveis, identificando a cadeia persona → necessidade → RF no contexto do projeto.</span></li>
+          <li><span class="obj-tag">OA-8</span><span><strong>Representar</strong> arquitetura como código usando Mermaid (<code>graph</code>, <code>sequenceDiagram</code>), conectando diagramas à rastreabilidade de testes (SWEBOK v4 Cap. 4 e 8).</span></li>
         </ul>
       </section>
 
@@ -211,11 +213,11 @@
         <h2>Detalhamento da instrução PE (10h00 — 12h00)</h2>
         <div class="class-line">
           <div class="cl-time">10h00<br>10h15</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-dy">Daily</span>Daily de abertura</h4><p>Cada aluno apresenta, em 1 minuto, o wireframe de uma das telas que vai implementar à tarde — defendendo por que SSR resolve melhor que CSR no caso.</p></div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-dy">Daily</span>Daily de abertura — Personas e Necessidades (SEBoK Pt.3)</h4><p>Cada aluno apresenta, em 1 minuto, o wireframe de uma das telas que vai implementar à tarde — defendendo por que SSR resolve melhor que CSR no caso. Conexão rápida: qual <strong>persona</strong> usa essa tela, qual <strong>necessidade</strong> ela atende (SEBoK Pt.3) e qual RF do projeto pode ser rastreado até ela.</p></div>
         </div>
         <div class="class-line">
           <div class="cl-time">10h15<br>10h35</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>SSR vs CSR vs hydration</h4><p>Quadro com os 3 modelos. Critérios: SEO, time-to-first-byte, complexidade de stack, latência percebida. Por que SSR é o caminho natural quando o back-end já existe e o foco é fluxo de dados, não interatividade rica.</p></div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>SSR vs CSR vs hydration · Arquitetura como código (Mermaid)</h4><p>Quadro com os 3 modelos. Critérios: SEO, time-to-first-byte, complexidade de stack, latência percebida. Por que SSR é o caminho natural quando o back-end já existe e o foco é fluxo de dados, não interatividade rica. Encerramento do bloco: demonstração de <strong>Mermaid</strong> (<code>graph LR</code> e <code>sequenceDiagram</code>) para representar a arquitetura MVC do projeto como código — diagrama versionado junto ao repositório.</p></div>
         </div>
         <div class="class-line">
           <div class="cl-time">10h35<br>10h55</div>
@@ -235,7 +237,7 @@
         </div>
         <div class="class-line">
           <div class="cl-time">11h50<br>12h00</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Síntese + segurança XSS</h4><p>Cada aluno escreve em 30 segundos: "<code>&lt;%= %&gt;</code> escapa, <code>&lt;%- %&gt;</code> não". Demo de XSS injection mostrando por que NUNCA usar <code>&lt;%- %&gt;</code> com conteúdo de usuário. Anúncio da entrega: 2 telas + form + DOM + MR.</p></div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Síntese: segurança XSS · Testes e Rastreabilidade (SWEBOK v4 Cap. 4 e 8)</h4><p>Cada aluno escreve em 30 segundos: "<code>&lt;%= %&gt;</code> escapa, <code>&lt;%- %&gt;</code> não". Demo de XSS injection mostrando por que NUNCA usar <code>&lt;%- %&gt;</code> com conteúdo de usuário. Fechamento: conexão entre os testes escritos na aula 6 e a <strong>rastreabilidade</strong> de requisitos — como o SWEBOK v4 Cap. 4 (Testing) e Cap. 8 (Configuration Management / Traceability) enquadram o que o time já faz. Anúncio da entrega: 2 telas + form + DOM + MR.</p></div>
         </div>
       </section>
 
@@ -259,6 +261,18 @@
             <tr><td>Body parser</td><td><code>express.urlencoded</code></td><td>Forms tradicionais (<code>application/x-www-form-urlencoded</code>)</td></tr>
             <tr><td>Inspeção</td><td>DevTools (Elements / Network)</td><td>Inspecionar HTML renderizado e payload do form</td></tr>
             <tr><td>Repositório</td><td><code>src/views/</code>, <code>src/views/partials/</code></td><td>Templates EJS e parciais</td></tr>
+            <tr><td>Autoestudo</td><td>Front-End 1</td><td>Introdução ao front-end no contexto do projeto</td></tr>
+            <tr><td>Autoestudo</td><td>SWEBOK v4 Cap. 4 &amp; 8 — Testing &amp; Traceability</td><td>Base teórica de testes e rastreabilidade de requisitos</td></tr>
+            <tr><td>Autoestudo</td><td>SEBoK Pt.3 — Stakeholder Needs</td><td>Cadeia persona → necessidade → RF; base para OA-7</td></tr>
+            <tr><td>Autoestudo</td><td>KLM/GOMS — HCI</td><td>Modelos de interação humano-computador; embasamento de UX</td></tr>
+            <tr><td>Autoestudo</td><td>State Machines UIs</td><td>Modelagem de estados de interface; pré-requisito para interações dinâmicas</td></tr>
+            <tr><td>Autoestudo</td><td>HTML e suas estruturas</td><td>Referência de elementos HTML semânticos</td></tr>
+            <tr><td>Autoestudo</td><td>Boas práticas HTML</td><td>Acessibilidade, semântica e estruturação de documentos</td></tr>
+            <tr><td>Autoestudo</td><td>DOM (+aprofundamentos)</td><td>API do DOM, eventos, manipulação de elementos</td></tr>
+            <tr><td>Autoestudo</td><td>jQuery (+aprofundamentos)</td><td>Seletores e utilitários jQuery como referência comparativa</td></tr>
+            <tr><td>Autoestudo</td><td>Views com EJS</td><td>Sintaxe e boas práticas de templates EJS</td></tr>
+            <tr><td>Autoestudo</td><td>MVC Explained</td><td>Padrão MVC aplicado ao Express + EJS</td></tr>
+            <tr><td>Autoestudo</td><td>Mermaid as code</td><td>Diagramas de arquitetura versionados com Mermaid; base para OA-8</td></tr>
           </tbody>
         </table>
       </section>
