@@ -710,6 +710,88 @@
     </div>
   </div>
 
+  <!-- ====== SLIDE 14a: RETHINKING REACTIVITY ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh blue"><div class="st">Rethinking Reactivity — UI = f(estado)</div><div class="ss">Rich Harris · O estado como fonte única de verdade da interface</div></div>
+      <div class="g2" style="gap:12px;align-items:start;">
+        <div>
+          <div class="box bl" style="margin-bottom:10px;">
+            <h3>💡 A ideia central</h3>
+            <p>A interface é uma <strong>função pura do estado</strong>: dado um estado <em>S</em>, a UI sempre produz a mesma tela. Quando <em>S</em> muda, a UI recomputa — sem <code>document.querySelector</code> manual espalhado.</p>
+          </div>
+          <div class="box grn">
+            <h3>O que você já faz ↔ o que reactivity adiciona</h3>
+            <table style="width:100%;font-size:.82rem;border-spacing:0 4px;">
+              <tr><th style="text-align:left;color:#166534;padding:3px 0;">Hoje (imperativo)</th><th style="text-align:left;color:#1d4ed8;padding:3px 0;">Com state store</th></tr>
+              <tr><td><code>el.innerText = data.nome</code></td><td>Store muda → UI atualiza sozinha</td></tr>
+              <tr><td><code>el.classList.add('loading')</code></td><td>Estado <code>loading:true</code> → componente re-renderiza</td></tr>
+              <tr><td>Bugs de sincronia DOM/dados</td><td>UI é sempre reflexo fiel do estado</td></tr>
+            </table>
+          </div>
+        </div>
+        <div>
+          <div class="box amr" style="margin-bottom:10px;">
+            <h3>🔗 Onde você já viu isso neste curso</h3>
+            <ul>
+              <li><strong>UI states (Aula 8):</strong> loading / empty / error / success — 4 estados, 4 telas distintas.</li>
+              <li><strong>localStorage:</strong> preferências são estado persistido — o tema escuro é <code>estado.tema</code>.</li>
+              <li><strong>fetch + JSON:</strong> a resposta é o próximo estado da lista de dados.</li>
+            </ul>
+          </div>
+          <div class="box acc">
+            <h3>🚀 Onde isso vai te levar</h3>
+            <p>Svelte, Vue, React, SolidJS — todos são implementações desta ideia. Entendendo o princípio agora, qualquer framework será uma ferramenta nova, não um conceito novo.</p>
+            <p style="margin-top:6px;font-size:.82rem;color:#374151;font-style:italic;">Rich Harris. "Rethinking Reactivity." Svelte Summit 2019.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ====== SLIDE 14b: SWEBOK v4 Cap. 11 — VERIFICAÇÃO & QUALIDADE ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh green"><div class="st">Verificação &amp; Qualidade (SWEBOK v4 · Cap. 11)</div><div class="ss">Estamos construindo o front corretamente? — ferramentas de qualidade visual e acessibilidade</div></div>
+      <div class="g2" style="gap:12px;align-items:start;">
+        <div>
+          <div class="box grn" style="margin-bottom:10px;">
+            <h3>📐 Verificação vs Validação</h3>
+            <table style="width:100%;font-size:.85rem;border-spacing:0 4px;">
+              <tr><th style="text-align:left;padding:3px 0;">Verificação</th><th style="text-align:left;padding:3px 0;">Validação</th></tr>
+              <tr><td>"Construímos <strong>certo</strong>?"</td><td>"Construímos a coisa <strong>certa</strong>?"</td></tr>
+              <tr><td>CSS sem conflito, WCAG OK, score</td><td>Persona consegue usar o fluxo</td></tr>
+            </table>
+          </div>
+          <div class="box bl">
+            <h3>🔧 Ferramentas de verificação front-end</h3>
+            <ul style="font-size:.85rem;">
+              <li><strong>Lighthouse</strong> — performance, a11y, SEO, best practices (meta: score ≥ 80)</li>
+              <li><strong>axe-core / Accessibility tab</strong> — WCAG 2.1 automatizado no DevTools</li>
+              <li><strong>stylelint</strong> — CSS linting (erros, convenções BEM)</li>
+              <li><strong>ESLint</strong> — qualidade e consistência do JS</li>
+            </ul>
+          </div>
+        </div>
+        <div>
+          <div class="box amr" style="margin-bottom:10px;">
+            <h3>🎯 Para o projeto BrPec</h3>
+            <ul style="font-size:.85rem;">
+              <li>Lighthouse Performance ≥ 80 na página principal</li>
+              <li>0 erros axe-core na aba Accessibility</li>
+              <li>Contraste WCAG AA: 4.5:1 texto, 3:1 UI</li>
+              <li>CSS Variables centralizadas em um arquivo <code>:root</code></li>
+            </ul>
+          </div>
+          <div class="box acc">
+            <h3>🔮 Ponte para a Aula 10</h3>
+            <p>A Aula 10 formaliza testes por camada: Jest para lógica, Supertest para endpoints. Verificação de front (Lighthouse, axe) complementa — cobre o que testes de unidade não alcançam: renderização, contraste, tempo de carregamento.</p>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ====== SLIDE 13.5: RM-ODP — AS 5 VISÕES ====== -->
   <div class="slide">
     <div class="sc">
@@ -793,7 +875,7 @@
   </div>
   <div class="nav-wrapper">
     <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
-    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">14</span></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">19</span></div>
     <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
   </div>
   <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>
@@ -915,9 +997,11 @@ var animMap = [
   animNoop,     // 12 destructuring
   animNoop,     // 13 classes/closures
   animNoop,     // 14 storage/FormData
-  animRmOdp,    // 15 RM-ODP NEW
-  animRfRnf,    // 16 RF/RNF NEW
-  animClosing   // 17 closing
+  null,         // 15 Rethinking Reactivity (static)
+  null,         // 16 SWEBOK v4 Cap.11 Verificação (static)
+  animRmOdp,    // 17 RM-ODP
+  animRfRnf,    // 18 RF/RNF
+  animClosing   // 19 closing
 ];
 
 function runAnim(idx) {

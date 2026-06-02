@@ -170,6 +170,8 @@
         <a href="#sec-events" class="toc-h3">21. Delegação de eventos</a>
         <a href="#sec-e2e">22. Exemplo end-to-end</a>
         <a href="#sec-checklist">23. Checklist</a>
+        <a href="#sec-reactivity">24. Rethinking Reactivity</a>
+        <a href="#sec-swebok11">25. Verificação &amp; Qualidade (SWEBOK v4 · Cap. 11)</a>
         <a href="#sec-refs">Referências</a>
       </div>
     </aside>
@@ -989,8 +991,70 @@ $lista.<span class="hl-fn">addEventListener</span>(<span class="hl-str">'click'<
         </ul>
       </section>
 
+      <section class="mat-section" id="sec-reactivity">
+        <h2>24. Rethinking Reactivity — UI = f(estado)</h2>
+        <p>Em 2019, Rich Harris (criador do Svelte) apresentou a palestra <em>Rethinking Reactivity</em>, que redefine como pensamos sobre interfaces. A ideia central é simples e poderosa: <strong>a interface deveria ser uma função pura do estado</strong>. Dado um estado <em>S</em>, a UI sempre produz a mesma tela. Quando <em>S</em> muda, a UI recomputa automaticamente — sem manipulação manual de DOM espalhada pelo código.</p>
+        <h3>O modelo imperativo (o que fazemos hoje)</h3>
+        <p>No modelo imperativo, escrevemos <em>o que fazer quando algo muda</em>:</p>
+        <ul>
+          <li><code>el.innerText = data.nome</code> — toda vez que <code>data.nome</code> mudar, lembramos de atualizar o elemento.</li>
+          <li><code>el.classList.add('loading')</code> — gerenciamos manualmente cada classe de estado.</li>
+          <li>Bugs surgem quando esquecemos de sincronizar DOM e dados.</li>
+        </ul>
+        <h3>O modelo reativo</h3>
+        <p>No modelo reativo, descrevemos <em>como a UI deve parecer para cada estado</em>. O sistema cuida das atualizações. Você já praticou isso nas aulas anteriores sem perceber:</p>
+        <ul>
+          <li><strong>UI states (Aula 8):</strong> loading / empty / error / success são estados — a UI é diferente em cada um.</li>
+          <li><strong>localStorage:</strong> o tema salvo é estado persistido. O toggle muda o estado; o CSS reage via <code>data-theme</code>.</li>
+          <li><strong>fetch + JSON:</strong> a resposta é o próximo estado da lista de dados. Você já escreve <code>renderList(data)</code> — isso <em>é</em> uma função de estado.</li>
+        </ul>
+        <h3>Onde isso te leva</h3>
+        <p>React, Vue, Svelte, SolidJS — cada um é uma implementação diferente desta ideia. Entendendo o princípio agora (estado → UI), a curva de aprendizado de qualquer framework cai drasticamente: a sintaxe muda, o conceito não.</p>
+        <p><em>Referência: Rich Harris. "Rethinking Reactivity." Svelte Summit, 2019. Disponível no YouTube.</em></p>
+      </section>
+
+      <section class="mat-section" id="sec-swebok11">
+        <h2>25. Verificação &amp; Qualidade — SWEBOK v4 · Capítulo 11</h2>
+        <p>O capítulo 11 do SWEBOK v4 trata de <strong>Software Quality</strong> — as práticas que garantem que o software foi construído corretamente e atende aos requisitos. Para o front-end, isso se traduz em ferramentas concretas de verificação.</p>
+        <h3>Verificação vs Validação</h3>
+        <ul>
+          <li><strong>Verificação:</strong> "Construímos o front <em>certo</em>?" — CSS sem conflito, acessibilidade ok, performance score aceitável.</li>
+          <li><strong>Validação:</strong> "Construímos a coisa <em>certa</em>?" — a persona consegue usar o fluxo de ponta a ponta.</li>
+        </ul>
+        <h3>Ferramentas práticas</h3>
+        <ul>
+          <li><strong>Lighthouse (DevTools F12 → Lighthouse):</strong> avalia Performance, Acessibilidade, SEO e Best Practices em uma só rodada. Meta recomendada para o projeto: score ≥ 80 em todos os eixos.</li>
+          <li><strong>axe-core / aba Accessibility:</strong> detecta violações WCAG 2.1 automaticamente. Zero erros é o critério mínimo.</li>
+          <li><strong>stylelint:</strong> linter de CSS — identifica propriedades inválidas, seletores muito específicos e violações de convenções BEM.</li>
+          <li><strong>ESLint:</strong> linter de JavaScript — variáveis não usadas, padrões inseguros, inconsistências de estilo.</li>
+        </ul>
+        <h3>Para o projeto BrPec</h3>
+        <ul>
+          <li>Roda Lighthouse na página principal e anota o score inicial.</li>
+          <li>Corrige os 3 maiores problemas de acessibilidade identificados pelo axe-core.</li>
+          <li>Verifica contraste: texto sobre fundo deve ter relação ≥ 4.5:1 (WCAG AA).</li>
+          <li>Centraliza todas as CSS Variables em um único bloco <code>:root</code> — facilita o stylelint encontrar duplicatas.</li>
+        </ul>
+        <h3>Ponte para Aula 10</h3>
+        <p>A verificação de front (Lighthouse, axe) complementa — mas não substitui — os testes automatizados da Aula 10. Jest e Supertest cobrem lógica e endpoints; Lighthouse cobre renderização, carregamento e acessibilidade. Os dois juntos formam a estratégia de qualidade completa.</p>
+      </section>
+
       <section class="mat-section" id="sec-refs">
         <h2>Referências</h2>
+        <h3>Autoestudos desta aula (Semana 08)</h3>
+        <ul>
+          <li>Front-End 3 — CSS e JavaScript (material principal da aula)</li>
+          <li>SWEBOK v4: Capítulo 11 — Software Quality (Verification &amp; Quality Practices)</li>
+          <li>Rich Harris — "Rethinking Reactivity" (Svelte Summit 2019, YouTube)</li>
+          <li>CSS parte 1, 2, 3 — série do professor Ovidio</li>
+          <li>CSS parte 4 (opcional) — aprofundamento</li>
+          <li>Como pensar para implementar CSS — raciocínio de layout</li>
+          <li>CSS na prática (opcional) — exercícios complementares</li>
+          <li>Responsividade — mobile-first na prática</li>
+          <li>jQuery e classes/dimensões/propriedades de CSS — <em>complementar — sem slide dedicado</em></li>
+          <li>Bootstrap — Ferramenta para responsividade e padrões de CSS — <em>complementar — sem slide dedicado</em></li>
+        </ul>
+        <h3>Referências técnicas complementares</h3>
         <ul>
           <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/CSS/Using_CSS_custom_properties" target="_blank" rel="noopener noreferrer">MDN — Usando CSS Custom Properties</a> — referência completa de variáveis em CSS</li>
           <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/CSS/CSS_flexible_box_layout" target="_blank" rel="noopener noreferrer">MDN — CSS Flexible Box Layout</a> — Flexbox em profundidade</li>
