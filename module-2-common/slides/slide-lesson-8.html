@@ -714,10 +714,38 @@
     </div>
   </div>
 
+  <!-- ====== SLIDE 14a0: PONDERADA III — AVISO ====== -->
+  <div class="slide">
+    <div class="sc">
+      <div class="sh amber"><div class="st">⚠️ Ponderada de Programação III — Atenção</div><div class="ss">Leia antes de começar</div></div>
+      <div style="display:flex;flex-direction:column;gap:18px;align-items:center;justify-content:center;padding:10px 0;">
+        <div class="box amr" style="width:100%;text-align:center;padding:22px 28px;">
+          <div style="font-size:2.6rem;margin-bottom:8px;">📝</div>
+          <h2 style="margin:0 0 10px;font-size:1.5rem;color:#92400e;">A ponderada será <strong>no papel</strong></h2>
+          <p style="font-size:1.1rem;color:#374151;">Cada aluno faz <strong>individualmente</strong>.</p>
+        </div>
+        <div class="g2" style="width:100%;gap:18px;">
+          <div class="box bl" style="text-align:center;padding:18px 16px;">
+            <div style="font-size:1.8rem;">🎓</div>
+            <h3 style="margin:10px 0 6px;font-size:1.15rem;">10h → 11h</h3>
+            <p style="margin:0;">Instrução em sala</p>
+            <small style="color:#64748b;">Conteúdo + dúvidas</small>
+          </div>
+          <div class="box grn" style="text-align:center;padding:18px 16px;">
+            <div style="font-size:1.8rem;">✍️</div>
+            <h3 style="margin:10px 0 6px;font-size:1.15rem;">11h → 12h</h3>
+            <p style="margin:0;">Ponderada individual</p>
+            <small style="color:#374151;">RTM no papel</small>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
   <!-- ====== SLIDE 14a: PONDERADA III — INTRO (com timer) ====== -->
   <div class="slide">
     <div class="sc">
-      <div class="sh amber"><div class="st">📋 Ponderada de Programação III — o RTM é o fechamento documental</div><div class="ss">⏱️ Bloco de trabalho em sala — 50 minutos</div></div>
+      <div class="sh amber"><div class="st">📋 Ponderada de Programação III — o RTM é o fechamento documental</div><div class="ss">⏱️ Bloco individual em sala — 11h às 12h (60 minutos)</div></div>
       <div class="g2" style="align-items:start;margin-bottom:12px;">
         <div>
           <div class="box grn" style="margin-bottom:10px;">
@@ -742,7 +770,7 @@
         <div style="display:flex;flex-direction:column;align-items:center;gap:14px;">
           <div style="background:linear-gradient(135deg,#b45309,#f59e0b);border-radius:20px;padding:24px 28px;text-align:center;color:white;width:100%;box-sizing:border-box;">
             <div style="font-size:1rem;font-weight:700;margin-bottom:10px;opacity:.92;">⏱️ Bloco de Trabalho — Ponderada III</div>
-            <div class="daily-timer" id="pond-timer">50:00</div>
+            <div class="daily-timer" id="pond-timer">60:00</div>
             <div style="margin-top:12px;">
               <button id="pond-start-btn" onclick="startPond()" style="background:rgba(255,255,255,.25);border:1px solid rgba(255,255,255,.4);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">▶ Iniciar</button>
               <button onclick="resetPond()" style="background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.25);color:white;padding:9px 22px;border-radius:10px;font-weight:700;font-size:.9rem;cursor:pointer;margin:0 6px;font-family:'Manrope',sans-serif;">↺ Reset</button>
@@ -992,7 +1020,7 @@
   </div>
   <div class="nav-wrapper">
     <div class="nav-buttons"><button id="prev-btn" onclick="previousSlide()">← Anterior</button></div>
-    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">23</span></div>
+    <div class="slide-counter"><span id="current-slide">1</span> / <span id="total-slides">24</span></div>
     <div class="nav-buttons"><button id="next-btn" onclick="nextSlide()">Próximo →</button></div>
   </div>
   <button class="fullscreen-btn" onclick="toggleFullScreen()" title="Tela cheia">⛶</button>
@@ -1029,7 +1057,7 @@ function resetDaily() {
 
 // ── PONDERADA TIMER ───────────────────────────────────────────────────────
 var pondInterval = null;
-var pondSeconds = 3000;
+var pondSeconds = 3600;
 var pondRunning = false;
 function updatePondDisplay() {
   var m = Math.floor(pondSeconds / 60);
@@ -1050,7 +1078,7 @@ function startPond() {
 function resetPond() {
   clearInterval(pondInterval);
   pondRunning = false;
-  pondSeconds = 3000;
+  pondSeconds = 3600;
   updatePondDisplay();
   document.getElementById('pond-start-btn').textContent = '▶ Iniciar';
 }
@@ -1211,13 +1239,14 @@ var animMap = [
   animBackendDual,  // 14
   animHeaders,      // 15
   null,             // 16 Lamport Ordering (static)
-  null,             // 17 Ponderada III intro (static)
-  null,             // 18 4 entregas mínimas (static)
-  null,             // 19 Como preencher RTM (static)
-  null,             // 20 RNF 8 eixos (static)
-  animRmOdp,        // 21
-  animRfRnf,        // 22
-  animRecap         // 23
+  null,             // 17 Ponderada III — Aviso (static)
+  null,             // 18 Ponderada III intro + timer (static)
+  null,             // 19 4 entregas mínimas (static)
+  null,             // 20 Como preencher RTM (static)
+  null,             // 21 RNF 8 eixos (static)
+  animRmOdp,        // 22
+  animRfRnf,        // 23
+  animRecap         // 24
 ];
 
 function runAnim(idx) {
