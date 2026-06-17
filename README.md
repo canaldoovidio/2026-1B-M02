@@ -25,7 +25,7 @@ Acesse as aulas pela página inicial: [`index.html`](index.html).
 | 7 | 06 | 27/05/2026 | Front-End 1 — HTML, DOM e JavaScript |
 | 8 | 07 | 02/06/2026 | Front-End 2 — Assíncrono e Redes |
 | 9 | 08 | 10/06/2026 | Front-End 3 — CSS e JavaScript |
-| 10 | 09 | 18/06/2026 | Testes e Automação |
+| 10 | 09 | 18/06/2026 | Front-End III bis · Responsividade, jQuery e Bootstrap |
 | 11 | 10 | 24/06/2026 | Mergulhando nas Redes |
 
 ## Estrutura

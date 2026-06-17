@@ -4,7 +4,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🧪</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aula 10 — Plano de Ensino — Testes e Automação — Inteli</title>
+  <title>Aula 10 · Plano de Ensino · Front-End III bis · Inteli</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../../css/inteli-styles.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -103,8 +103,8 @@
     <div class="container">
       <span class="mat-badge">Módulo 2 · Ciclo Comum · IN02</span>
       <span class="mat-badge">Plano de Ensino</span>
-      <h1>Aula 10 — Testes e Automação</h1>
-      <p class="subtitle">Plano operacional do dia: cobrir cada camada do MVC com o tipo certo de teste — <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">unit</code>, <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">supertest</code>, banco efêmero, <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">Husky</code> e CI no GitHub Actions.</p>
+      <h1>Aula 10 · Front-End III bis · Responsividade, jQuery e Bootstrap</h1>
+      <p class="subtitle">Plano operacional do dia 18/06/2026: fechar o pacote front-end do BrPec, ligar <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">CSS por camadas</code>, <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">responsividade</code>, <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">jQuery</code> e <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">Bootstrap</code>, e preparar a turma para a Prova Regular de 19/06.</p>
       <a href="../../index.html" class="btn btn-outline-light btn-sm">← Voltar ao Módulo</a>
     </div>
   </header>
@@ -142,33 +142,33 @@
       <section class="mat-section" id="sec-resumo">
         <h2>Resumo</h2>
         <div class="intro-card">
-          <p>A aula 10 traz <strong>garantia</strong> para tudo que foi construído nas aulas anteriores. Os alunos cobrem <strong>cada camada do MVC</strong> com o tipo de teste certo: <strong>helpers</strong> com unit puro, <strong>services</strong> com mock do repository, <strong>repositories</strong> com banco efêmero (<code>pg-mem</code> ou Postgres em Docker), <strong>controllers</strong> com <code>supertest</code>, e <strong>views EJS</strong> com smoke pelo controller.</p>
-          <p><strong>Coverage</strong> entra como métrica (não meta). <strong>Husky</strong> + <strong>lint-staged</strong> travam erros no pre-commit. <strong>GitHub Actions</strong> roda lint + tests com Postgres como service container. A pirâmide de testes vira regra prática a partir desta aula.</p>
+          <p>A aula 10 fecha o eixo de front-end do Módulo 2. Depois da Aula 9 (CSS Variables, Grid, BEM, ESM, classes), os alunos amarram <strong>como pensar para implementar CSS</strong> em camadas (tokens, layout, componentes, utilities, estado), aplicam <strong>responsividade real</strong> (mobile-first com <code>min-width</code>), aceleram a manipulação do DOM com <strong>jQuery</strong> (classes, dimensões, propriedades) e usam <strong>Bootstrap 5</strong> para grid de 12 colunas, utilities e componentes prontos (navbar, card, form, modal, alert, table).</p>
+          <p>O bloco final amarra <strong>Rethinking Reactivity</strong> (níveis de reatividade: DOM direto, vDOM, signals) e <strong>SWEBOK v4 Cap. 11</strong> (Verification e Quality Practice) com a <strong>Prova Regular de 19/06</strong>: 2 a 3 slides de guia de estudo apontam os temas de computação cobrados, dão prioridades baseadas nas notas das Ponderadas e um checklist de revisão até sexta-feira.</p>
         </div>
       </section>
 
       <section class="mat-section" id="sec-obj">
         <h2>Objetivos de aprendizagem</h2>
         <ul class="obj-list">
-          <li><span class="obj-tag">OA-1</span><span><strong>Posicionar</strong> cada teste na camada correta da pirâmide (unit / integração / e2e).</span></li>
-          <li><span class="obj-tag">OA-2</span><span><strong>Aplicar</strong> AAA (Arrange/Act/Assert) com naming <code>describe/it</code> claro e legível.</span></li>
-          <li><span class="obj-tag">OA-3</span><span><strong>Mockar</strong> o repository em testes de service usando <code>jest.fn()</code>.</span></li>
-          <li><span class="obj-tag">OA-4</span><span><strong>Configurar</strong> banco efêmero para repository (<code>pg-mem</code>, Testcontainers ou Postgres descartável).</span></li>
-          <li><span class="obj-tag">OA-5</span><span><strong>Testar</strong> controllers com <code>supertest</code> cobrindo status, shape JSON e redirecionamentos.</span></li>
-          <li><span class="obj-tag">OA-6</span><span><strong>Configurar</strong> Husky + lint-staged + GitHub Actions com Postgres como service.</span></li>
+          <li><span class="obj-tag">OA-1</span><span><strong>Decidir</strong> em qual camada cada estilo CSS vive (token, layout, componente BEM, utility, estado).</span></li>
+          <li><span class="obj-tag">OA-2</span><span><strong>Implementar</strong> responsividade mobile-first com <code>@media (min-width)</code>, Grid <code>auto-fit/minmax</code> e tipografia fluida com <code>clamp()</code>.</span></li>
+          <li><span class="obj-tag">OA-3</span><span><strong>Manipular</strong> DOM com jQuery em três frentes: classes (<code>addClass/toggleClass</code>), dimensões (<code>width/offset</code>) e propriedades (<code>attr/prop/css</code>).</span></li>
+          <li><span class="obj-tag">OA-4</span><span><strong>Aplicar</strong> Bootstrap 5: grid de 12 colunas, utilities (<code>p-3</code>, <code>d-flex</code>, <code>justify-content-between</code>) e componentes (<code>navbar</code>, <code>card</code>, <code>modal</code>, <code>table-responsive</code>).</span></li>
+          <li><span class="obj-tag">OA-5</span><span><strong>Distinguir</strong> três níveis de reatividade (DOM direto, virtual DOM, signals) e justificar a escolha por projeto.</span></li>
+          <li><span class="obj-tag">OA-6</span><span><strong>Mapear</strong> os tópicos de computação cobrados na Prova Regular de 19/06 e elaborar plano de revisão até a data.</span></li>
         </ul>
       </section>
 
       <section class="mat-section" id="sec-pre">
         <h2>Pré-requisitos</h2>
         <ul>
-          <li>Aulas 5–9 concluídas: o projeto já existe com camadas implementadas (controllers, services, repositories, helpers e views EJS).</li>
-          <li>Camadas separadas em diretórios distintos (<code>src/controllers</code>, <code>src/services</code>, <code>src/repositories</code>, <code>src/helpers</code>).</li>
-          <li>Jest e <code>ts-jest</code> instalados no projeto (caso ainda não, instalar no Bloco 1).</li>
+          <li>Aulas 6 a 9 concluídas: projeto BrPec com endpoints REST, fetch funcional e CSS arquitetural (variables + BEM + Grid/Flex) já no ar.</li>
+          <li>Autoestudos da Semana 09 lidos: CSS partes 1 a 3, Responsividade, Como pensar para implementar CSS, jQuery (classes, dimensões, propriedades), Bootstrap, Rethinking Reactivity e SWEBOK v4 Cap. 11.</li>
+          <li>Material das Aulas 5 e 6 acessível para revisão pré-prova (Back-End I e II).</li>
         </ul>
         <div class="callout callout-info">
           <div class="callout-label">Importante</div>
-          <p>Aqui a equipe cobre <strong>o que ficou descoberto</strong> — o trabalho não é "escrever testes do zero", é auditar o projeto e tapar buracos camada a camada.</p>
+          <p>Aula tem duas camadas: <strong>polir o front-end do BrPec</strong> para a Sprint Review e <strong>preparar a turma para a Prova Regular de sexta</strong>. Reservar tempo para os dois.</p>
         </div>
       </section>
 
@@ -176,82 +176,82 @@
         <h2>Cronograma do dia</h2>
         <div class="day-timeline">
           <div class="day-block autoest">
-            <div class="blk-head"><h3 class="blk-title">📚 Bloco 1 · Autoestudo</h3><span class="blk-time">08h00 — 10h00</span></div>
-            <p>Estudo individual orientado pelo material da aula 10.</p>
+            <div class="blk-head"><h3 class="blk-title">📚 Bloco 1 · Autoestudo</h3><span class="blk-time">08h00 - 10h00</span></div>
+            <p>Estudo individual orientado pelos autoestudos oficiais da Semana 09.</p>
             <ul>
-              <li>Leitura completa do <strong>Material da Aula 10</strong> (pirâmide de testes, AAA, mocks, banco efêmero, supertest, Husky, GitHub Actions).</li>
-              <li>Auditar o projeto e listar <strong>funções e rotas sem testes</strong> agrupadas por camada (helpers, services, repositories, controllers).</li>
-              <li>Instalar <code>husky</code> e <code>lint-staged</code> como devDependencies (<code>npm i -D husky lint-staged</code>).</li>
-              <li>Caderno de bordo: anotar dúvidas sobre quando mockar e quando subir banco real.</li>
+              <li>Leitura dos materiais: <strong>CSS parte 1, 2, 3</strong>, <strong>Como pensar para implementar CSS</strong>, <strong>Responsividade</strong>, <strong>jQuery (classes, dimensões e propriedades)</strong>, <strong>Bootstrap</strong>, <strong>Rethinking Reactivity</strong> e <strong>SWEBOK v4 Cap. 11</strong>.</li>
+              <li>Auditar o front-end atual do BrPec: o que falta para o produto rodar bem em mobile e ter visual profissional?</li>
+              <li>Listar 5 telas/componentes onde Bootstrap economizaria tempo.</li>
+              <li>Caderno de bordo: anotar dúvidas para a daily.</li>
             </ul>
           </div>
           <div class="day-block pe">
-            <div class="blk-head"><h3 class="blk-title">🎓 Bloco 2 · Instrução PE — Aula em metodologia ativa</h3><span class="blk-time">10h00 — 12h00</span></div>
+            <div class="blk-head"><h3 class="blk-title">🎓 Bloco 2 · Instrução PE · Aula em metodologia ativa</h3><span class="blk-time">10h00 - 12h00</span></div>
             <p>Encontro síncrono com o professor especialista. 15 minutos de daily seguidos de 1h45 de aula.</p>
             <ul>
-              <li><strong>10h00 — 10h15</strong> · Daily: lacunas de cobertura trazidas do autoestudo.</li>
-              <li><strong>10h15 — 12h00</strong> · Pirâmide, AAA, mock de repository, banco efêmero, supertest, coverage e CI.</li>
+              <li><strong>10h00 - 10h15</strong> · Daily: recap da Aula 9 e dúvidas dos autoestudos da Semana 09.</li>
+              <li><strong>10h15 - 11h10</strong> · Pensar CSS em camadas, responsividade aplicada e jQuery (classes, dimensões, propriedades).</li>
+              <li><strong>11h10 - 11h40</strong> · Bootstrap 5: grid, utilities e componentes aplicados ao BrPec.</li>
+              <li><strong>11h40 - 12h00</strong> · Rethinking Reactivity + SWEBOK 11 + abertura do Guia da Prova.</li>
             </ul>
           </div>
           <div class="day-block lunch">
-            <div class="blk-head"><h3 class="blk-title">🍴 Intervalo · Almoço</h3><span class="blk-time">12h00 — 14h00</span></div>
+            <div class="blk-head"><h3 class="blk-title">🍴 Intervalo · Almoço</h3><span class="blk-time">12h00 - 14h00</span></div>
             <p>Janela livre.</p>
           </div>
           <div class="day-block dev">
-            <div class="blk-head"><h3 class="blk-title">🛠️ Bloco 3 · Desenvolvimento do projeto</h3><span class="blk-time">14h00 — 16h00</span></div>
-            <p>Janela de trabalho da equipe sobre o projeto integrador.</p>
+            <div class="blk-head"><h3 class="blk-title">🛠️ Bloco 3 · Desenvolvimento do projeto + Revisão da Prova</h3><span class="blk-time">14h00 - 16h00</span></div>
+            <p>Janela dupla: terminar polimento do front-end do BrPec e revisar conteúdos da Prova Regular de sexta.</p>
             <ul>
-              <li>Subir cobertura mínima de cada camada: pelo menos 1 helper, 1 service, 1 repository e 1 controller testados.</li>
-              <li>Ativar <strong>Husky</strong> + <strong>lint-staged</strong> no <code>pre-commit</code> (<code>npx husky init</code> + script <code>lint-staged</code>).</li>
-              <li>Criar workflow <code>.github/workflows/ci.yml</code> com Postgres como <em>service container</em>, rodando lint + tests.</li>
-              <li>Abrir Merge Request <code>chore(test): cobertura por camada + CI</code> com evidência (badge ou screenshot do workflow verde).</li>
+              <li>Aplicar responsividade mobile-first em pelo menos 3 telas (lista de bovinos, formulário de movimentação, dashboard).</li>
+              <li>Adicionar 1 interação jQuery útil (toggle de filtros, máscara em campo, expand/collapse em card).</li>
+              <li>Migrar 1 fluxo para usar componentes Bootstrap (navbar + card + alert).</li>
+              <li>Revisar guia da prova (slides 13 a 15) e fechar lista de pontos a estudar até sexta.</li>
+              <li>Abrir Merge Request <code>chore(front): responsividade + Bootstrap + jQuery</code> com prints antes/depois.</li>
             </ul>
           </div>
         </div>
       </section>
 
       <section class="mat-section" id="sec-class">
-        <h2>Detalhamento da instrução PE (10h00 — 12h00)</h2>
+        <h2>Detalhamento da instrução PE (10h00 - 12h00)</h2>
         <div class="class-line">
           <div class="cl-time">10h00<br>10h15</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-dy">Daily</span>Daily de abertura</h4><p>Cada aluno apresenta, em 1 minuto, uma camada do projeto que ainda não tem teste e o motivo do gap.</p></div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-dy">Daily</span>Daily de abertura</h4><p>Cada aluno apresenta, em 1 minuto, o ponto da Aula 9 que dominou e o autoestudo desta semana que ainda gerou dúvida (CSS, jQuery ou Bootstrap).</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">10h15<br>10h30</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>Pirâmide de testes + anti-padrões</h4><p>Apresentação da pirâmide (muitos unit, alguns integration, poucos e2e), o anti-padrão "casquinha de sorvete" (e2e demais) e o "ampulheta" (sem integração). Como cada camada do MVC mapeia para a pirâmide.</p></div>
+          <div class="cl-time">10h15<br>10h35</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>Como pensar para implementar CSS</h4><p>Pirâmide do CSS aplicado: tokens, base, layout, componentes BEM, utilities e estado. Heurística do "onde colocar?" e cheiros de CSS espaguete.</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">10h30<br>10h50</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Helpers com unit puro (AAA)</h4><p>Em pares: escolher um helper de formatação/validação e escrever um teste com <strong>Arrange / Act / Assert</strong> explícito, naming <code>describe/it</code> claro. Rodar <code>jest --watch</code> para ver red→green ao vivo.</p></div>
+          <div class="cl-time">10h35<br>10h55</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Responsividade aplicada</h4><p>Mobile-first com <code>@media (min-width)</code>. Demo de grid auto-fit/minmax e <code>clamp()</code> para tipografia fluida. Pares aplicam em uma tela do BrPec.</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">10h50<br>11h10</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Service com mock de repository (red→green)</h4><p>Demo: testar um service usando <code>jest.fn()</code> para fingir o repository, isolando a regra de negócio. Os pares replicam o padrão em um service do próprio projeto e debatem quando o mock está "demais".</p></div>
+          <div class="cl-time">10h55<br>11h15</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>jQuery · classes, dimensões e propriedades</h4><p>Comparação vanilla vs jQuery. Demo de <code>addClass/toggleClass</code>, <code>$(window).width()</code> com debounce e diferença entre <code>.attr()</code>, <code>.prop()</code> e <code>.css()</code>. Regra de ouro: alternar classes, não estilo inline.</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">11h10<br>11h30</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Repository com banco efêmero</h4><p>Demonstração de duas estratégias: <code>pg-mem</code> (in-memory rápido) e Postgres em Docker (mais fiel). Padrão <code>BEGIN/ROLLBACK</code> por teste para garantir isolamento. Os pares escolhem uma estratégia e escrevem 1 teste de repository.</p></div>
+          <div class="cl-time">11h15<br>11h40</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Bootstrap 5 · grid, utilities e componentes</h4><p>Container/row/col-md-N, utilities (<code>p-3</code>, <code>d-flex</code>, <code>justify-content-between</code>) e seis componentes prioritários: navbar, card, form, alert, modal e table-responsive. Quando usar e quando evitar.</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">11h30<br>11h45</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Controller com supertest</h4><p>Em pares: importar o app Express, usar <code>supertest</code> para fazer <code>request(app).post('/...').expect(201)</code>, validar status, shape JSON e redirecionamentos. Discussão: onde plugar o banco efêmero?</p></div>
+          <div class="cl-time">11h40<br>11h50</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>Rethinking Reactivity + SWEBOK Cap. 11</h4><p>Três níveis de reatividade (DOM direto, virtual DOM, signals) e como SWEBOK 11 amarra verificação contínua: review, lint estático, testes, ISO/IEC 25010.</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">11h45<br>11h55</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>Coverage como métrica + Husky + GitHub Actions</h4><p>Coverage como métrica (não meta) — número alto sem assert significativo é teatro. Apresentação rápida do <code>pre-commit</code> com Husky + lint-staged e do workflow GitHub Actions com Postgres como <em>service container</em>.</p></div>
-        </div>
-        <div class="class-line">
-          <div class="cl-time">11h55<br>12h00</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Síntese + entrega da tarde</h4><p>Cada aluno escreve <em>"a aula 10 me ensinou que..."</em>. O professor anuncia a entrega: cobertura por camada + Husky + workflow verde no MR <code>chore(test): cobertura por camada + CI</code>.</p></div>
+          <div class="cl-time">11h50<br>12h00</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-am">Ativa</span>Abertura do Guia da Prova + síntese</h4><p>Apresentação dos slides 13 a 15: mapa de temas de computação, complementos teóricos e checklist de revisão até sexta. Cada aluno escreve <em>"o que vou estudar hoje à noite para a prova"</em>.</p></div>
         </div>
       </section>
 
       <section class="mat-section" id="sec-am">
         <h2>Estratégias de metodologia ativa</h2>
         <ul>
-          <li><strong>Dojo de testes</strong> — cada par escreve 1 teste por camada e roda no projetor, expondo o ciclo red→green em tempo real.</li>
-          <li><strong>Debate sobre over-mocking</strong> — após o exercício de service, a turma discute quando mockar protege e quando esconde bug real.</li>
-          <li><strong>Code review cruzado</strong> — equipes trocam o <code>ci.yml</code> recém-escrito para validar steps, services e cache antes de abrir o MR.</li>
+          <li><strong>Dojo de CSS</strong> · cada par pega uma tela do BrPec, identifica em qual camada cada estilo deveria estar (token, layout, componente, utility) e refatora em tempo real.</li>
+          <li><strong>Pair coding com jQuery</strong> · um aluno descreve o comportamento desejado, o outro implementa com classes alternadas; troca de papéis a cada interação.</li>
+          <li><strong>Sprint Bootstrap</strong> · 15 minutos cronometrados para migrar uma tela do CSS próprio para Bootstrap usando navbar, card e tabela responsiva.</li>
+          <li><strong>Roda de revisão da prova</strong> · grupos pegam um tópico do guia (REST, ACID, normalização, lógica, grafos, MVC) e explicam para a turma em 2 minutos.</li>
         </ul>
       </section>
 
@@ -260,13 +260,12 @@
         <table class="res-table">
           <thead><tr><th>Categoria</th><th>Recurso</th><th>Uso</th></tr></thead>
           <tbody>
-            <tr><td>Slides</td><td><code>slides/slide-lesson-10.html</code></td><td>Exposição na instrução PE</td></tr>
-            <tr><td>Material</td><td><code>materials/lesson-10-material.html</code></td><td>Autoestudo</td></tr>
-            <tr><td>Test runner</td><td><code>jest</code> + <code>ts-jest</code></td><td>Unit, integration e coverage</td></tr>
-            <tr><td>HTTP testing</td><td><code>supertest</code></td><td>Testes de controller (status, shape, redirect)</td></tr>
-            <tr><td>Banco efêmero</td><td><code>pg-mem</code> ou Testcontainers</td><td>Testes de repository com isolamento</td></tr>
-            <tr><td>Pre-commit hooks</td><td><code>husky</code> + <code>lint-staged</code></td><td>Travar erros antes do commit</td></tr>
-            <tr><td>CI</td><td><code>.github/workflows/ci.yml</code></td><td>Lint + tests com Postgres como service</td></tr>
+            <tr><td>Slides</td><td><code>slides/slide-lesson-10.html</code></td><td>Exposição na instrução PE · 16 slides</td></tr>
+            <tr><td>Material</td><td><code>materials/lesson-10-material.html</code></td><td>Autoestudo da Semana 09</td></tr>
+            <tr><td>CSS framework</td><td>Bootstrap 5.3</td><td>Grid de 12 colunas, utilities, componentes</td></tr>
+            <tr><td>DOM helper</td><td>jQuery 3.x</td><td>Manipulação rápida em projetos sem framework reativo</td></tr>
+            <tr><td>Referência teórica</td><td>Rethinking Reactivity (Rich Harris) + SWEBOK v4 Cap. 11</td><td>Justificar escolhas e amarrar qualidade</td></tr>
+            <tr><td>Guia da Prova</td><td>Slides 13, 14 e 15 do deck</td><td>Mapa de temas, lacunas e checklist para 19/06</td></tr>
           </tbody>
         </table>
       </section>
@@ -274,28 +273,25 @@
       <section class="mat-section" id="sec-aval">
         <h2>Verificação de aprendizagem</h2>
         <ul class="crit-list">
-          <li><span class="obj-tag">CR-1</span><span>Pelo menos 1 <strong>helper</strong> testado com AAA explícito (Arrange/Act/Assert) e naming <code>describe/it</code> claro.</span></li>
-          <li><span class="obj-tag">CR-2</span><span>Pelo menos 1 <strong>service</strong> testado mockando o repository com <code>jest.fn()</code>.</span></li>
-          <li><span class="obj-tag">CR-3</span><span>Pelo menos 1 <strong>repository</strong> testado com banco efêmero (<code>pg-mem</code>, Testcontainers ou Postgres descartável) com isolamento por teste.</span></li>
-          <li><span class="obj-tag">CR-4</span><span>Pelo menos 1 <strong>controller</strong> testado com <code>supertest</code> cobrindo status e shape JSON.</span></li>
-          <li><span class="obj-tag">CR-5</span><span><strong>Husky + lint-staged</strong> ativos no pre-commit + workflow GitHub Actions verde, tudo no MR <code>chore(test): cobertura por camada + CI</code> aberto até as 16h.</span></li>
+          <li><span class="obj-tag">CR-1</span><span>Pelo menos 3 telas do BrPec com <strong>responsividade mobile-first</strong> validada em viewport ≤640px, 768px e ≥1024px.</span></li>
+          <li><span class="obj-tag">CR-2</span><span>Pelo menos 1 interação implementada com <strong>jQuery</strong> alternando classes (não <code>.css()</code> inline).</span></li>
+          <li><span class="obj-tag">CR-3</span><span>Pelo menos 1 fluxo migrado para <strong>componentes Bootstrap</strong> (combinação de navbar + card + alert ou table-responsive).</span></li>
+          <li><span class="obj-tag">CR-4</span><span>Aluno consegue explicar a diferença entre <strong>três níveis de reatividade</strong> (DOM direto, vDOM, signals) em até 1 minuto.</span></li>
+          <li><span class="obj-tag">CR-5</span><span>Cada aluno entrega ao fim do dia um <strong>plano de revisão pessoal</strong> com os 5 temas críticos do guia da prova e em que horário vai estudar cada um.</span></li>
         </ul>
         <div class="callout callout-warn">
           <div class="callout-label">Critério mínimo</div>
-          <p>Aluno que sair às 16h sem <strong>pelo menos um teste por camada (helper, service, repository, controller)</strong> e sem o <strong>workflow do GitHub Actions verde</strong> está em débito técnico — o projeto não pode subir para produção sem rede de proteção mínima.</p>
+          <p>Aluno que sair às 16h sem <strong>responsividade aplicada em pelo menos uma tela</strong> e sem <strong>plano de revisão escrito</strong> está em débito · MR aberto até 16h com prints antes/depois.</p>
         </div>
       </section>
 
       <section class="mat-section" id="sec-next">
-        <h2>Conexão com a aula 11</h2>
-        <p>A aula 11 fecha o módulo olhando para <strong>baixo da nossa stack</strong>: a infraestrutura de redes — TCP/IP, DNS, HTTPS+TLS, CDN, cache HTTP e padrões de tolerância a falhas — que sustenta tudo em produção.</p>
-        <ul>
-          <li>Os controllers testados hoje passarão a receber requests cruzando CDN, cache e TLS — entender essa cadeia muda como projetamos endpoints.</li>
-          <li>Os testes que você escreveu serão os primeiros a quebrar quando rede falhar: timeouts, retries e idempotência viram parte do projeto na próxima aula.</li>
-        </ul>
+        <h2>Conexão com a aula 11 e com a Prova Regular</h2>
+        <p>Na sexta-feira (19/06) acontece a <strong>Prova Regular</strong> cobrindo os autoestudos das semanas 04 a 09. Os slides 13 a 15 do deck listam, sem expor questões, quais temas de computação preparar e em que ordem revisar.</p>
+        <p>Na semana seguinte, a Aula 11 fecha o módulo com <strong>Mergulhando nas Redes</strong>: TCP/IP, DNS, HTTPS, cache HTTP e padrões de resiliência · a camada que sustenta tudo que você construiu.</p>
         <div class="callout callout-info">
-          <div class="callout-label">Para o autoestudo da aula 11</div>
-          <p>Antes das 8h do próximo dia: rodar <code>dig</code> no domínio do projeto, ler o material da aula 11 e mapear quais respostas do back-end fazem sentido cachear (e por quanto tempo).</p>
+          <div class="callout-label">Para a noite de hoje</div>
+          <p>Reler material das Aulas 5 e 6 (Back-End I e II) · revisar arquitetura de 6 camadas + AppError + asyncHandler · refazer no papel uma transação <code>pg</code> com BEGIN/COMMIT/ROLLBACK.</p>
         </div>
       </section>
 
