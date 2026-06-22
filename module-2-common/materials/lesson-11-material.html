@@ -4,7 +4,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aula 11 — Mergulhando nas Redes — Inteli</title>
+  <title>Aula 11 · Mergulhando nas Redes · Inteli</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../../css/inteli-styles.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -135,7 +135,7 @@
     <div class="container">
       <div class="mat-badge">Módulo 2 · Ciclo Comum · IN02</div>
       <h1>Mergulhando nas Redes</h1>
-      <p class="subtitle">Aula 11 — Material de Leitura Aprofundado</p>
+      <p class="subtitle">Aula 11 · Material de Leitura Aprofundado</p>
       <div class="d-flex gap-2 flex-wrap">
         <a href="../slides/slide-lesson-11.html" class="btn btn-light btn-sm">&#9654; Slides</a>
         <a href="../../index.html" class="btn btn-outline-light btn-sm">&#8592; Voltar ao Módulo</a>
@@ -153,7 +153,7 @@
         <a href="#sec-tcp" class="toc-h3">3. TCP vs UDP</a>
         <a href="#sec-ip" class="toc-h3">4. IP, NAT, portas, sockets</a>
         <a href="#sec-dns">5. DNS</a>
-        <a href="#sec-http" class="toc-h3">6. HTTP — métodos, status, headers</a>
+        <a href="#sec-http" class="toc-h3">6. HTTP · métodos, status, headers</a>
         <a href="#sec-http23" class="toc-h3">7. HTTP/2 e HTTP/3</a>
         <a href="#sec-https">8. HTTPS e TLS</a>
         <a href="#sec-letsencrypt" class="toc-h3">9. Certificados e Let's Encrypt</a>
@@ -168,6 +168,9 @@
         <a href="#sec-stack-impl" class="toc-h3">18. Implicações no nosso stack</a>
         <a href="#sec-anti" class="toc-h3">19. Anti-padrões</a>
         <a href="#sec-checklist">20. Checklist</a>
+        <a href="#sec-sebok">21. SEBoK Parte 3 · Realização e Integração</a>
+        <a href="#sec-tools">22. Ferramentas · Wireshark e Packet Tracer</a>
+        <a href="#sec-glossario">23. Dicionário de Redes</a>
         <a href="#sec-refs">Referências</a>
       </div>
     </aside>
@@ -176,12 +179,12 @@
 
       <section class="mat-section" id="sec-intro">
         <h2>1. Por que redes para o backend</h2>
-        <p>Tem uma piada antiga entre devs: "rede sempre cai". A piada nasce de uma verdade incômoda — a rede é a parte mais imprevisível de qualquer sistema distribuído. Pacotes se perdem, latências variam, DNS atrasa, certificados expiram, NATs fecham conexões, ISPs trocam rotas, e tudo isso acontece sem o seu código saber. Você pode escrever a melhor lógica de domínio do mundo, mas se ela trafega por uma rede mal compreendida, vai falhar de formas que parecem mágicas.</p>
+        <p>Tem uma piada antiga entre devs: "rede sempre cai". A piada nasce de uma verdade incômoda, a rede é a parte mais imprevisível de qualquer sistema distribuído. Pacotes se perdem, latências variam, DNS atrasa, certificados expiram, NATs fecham conexões, ISPs trocam rotas, e tudo isso acontece sem o seu código saber. Você pode escrever a melhor lógica de domínio do mundo, mas se ela trafega por uma rede mal compreendida, vai falhar de formas que parecem mágicas.</p>
         <p>Esta aula é uma <em>imersão</em> na pilha de redes pela ótica do desenvolvedor de backend. Não vamos virar especialistas em BGP nem montar VLANs. Vamos entender o suficiente para tomar boas decisões: por que uma requisição às vezes leva 2 segundos para começar; por que o navegador faz um <em>preflight</em> CORS antes do POST; por que <code>Cache-Control: max-age=3600</code> pode ser uma bomba-relógio; por que o time DevOps reclama quando você não respeita idempotência; o que mudar quando seu app vai pra trás de uma CDN.</p>
 
         <div class="callout callout-info sr">
           <div class="callout-label">A premissa desta aula</div>
-          <p>Vamos assumir o stack do projeto: <strong>TypeScript + Node.js + Express + EJS</strong> servindo HTML por SSR e endpoints JSON por API. Sempre que houver código, ele vai estar em TypeScript — e os exemplos focam em decisões que afetam o nosso código direto, não em RFCs por completude.</p>
+          <p>Vamos assumir o stack do projeto: <strong>TypeScript + Node.js + Express + EJS</strong> servindo HTML por SSR e endpoints JSON por API. Sempre que houver código, ele vai estar em TypeScript, e os exemplos focam em decisões que afetam o nosso código direto, não em RFCs por completude.</p>
         </div>
 
         <h3>O que distingue um dev backend "que sabe redes"</h3>
@@ -189,8 +192,8 @@
       </section>
 
       <section class="mat-section" id="sec-stack">
-        <h2>2. Modelo TCP/IP — quatro camadas</h2>
-        <p>Antes do TCP/IP, o mundo aprendia redes pelo modelo OSI de 7 camadas. Hoje, o que efetivamente roda na Internet é o modelo TCP/IP de 4 camadas. As quatro estão empilhadas: cada camada superior usa serviços da inferior, sem precisar saber como ela faz seu trabalho. Isso é encapsulamento — o mesmo princípio que separa controllers, services e repositories no MVC.</p>
+        <h2>2. Modelo TCP/IP · quatro camadas</h2>
+        <p>Antes do TCP/IP, o mundo aprendia redes pelo modelo OSI de 7 camadas. Hoje, o que efetivamente roda na Internet é o modelo TCP/IP de 4 camadas. As quatro estão empilhadas: cada camada superior usa serviços da inferior, sem precisar saber como ela faz seu trabalho. Isso é encapsulamento, o mesmo princípio que separa controllers, services e repositories no MVC.</p>
 
         <div class="stack">
           <div class="stack-layer app">Application <span class="ex">HTTP, DNS, TLS, SMTP</span></div>
@@ -201,7 +204,7 @@
 
         <ul>
           <li><strong>Link:</strong> cabos, Wi-Fi, MAC addresses. Move bits entre dois nós fisicamente conectados (mesmo segmento).</li>
-          <li><strong>Internet:</strong> IP (Internet Protocol). Roteia pacotes entre redes — sabe como chegar do seu Wi-Fi de casa ao servidor em São Paulo passando pelo provedor.</li>
+          <li><strong>Internet:</strong> IP (Internet Protocol). Roteia pacotes entre redes, sabe como chegar do seu Wi-Fi de casa ao servidor em São Paulo passando pelo provedor.</li>
           <li><strong>Transport:</strong> TCP ou UDP. Adiciona <em>portas</em>, controle de erro e (no caso de TCP) entrega ordenada.</li>
           <li><strong>Application:</strong> HTTP, DNS, SMTP, gRPC. O que sua aplicação <em>realmente</em> fala.</li>
         </ul>
@@ -209,22 +212,22 @@
         <p>Cada camada adiciona seu próprio <em>header</em> ao pacote. Quando seu Express envia <code>{ "ok": true }</code>, isso passa por: <code>HTTP body</code> → envelope HTTP → segmento TCP → datagrama IP → quadro Ethernet. No outro lado, descasca tudo na ordem inversa. Saber que isso existe ajuda a entender ferramentas como <code>tcpdump</code>, <code>wireshark</code> e a maioria dos perfis de erro de rede.</p>
 
         <div class="callout callout-deep sr">
-          <div class="callout-label">OSI 7 camadas — quando ainda é útil</div>
+          <div class="callout-label">OSI 7 camadas, quando ainda é útil</div>
           <p>O modelo OSI (Físico, Enlace, Rede, Transporte, Sessão, Apresentação, Aplicação) sobrevive como vocabulário. Quando alguém diz "isso é problema de camada 7" (lê-se "camada de aplicação", como HTTP) ou "load balancer L4 vs L7", está falando OSI. Para o dia a dia de backend, o TCP/IP de 4 camadas é mais direto.</p>
         </div>
       </section>
 
       <section class="mat-section" id="sec-tcp">
-        <h2>3. TCP vs UDP — confiável ou veloz</h2>
+        <h2>3. TCP vs UDP · confiável ou veloz</h2>
         <p>Na camada de transporte, dois protocolos disputam a maioria do tráfego. <strong>TCP</strong> é confiável, ordenado, com controle de fluxo e congestionamento. <strong>UDP</strong> é leve, sem garantia de entrega nem de ordem. A escolha depende do que você está mandando.</p>
 
         <table class="mat-table">
           <thead><tr><th></th><th>TCP</th><th>UDP</th></tr></thead>
           <tbody>
-            <tr><td><strong>Conexão</strong></td><td>3-way handshake antes</td><td>Sem handshake — manda direto</td></tr>
+            <tr><td><strong>Conexão</strong></td><td>3-way handshake antes</td><td>Sem handshake, manda direto</td></tr>
             <tr><td><strong>Garantia de entrega</strong></td><td>Sim (retransmite perdidos)</td><td>Não (perdeu, perdeu)</td></tr>
             <tr><td><strong>Ordem</strong></td><td>Garantida</td><td>Pacotes podem chegar fora de ordem</td></tr>
-            <tr><td><strong>Controle de congestão</strong></td><td>Sim (slow-start, AIMD)</td><td>Não — você implementa se quiser</td></tr>
+            <tr><td><strong>Controle de congestão</strong></td><td>Sim (slow-start, AIMD)</td><td>Não, você implementa se quiser</td></tr>
             <tr><td><strong>Casos de uso</strong></td><td>HTTP/1, HTTP/2, SSH, banco</td><td>DNS, streaming, jogos, VoIP</td></tr>
             <tr><td><strong>Custo da primeira conexão</strong></td><td>~1 RTT só pro handshake</td><td>0 RTT</td></tr>
           </tbody>
@@ -233,17 +236,17 @@
         <h3>O 3-way handshake do TCP</h3>
         <p>Antes de transmitir dados, TCP estabelece uma conexão em três passos:</p>
         <ol>
-          <li><strong>SYN</strong> — cliente envia "quero conversar, número de sequência X".</li>
-          <li><strong>SYN-ACK</strong> — servidor responde "ok, e meu número é Y, confirmo X+1".</li>
-          <li><strong>ACK</strong> — cliente confirma "Y+1 recebido". Conexão aberta.</li>
+          <li><strong>SYN</strong>, cliente envia "quero conversar, número de sequência X".</li>
+          <li><strong>SYN-ACK</strong>, servidor responde "ok, e meu número é Y, confirmo X+1".</li>
+          <li><strong>ACK</strong>, cliente confirma "Y+1 recebido". Conexão aberta.</li>
         </ol>
-        <p>Cada passo é um RTT (Round-Trip Time, latência ida-e-volta). Em redes próximas, isso é ~5ms. Entre Brasil e Estados Unidos, ~150ms. Multiplicado por dezenas de requisições, vira segundos visíveis ao usuário — daí toda a obsessão moderna por <em>connection reuse</em>, <em>keep-alive</em> e protocolos sem handshake.</p>
+        <p>Cada passo é um RTT (Round-Trip Time, latência ida-e-volta). Em redes próximas, isso é ~5ms. Entre Brasil e Estados Unidos, ~150ms. Multiplicado por dezenas de requisições, vira segundos visíveis ao usuário, daí toda a obsessão moderna por <em>connection reuse</em>, <em>keep-alive</em> e protocolos sem handshake.</p>
 
         <h3>Quando UDP é a melhor escolha</h3>
-        <p>UDP brilha quando perder um pacote ocasional importa menos que latência. Em <strong>DNS</strong>, perder uma resposta é só perguntar de novo — abrir TCP para cada lookup atrasaria toda a navegação. Em <strong>streaming de vídeo</strong>, perder um frame ruim é melhor que pausar a tela esperando retransmissão. Em <strong>jogos online</strong>, posição do inimigo daqui a 50ms é mais útil que posição certa daqui a 500ms.</p>
+        <p>UDP brilha quando perder um pacote ocasional importa menos que latência. Em <strong>DNS</strong>, perder uma resposta é só perguntar de novo, abrir TCP para cada lookup atrasaria toda a navegação. Em <strong>streaming de vídeo</strong>, perder um frame ruim é melhor que pausar a tela esperando retransmissão. Em <strong>jogos online</strong>, posição do inimigo daqui a 50ms é mais útil que posição certa daqui a 500ms.</p>
 
-        <h3>HTTP/3 e QUIC — UDP escondendo TCP</h3>
-        <p>HTTP/3, padronizado em 2022, é HTTP sobre <strong>QUIC</strong>, e QUIC é um protocolo de transporte que roda em cima de UDP. Em vez de pegar TCP no kernel (lento de evoluir, fixo no S.O.), QUIC implementa em user-space: sem head-of-line blocking, com 0-RTT de retomada de conexão, criptografia obrigatória (TLS 1.3 embutido). É UDP com confiabilidade reescrita do zero — e é o que move boa parte do tráfego do Google e do Cloudflare hoje.</p>
+        <h3>HTTP/3 e QUIC · UDP escondendo TCP</h3>
+        <p>HTTP/3, padronizado em 2022, é HTTP sobre <strong>QUIC</strong>, e QUIC é um protocolo de transporte que roda em cima de UDP. Em vez de pegar TCP no kernel (lento de evoluir, fixo no S.O.), QUIC implementa em user-space: sem head-of-line blocking, com 0-RTT de retomada de conexão, criptografia obrigatória (TLS 1.3 embutido). É UDP com confiabilidade reescrita do zero, e é o que move boa parte do tráfego do Google e do Cloudflare hoje.</p>
 
         <div class="callout callout-tip sr">
           <div class="callout-label">Você quase nunca escolhe TCP ou UDP diretamente</div>
@@ -255,11 +258,11 @@
         <h2>4. IP, NAT, portas e sockets</h2>
 
         <h3>IPv4 vs IPv6</h3>
-        <p>O IPv4 usa endereços de 32 bits (~4,3 bilhões), escritos em formato decimal pontilhado: <code>192.168.0.1</code>. Esse espaço acabou em 2011. IPv6 usa 128 bits (~3,4×10³⁸ endereços) em hexadecimal com dois-pontos: <code>2001:0db8:85a3::8a2e:0370:7334</code>. A maior parte da Internet hoje convive com os dois — seu servidor escuta nos dois, seu provedor móvel já pode estar lhe entregando IPv6 nativo, e seu <code>fetch</code> sequer percebe a diferença.</p>
+        <p>O IPv4 usa endereços de 32 bits (~4,3 bilhões), escritos em formato decimal pontilhado: <code>192.168.0.1</code>. Esse espaço acabou em 2011. IPv6 usa 128 bits (~3,4×10³⁸ endereços) em hexadecimal com dois-pontos: <code>2001:0db8:85a3::8a2e:0370:7334</code>. A maior parte da Internet hoje convive com os dois, seu servidor escuta nos dois, seu provedor móvel já pode estar lhe entregando IPv6 nativo, e seu <code>fetch</code> sequer percebe a diferença.</p>
 
-        <h3>NAT — por que IP local não é IP público</h3>
+        <h3>NAT · por que IP local não é IP público</h3>
         <p>Seu computador em casa tem um IP da rede local (algo como <code>192.168.0.42</code>) que <em>não existe</em> na Internet. O roteador faz <strong>NAT</strong> (Network Address Translation): quando você manda um pacote, ele troca o IP de origem pelo IP público dele e guarda numa tabela "esse fluxo veio de 192.168.0.42:54321". Quando a resposta volta, ele consulta a tabela e devolve para o computador certo.</p>
-        <p>Para o backend, NAT importa porque: (1) você não pode confiar cegamente que <code>req.ip</code> é o IP do usuário (pode ser o IP do NAT corporativo); (2) conexões NAT têm tempo de vida limitado — se ficarem ociosas, o roteador "esquece" do mapeamento e fecha; (3) servidores backend nunca rodam atrás de NAT residencial — precisam de IP público ou de um proxy reverso.</p>
+        <p>Para o backend, NAT importa porque: (1) você não pode confiar cegamente que <code>req.ip</code> é o IP do usuário (pode ser o IP do NAT corporativo); (2) conexões NAT têm tempo de vida limitado, se ficarem ociosas, o roteador "esquece" do mapeamento e fecha; (3) servidores backend nunca rodam atrás de NAT residencial, precisam de IP público ou de um proxy reverso.</p>
 
         <h3>Portas e sockets</h3>
         <p>Um IP identifica uma máquina; uma <strong>porta</strong> identifica um <em>processo</em> dentro dela. A combinação <code>IP:porta</code> + <code>protocolo</code> é um <strong>socket</strong>. Seu Express escutando em <code>0.0.0.0:3000</code> aceita conexões em qualquer IP da máquina, na porta 3000. Quando um cliente se conecta vindo de <code>200.10.5.7:54912</code>, o sistema operacional cria uma conexão única identificada pela quíntupla <em>(TCP, 200.10.5.7, 54912, IP-do-servidor, 3000)</em>.</p>
@@ -268,23 +271,23 @@
         <table class="mat-table">
           <thead><tr><th>Porta</th><th>Serviço</th><th>Notas</th></tr></thead>
           <tbody>
-            <tr><td><code>80</code></td><td>HTTP</td><td>Texto puro — em desuso para acesso direto</td></tr>
-            <tr><td><code>443</code></td><td>HTTPS</td><td>HTTP sobre TLS — padrão atual</td></tr>
+            <tr><td><code>80</code></td><td>HTTP</td><td>Texto puro, em desuso para acesso direto</td></tr>
+            <tr><td><code>443</code></td><td>HTTPS</td><td>HTTP sobre TLS, padrão atual</td></tr>
             <tr><td><code>22</code></td><td>SSH</td><td>Acesso remoto a servidores</td></tr>
             <tr><td><code>5432</code></td><td>PostgreSQL</td><td>O banco do nosso projeto</td></tr>
-            <tr><td><code>3306</code></td><td>MySQL</td><td>—</td></tr>
+            <tr><td><code>3306</code></td><td>MySQL</td><td>,</td></tr>
             <tr><td><code>6379</code></td><td>Redis</td><td>Cache em memória</td></tr>
-            <tr><td><code>27017</code></td><td>MongoDB</td><td>—</td></tr>
+            <tr><td><code>27017</code></td><td>MongoDB</td><td>,</td></tr>
             <tr><td><code>53</code></td><td>DNS</td><td>UDP (e TCP em consultas grandes)</td></tr>
           </tbody>
         </table>
 
-        <p>Portas abaixo de 1024 são "privilegiadas" — em Linux, só processos root conseguem escutar nelas por padrão. Por isso seu Express em dev usa 3000, e o produção fica atrás de um Nginx (que escuta na 443 e proxya pra 3000).</p>
+        <p>Portas abaixo de 1024 são "privilegiadas", em Linux, só processos root conseguem escutar nelas por padrão. Por isso seu Express em dev usa 3000, e o produção fica atrás de um Nginx (que escuta na 443 e proxya pra 3000).</p>
       </section>
 
       <section class="mat-section" id="sec-dns">
-        <h2>5. DNS — a agenda da Internet</h2>
-        <p>Pessoas digitam <code>inteli.edu.br</code>; máquinas só falam IP. <strong>DNS</strong> (Domain Name System) é o protocolo que traduz nomes em IPs — uma agenda de telefones distribuída, hierárquica e cacheada em mil lugares.</p>
+        <h2>5. DNS · a agenda da Internet</h2>
+        <p>Pessoas digitam <code>inteli.edu.br</code>; máquinas só falam IP. <strong>DNS</strong> (Domain Name System) é o protocolo que traduz nomes em IPs, uma agenda de telefones distribuída, hierárquica e cacheada em mil lugares.</p>
 
         <h3>Tipos de registros (records)</h3>
         <table class="mat-table">
@@ -296,7 +299,7 @@
             <tr><td><strong>MX</strong></td><td>Servidor de e-mail do domínio</td><td><code>10 mx.google.com</code></td></tr>
             <tr><td><strong>TXT</strong></td><td>Texto livre (SPF, verificação de domínio)</td><td><code>"v=spf1 include:..."</code></td></tr>
             <tr><td><strong>NS</strong></td><td>Servidores de nome autoritativos</td><td><code>ns1.cloudflare.com</code></td></tr>
-            <tr><td><strong>SOA</strong></td><td>Metadados da zona (TTL, serial)</td><td>—</td></tr>
+            <tr><td><strong>SOA</strong></td><td>Metadados da zona (TTL, serial)</td><td>,</td></tr>
           </tbody>
         </table>
 
@@ -312,13 +315,13 @@
           <li>Resolver pergunta ao autoritativo o registro A. Recebe o IP.</li>
           <li>Resolver guarda em cache pelo TTL e devolve para o S.O.</li>
         </ol>
-        <p>Esse vai-e-volta acontece em milissegundos quando há cache, e em centenas de ms quando não há. Por isso o primeiro acesso a um site novo "demora" — DNS frio.</p>
+        <p>Esse vai-e-volta acontece em milissegundos quando há cache, e em centenas de ms quando não há. Por isso o primeiro acesso a um site novo "demora", DNS frio.</p>
 
         <h3>TTL e propagação</h3>
         <p>Cada registro DNS tem um <strong>TTL</strong> (Time To Live) em segundos: por quanto tempo um cache pode reusar a resposta. Um TTL de 3600 (1 hora) significa "essa resposta é válida por uma hora; depois, pergunta de novo". TTL alto = poucas consultas, mas mudanças demoram a propagar. TTL baixo = mudanças rápidas, mas DNS lento. A prática consagrada é: TTL alto (1h-24h) em produção estável; abaixar para 60s antes de uma mudança de IP, fazer a mudança, e voltar ao TTL alto.</p>
 
         <div class="code-wrap">
-          <div class="code-label">Bash — investigando DNS<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <div class="code-label">Bash, investigando DNS<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code><span class="hl-cmt"># dig: o canivete suíço do DNS</span>
 dig inteli.edu.br
 dig inteli.edu.br MX
@@ -335,12 +338,12 @@ dig @8.8.8.8 inteli.edu.br</code></pre>
 
         <div class="callout callout-warn sr">
           <div class="callout-label">DNS é o suspeito mais comum em "está lento"</div>
-          <p>Quando uma página demora para abrir e ninguém entende por quê, DNS é o primeiro lugar para olhar. Resolvers ruins, TTLs baixíssimos, registros encadeados em CNAMEs profundos — qualquer um deles adiciona centenas de ms antes do primeiro byte chegar. <code>chrome://net-internals/#dns</code> e <code>resolvectl statistics</code> ajudam a investigar.</p>
+          <p>Quando uma página demora para abrir e ninguém entende por quê, DNS é o primeiro lugar para olhar. Resolvers ruins, TTLs baixíssimos, registros encadeados em CNAMEs profundos, qualquer um deles adiciona centenas de ms antes do primeiro byte chegar. <code>chrome://net-internals/#dns</code> e <code>resolvectl statistics</code> ajudam a investigar.</p>
         </div>
       </section>
 
       <section class="mat-section" id="sec-http">
-        <h2>6. HTTP — métodos, status e headers</h2>
+        <h2>6. HTTP · métodos, status e headers</h2>
         <p>HTTP é o protocolo de aplicação da web. Texto puro (em HTTP/1.1), <em>request/response</em>, sem estado. Cada requisição é um pacote auto-contido que diz "fazer essa ação nesse recurso" e recebe uma resposta com código numérico + corpo.</p>
 
         <h3>Métodos (verbos)</h3>
@@ -353,17 +356,17 @@ dig @8.8.8.8 inteli.edu.br</code></pre>
             <tr><td><code>PATCH</code></td><td>Atualizar parcial</td><td>Depende</td><td>Não</td></tr>
             <tr><td><code>DELETE</code></td><td>Apagar recurso</td><td>Sim</td><td>Não</td></tr>
             <tr><td><code>HEAD</code></td><td>Como GET, mas só headers</td><td>Sim</td><td>Sim</td></tr>
-            <tr><td><code>OPTIONS</code></td><td>Capacidades / CORS preflight</td><td>Sim</td><td>—</td></tr>
+            <tr><td><code>OPTIONS</code></td><td>Capacidades / CORS preflight</td><td>Sim</td><td>,</td></tr>
           </tbody>
         </table>
 
-        <h3>Status codes — recap rápido</h3>
+        <h3>Status codes · recap rápido</h3>
         <ul>
           <li><strong>1xx</strong> informativo (raramente usado)</li>
-          <li><strong>2xx</strong> sucesso — <code>200 OK</code>, <code>201 Created</code>, <code>204 No Content</code></li>
-          <li><strong>3xx</strong> redirect — <code>301 Moved Permanently</code>, <code>302 Found</code>, <code>304 Not Modified</code></li>
-          <li><strong>4xx</strong> erro do cliente — <code>400 Bad Request</code>, <code>401 Unauthorized</code>, <code>403 Forbidden</code>, <code>404 Not Found</code>, <code>409 Conflict</code>, <code>429 Too Many Requests</code></li>
-          <li><strong>5xx</strong> erro do servidor — <code>500 Internal Server Error</code>, <code>502 Bad Gateway</code>, <code>503 Service Unavailable</code>, <code>504 Gateway Timeout</code></li>
+          <li><strong>2xx</strong> sucesso, <code>200 OK</code>, <code>201 Created</code>, <code>204 No Content</code></li>
+          <li><strong>3xx</strong> redirect, <code>301 Moved Permanently</code>, <code>302 Found</code>, <code>304 Not Modified</code></li>
+          <li><strong>4xx</strong> erro do cliente, <code>400 Bad Request</code>, <code>401 Unauthorized</code>, <code>403 Forbidden</code>, <code>404 Not Found</code>, <code>409 Conflict</code>, <code>429 Too Many Requests</code></li>
+          <li><strong>5xx</strong> erro do servidor, <code>500 Internal Server Error</code>, <code>502 Bad Gateway</code>, <code>503 Service Unavailable</code>, <code>504 Gateway Timeout</code></li>
         </ul>
         <p>A diferença entre <code>500</code> e <code>503</code> é importante para clientes: <code>500</code> "tem bug, não retente cegamente"; <code>503</code> "estou ocupado, retente daqui a pouco". Bibliotecas modernas de retry usam essa distinção.</p>
 
@@ -384,7 +387,7 @@ dig @8.8.8.8 inteli.edu.br</code></pre>
         </table>
 
         <div class="code-wrap">
-          <div class="code-label">TypeScript — fetch com headers explícitos<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <div class="code-label">TypeScript, fetch com headers explícitos<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code><span class="hl-kw">const</span> res = <span class="hl-kw">await</span> <span class="hl-fn">fetch</span>(<span class="hl-str">'https://api.exemplo.com/users'</span>, {
   method: <span class="hl-str">'POST'</span>,
   headers: {
@@ -407,7 +410,7 @@ dig @8.8.8.8 inteli.edu.br</code></pre>
           <tbody>
             <tr><td><strong>Transporte</strong></td><td>TCP</td><td>TCP + TLS</td><td>QUIC (UDP) + TLS 1.3</td></tr>
             <tr><td><strong>Formato</strong></td><td>Texto</td><td>Binário (frames)</td><td>Binário (frames)</td></tr>
-            <tr><td><strong>Multiplexação</strong></td><td>Não — 1 por conexão</td><td>Sim — vários streams na mesma conexão</td><td>Sim, sem head-of-line blocking</td></tr>
+            <tr><td><strong>Multiplexação</strong></td><td>Não, 1 por conexão</td><td>Sim, vários streams na mesma conexão</td><td>Sim, sem head-of-line blocking</td></tr>
             <tr><td><strong>Header compression</strong></td><td>Não</td><td>HPACK</td><td>QPACK</td></tr>
             <tr><td><strong>Server push</strong></td><td>Não</td><td>Sim (pouco usado, agora obsoleto)</td><td>Removido</td></tr>
             <tr><td><strong>0-RTT resume</strong></td><td>Não</td><td>Não</td><td>Sim</td></tr>
@@ -415,31 +418,31 @@ dig @8.8.8.8 inteli.edu.br</code></pre>
         </table>
 
         <p>O grande salto de HTTP/1.1 para HTTP/2 foi <em>multiplexação</em>: numa única conexão TCP, vários requests/responses voam em paralelo (em "streams"), em vez de serem enfileirados. Isso elimina a necessidade do truque antigo de "domain sharding" (espalhar assets por subdomínios para abrir mais conexões TCP).</p>
-        <p>HTTP/3 resolve um problema sutil de HTTP/2: <em>head-of-line blocking</em> no nível do TCP. Se um pacote TCP é perdido, todos os streams ficam parados esperando retransmissão — porque o TCP entrega em ordem. QUIC entrega cada stream independentemente, então perder um pacote afeta só um stream. Em redes ruins (móvel, Wi-Fi público), HTTP/3 percebe ganhos visíveis.</p>
+        <p>HTTP/3 resolve um problema sutil de HTTP/2: <em>head-of-line blocking</em> no nível do TCP. Se um pacote TCP é perdido, todos os streams ficam parados esperando retransmissão, porque o TCP entrega em ordem. QUIC entrega cada stream independentemente, então perder um pacote afeta só um stream. Em redes ruins (móvel, Wi-Fi público), HTTP/3 percebe ganhos visíveis.</p>
 
         <div class="callout callout-info sr">
           <div class="callout-label">Você (provavelmente) não escolhe a versão</div>
-          <p>Node.js falar HTTP/2 nativamente é fácil (<code>http2.createSecureServer</code>), mas a maioria dos projetos coloca um Nginx, Caddy ou Cloudflare na frente. Esses já negociam HTTP/2 ou HTTP/3 com o cliente automaticamente — seu Express continua falando HTTP/1.1 com o proxy. É o suficiente para 95% dos casos.</p>
+          <p>Node.js falar HTTP/2 nativamente é fácil (<code>http2.createSecureServer</code>), mas a maioria dos projetos coloca um Nginx, Caddy ou Cloudflare na frente. Esses já negociam HTTP/2 ou HTTP/3 com o cliente automaticamente, seu Express continua falando HTTP/1.1 com o proxy. É o suficiente para 95% dos casos.</p>
         </div>
       </section>
 
       <section class="mat-section" id="sec-https">
-        <h2>8. HTTPS e TLS — handshake conceitual</h2>
+        <h2>8. HTTPS e TLS · handshake conceitual</h2>
         <p>HTTPS é HTTP sobre <strong>TLS</strong> (Transport Layer Security, sucessor do SSL). TLS adiciona três coisas ao tráfego HTTP: <strong>confidencialidade</strong> (ninguém vê o conteúdo no caminho), <strong>integridade</strong> (ninguém altera no caminho) e <strong>autenticidade</strong> (você sabe que está falando com o servidor verdadeiro). Sem TLS, qualquer roteador entre você e o servidor pode ler e modificar suas requisições.</p>
 
-        <h3>O handshake — versão simplificada</h3>
+        <h3>O handshake · versão simplificada</h3>
         <ol>
-          <li><strong>ClientHello</strong> — cliente diz "aqui estão as versões TLS, suítes de cifras e <em>extensions</em> que sei usar; meu random é X".</li>
-          <li><strong>ServerHello + Certificate</strong> — servidor escolhe versão e suíte; envia seu certificado X.509.</li>
+          <li><strong>ClientHello</strong>, cliente diz "aqui estão as versões TLS, suítes de cifras e <em>extensions</em> que sei usar; meu random é X".</li>
+          <li><strong>ServerHello + Certificate</strong>, servidor escolhe versão e suíte; envia seu certificado X.509.</li>
           <li><strong>Cliente valida o certificado</strong> contra a CA raiz que conhece (cadeia de confiança).</li>
-          <li><strong>Key exchange</strong> — usando ECDHE (Elliptic Curve Diffie-Hellman Ephemeral), ambos derivam um segredo compartilhado <em>sem</em> transmiti-lo.</li>
-          <li><strong>Finished</strong> — ambos confirmam usando o segredo. A partir daqui, todo dado é criptografado.</li>
+          <li><strong>Key exchange</strong>, usando ECDHE (Elliptic Curve Diffie-Hellman Ephemeral), ambos derivam um segredo compartilhado <em>sem</em> transmiti-lo.</li>
+          <li><strong>Finished</strong>, ambos confirmam usando o segredo. A partir daqui, todo dado é criptografado.</li>
         </ol>
-        <p>Em TLS 1.3 (a versão atual), tudo isso acontece em 1-RTT — e em retomadas, em 0-RTT (o cliente já manda dados criptografados na primeira mensagem, usando o segredo da sessão anterior). É uma das razões para HTTP/3 ser tão rápido.</p>
+        <p>Em TLS 1.3 (a versão atual), tudo isso acontece em 1-RTT, e em retomadas, em 0-RTT (o cliente já manda dados criptografados na primeira mensagem, usando o segredo da sessão anterior). É uma das razões para HTTP/3 ser tão rápido.</p>
 
         <div class="callout callout-deep sr">
           <div class="callout-label">Por que ECDHE em vez de RSA</div>
-          <p>Antigamente, o cliente cifrava o segredo de sessão com a chave pública RSA do servidor e mandava. Funciona — mas se a chave RSA do servidor for comprometida no futuro, alguém que tenha gravado todo o tráfego antigo pode descriptografar tudo. ECDHE usa chaves efêmeras (uma por handshake), garantindo <strong>forward secrecy</strong>: comprometer a chave do servidor amanhã não te dá acesso ao tráfego de hoje.</p>
+          <p>Antigamente, o cliente cifrava o segredo de sessão com a chave pública RSA do servidor e mandava. Funciona, mas se a chave RSA do servidor for comprometida no futuro, alguém que tenha gravado todo o tráfego antigo pode descriptografar tudo. ECDHE usa chaves efêmeras (uma por handshake), garantindo <strong>forward secrecy</strong>: comprometer a chave do servidor amanhã não te dá acesso ao tráfego de hoje.</p>
         </div>
       </section>
 
@@ -447,16 +450,16 @@ dig @8.8.8.8 inteli.edu.br</code></pre>
         <h2>9. Certificados e Let's Encrypt</h2>
         <p>Um <strong>certificado X.509</strong> é um documento assinado por uma <em>autoridade certificadora</em> (CA) que diz: "a chave pública desse domínio é essa". Seu navegador confia em algumas dezenas de CAs raiz de fábrica (Let's Encrypt, DigiCert, Sectigo, etc.). Se um certificado é assinado por uma CA confiável e o domínio bate, o cadeado verde aparece.</p>
 
-        <h3>Let's Encrypt — TLS de graça</h3>
+        <h3>Let's Encrypt · TLS de graça</h3>
         <p>Antes de 2015, certificados custavam dezenas de dólares por ano. <strong>Let's Encrypt</strong> mudou isso emitindo certificados gratuitos via protocolo <strong>ACME</strong> (Automatic Certificate Management Environment). O fluxo:</p>
         <ol>
           <li>Você roda <code>certbot</code> (ou <code>caddy</code>, ou <code>traefik</code>) no seu servidor.</li>
           <li>Ele pede certificado para <code>seusite.com</code>.</li>
-          <li>Let's Encrypt diz: "prove que você controla esse domínio — coloque esse arquivo em <code>http://seusite.com/.well-known/acme-challenge/...</code>".</li>
+          <li>Let's Encrypt diz: "prove que você controla esse domínio, coloque esse arquivo em <code>http://seusite.com/.well-known/acme-challenge/...</code>".</li>
           <li>Você (ou o cliente ACME) coloca o arquivo. Let's Encrypt verifica e emite o cert.</li>
           <li>Cert vale 90 dias; o cliente ACME renova automaticamente a cada 60.</li>
         </ol>
-        <p>Resultado: HTTPS deixou de ser um "extra premium" e virou o padrão. Hoje, servir HTTP puro num site público é considerado má prática — Chrome inclusive marca como "Not Secure".</p>
+        <p>Resultado: HTTPS deixou de ser um "extra premium" e virou o padrão. Hoje, servir HTTP puro num site público é considerado má prática, Chrome inclusive marca como "Not Secure".</p>
 
         <div class="callout callout-warn sr">
           <div class="callout-label">Mixed content quebra HTTPS</div>
@@ -465,7 +468,7 @@ dig @8.8.8.8 inteli.edu.br</code></pre>
       </section>
 
       <section class="mat-section" id="sec-cache">
-        <h2>10. Cache HTTP — Cache-Control</h2>
+        <h2>10. Cache HTTP · Cache-Control</h2>
         <p>Cache é a otimização que mais entrega resultado por linha de configuração. O header <code>Cache-Control</code> diz a navegadores, CDNs e proxies por quanto tempo (e como) eles podem reusar uma resposta sem perguntar de novo ao servidor.</p>
 
         <h3>Diretivas que importam</h3>
@@ -475,35 +478,35 @@ dig @8.8.8.8 inteli.edu.br</code></pre>
             <tr><td><code>max-age=N</code></td><td>Cache fresco por N segundos</td></tr>
             <tr><td><code>s-maxage=N</code></td><td>Mesma coisa, mas só para CDNs/proxies (sobrescreve max-age)</td></tr>
             <tr><td><code>public</code></td><td>Qualquer cache (browser, CDN) pode armazenar</td></tr>
-            <tr><td><code>private</code></td><td>Só o cache do <em>browser do usuário</em> — CDN não armazena</td></tr>
+            <tr><td><code>private</code></td><td>Só o cache do <em>browser do usuário</em>, CDN não armazena</td></tr>
             <tr><td><code>no-cache</code></td><td>Pode armazenar, mas SEMPRE revalidar antes de usar</td></tr>
             <tr><td><code>no-store</code></td><td>Não armazenar de jeito nenhum</td></tr>
             <tr><td><code>must-revalidate</code></td><td>Quando expirar, não usar versão velha mesmo se servidor estiver fora</td></tr>
-            <tr><td><code>immutable</code></td><td>Promete nunca mudar — browser pula validação até max-age</td></tr>
+            <tr><td><code>immutable</code></td><td>Promete nunca mudar, browser pula validação até max-age</td></tr>
           </tbody>
         </table>
 
         <div class="code-wrap">
-          <div class="code-label">TypeScript — Cache-Control no Express<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <div class="code-label">TypeScript, Cache-Control no Express<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code><span class="hl-cmt">// página HTML pública (landing page)</span>
 app.<span class="hl-fn">get</span>(<span class="hl-str">'/'</span>, (req, res) =&gt; {
   res.<span class="hl-fn">setHeader</span>(<span class="hl-str">'Cache-Control'</span>, <span class="hl-str">'public, max-age=300'</span>);
   res.<span class="hl-fn">render</span>(<span class="hl-str">'home'</span>);
 });
 
-<span class="hl-cmt">// página personalizada (depende de usuário logado) — NUNCA public</span>
+<span class="hl-cmt">// página personalizada (depende de usuário logado), NUNCA public</span>
 app.<span class="hl-fn">get</span>(<span class="hl-str">'/perfil'</span>, (req, res) =&gt; {
   res.<span class="hl-fn">setHeader</span>(<span class="hl-str">'Cache-Control'</span>, <span class="hl-str">'private, no-cache'</span>);
   res.<span class="hl-fn">render</span>(<span class="hl-str">'perfil'</span>, { user: req.user });
 });
 
-<span class="hl-cmt">// estáticos versionados (com hash no nome) — cache eterno</span>
+<span class="hl-cmt">// estáticos versionados (com hash no nome), cache eterno</span>
 app.<span class="hl-fn">use</span>(<span class="hl-str">'/static'</span>, express.<span class="hl-fn">static</span>(<span class="hl-str">'public'</span>, {
   maxAge: <span class="hl-str">'1y'</span>,
   immutable: <span class="hl-kw">true</span>,
 }));
 
-<span class="hl-cmt">// API que pode mudar — sem cache</span>
+<span class="hl-cmt">// API que pode mudar, sem cache</span>
 app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/notificacoes'</span>, (req, res) =&gt; {
   res.<span class="hl-fn">setHeader</span>(<span class="hl-str">'Cache-Control'</span>, <span class="hl-str">'no-store'</span>);
   res.<span class="hl-fn">json</span>(notificacoes);
@@ -512,15 +515,15 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/notificacoes'</spa
 
         <h3>Camadas de cache</h3>
         <ul>
-          <li><strong>Browser</strong> — cache local do usuário. Mais perto, mais rápido.</li>
-          <li><strong>CDN</strong> — armazena no edge, próximo geograficamente do usuário.</li>
-          <li><strong>Reverse proxy</strong> (Nginx, Varnish) — cache na sua infraestrutura, na frente do app.</li>
-          <li><strong>App layer</strong> — Redis, Memcached, ou cache em memória do processo.</li>
+          <li><strong>Browser</strong>, cache local do usuário. Mais perto, mais rápido.</li>
+          <li><strong>CDN</strong>, armazena no edge, próximo geograficamente do usuário.</li>
+          <li><strong>Reverse proxy</strong> (Nginx, Varnish), cache na sua infraestrutura, na frente do app.</li>
+          <li><strong>App layer</strong>, Redis, Memcached, ou cache em memória do processo.</li>
         </ul>
 
         <div class="callout callout-danger sr">
           <div class="callout-label">Cache-Control: public num endpoint autenticado é uma catástrofe</div>
-          <p>Imagine uma página de perfil retornando <code>Cache-Control: public, max-age=3600</code> com a CDN na frente. A primeira requisição cacheia o perfil do usuário A. As próximas requisições — de qualquer outro usuário — recebem o perfil do A. Vazamento de dados em escala. Em endpoints que dependem de cookie/Authorization, sempre <code>private</code> ou <code>no-store</code>.</p>
+          <p>Imagine uma página de perfil retornando <code>Cache-Control: public, max-age=3600</code> com a CDN na frente. A primeira requisição cacheia o perfil do usuário A. As próximas requisições, de qualquer outro usuário, recebem o perfil do A. Vazamento de dados em escala. Em endpoints que dependem de cookie/Authorization, sempre <code>private</code> ou <code>no-store</code>.</p>
         </div>
       </section>
 
@@ -532,7 +535,7 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/notificacoes'</spa
         <p>O servidor envia, junto da resposta, um header <code>ETag</code> com um identificador da versão do conteúdo (geralmente um hash). Da próxima vez, o cliente envia <code>If-None-Match</code> com esse ETag. Se o servidor verificar que o conteúdo continua o mesmo, responde <code>304</code> sem corpo. Economia: zero bytes de payload.</p>
 
         <div class="code-wrap">
-          <div class="code-label">HTTP — fluxo de ETag<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <div class="code-label">HTTP, fluxo de ETag<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code><span class="hl-cmt"># 1. Primeira requisição</span>
 GET /api/produtos HTTP/1.1
 
@@ -549,16 +552,16 @@ If-None-Match: <span class="hl-str">"a8f93b1c"</span>
 
 HTTP/1.1 304 Not Modified
 ETag: <span class="hl-str">"a8f93b1c"</span>
-<span class="hl-cmt"># sem corpo — cliente reusa o que tinha em cache</span></code></pre>
+<span class="hl-cmt"># sem corpo, cliente reusa o que tinha em cache</span></code></pre>
         </div>
 
-        <h3>Last-Modified — alternativa baseada em data</h3>
-        <p>O servidor envia <code>Last-Modified: Wed, 21 Oct 2025 07:28:00 GMT</code>. O cliente, na próxima vez, manda <code>If-Modified-Since: ...</code>. Se nada mudou desde então, <code>304</code>. Tem precisão de 1 segundo (versus ETag que pode ser arbitrário) e não funciona bem se o conteúdo é gerado dinamicamente — daí ETag costuma ser preferido.</p>
+        <h3>Last-Modified · alternativa baseada em data</h3>
+        <p>O servidor envia <code>Last-Modified: Wed, 21 Oct 2025 07:28:00 GMT</code>. O cliente, na próxima vez, manda <code>If-Modified-Since: ...</code>. Se nada mudou desde então, <code>304</code>. Tem precisão de 1 segundo (versus ETag que pode ser arbitrário) e não funciona bem se o conteúdo é gerado dinamicamente, daí ETag costuma ser preferido.</p>
 
         <p>Express já implementa ETag automaticamente para respostas estáticas. Para JSON dinâmico, gere você mesmo:</p>
 
         <div class="code-wrap">
-          <div class="code-label">TypeScript — ETag manual<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <div class="code-label">TypeScript, ETag manual<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code><span class="hl-kw">import</span> { createHash } <span class="hl-kw">from</span> <span class="hl-str">'crypto'</span>;
 
 app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/produtos'</span>, <span class="hl-kw">async</span> (req, res) =&gt; {
@@ -577,7 +580,7 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/produtos'</span>, 
       </section>
 
       <section class="mat-section" id="sec-cdn">
-        <h2>12. CDN — entregando do edge</h2>
+        <h2>12. CDN · entregando do edge</h2>
         <p>Uma <strong>CDN</strong> (Content Delivery Network) é uma rede de servidores espalhados pelo mundo que armazena cópias do seu conteúdo perto fisicamente do usuário. Em vez do navegador em São Paulo buscar uma imagem no seu servidor de Virginia (latência ~150ms), busca no <em>PoP</em> (Point of Presence) da CDN em São Paulo (latência ~5ms).</p>
 
         <h3>Anatomia</h3>
@@ -591,10 +594,10 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/produtos'</span>, 
 
         <h3>Quem domina o mercado</h3>
         <ul>
-          <li><strong>Cloudflare</strong> — popular para sites públicos; tem plano grátis robusto.</li>
-          <li><strong>Fastly</strong> — querida do mundo SaaS por flexibilidade (VCL).</li>
-          <li><strong>AWS CloudFront</strong> — integrado ao stack AWS.</li>
-          <li><strong>Akamai</strong> — pioneira; muito usada por empresas grandes.</li>
+          <li><strong>Cloudflare</strong>, popular para sites públicos; tem plano grátis robusto.</li>
+          <li><strong>Fastly</strong>, querida do mundo SaaS por flexibilidade (VCL).</li>
+          <li><strong>AWS CloudFront</strong>, integrado ao stack AWS.</li>
+          <li><strong>Akamai</strong>, pioneira; muito usada por empresas grandes.</li>
         </ul>
 
         <p>Para o backend dev, pôr CDN na frente da aplicação afeta o que escrever no <code>Cache-Control</code>: a CDN obedece <code>s-maxage</code> antes de <code>max-age</code>; respeita <code>private</code> (não cacheia); e geralmente respeita <code>Vary: Cookie</code> para não vazar dados entre usuários. Estáticos com hash no nome (<code>app.a8f9b1.js</code>) podem ter cache eterno (<code>max-age=31536000, immutable</code>) porque uma mudança gera novo nome.</p>
@@ -609,11 +612,11 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/produtos'</span>, 
         <h2>13. Retry, backoff exponencial, jitter, timeout</h2>
         <p>Toda chamada de rede pode falhar. Conexão é interrompida, servidor está sobrecarregado, DNS expirou, certificado mudou. Como reagir? Há quatro técnicas que, juntas, transformam "falhou" em "se recuperou silenciosamente".</p>
 
-        <h3>Timeout — sempre</h3>
+        <h3>Timeout · sempre</h3>
         <p>Sem timeout, uma requisição pode pendurar para sempre. Em Node.js, isso significa um worker preso, uma conexão de banco esperando, um usuário olhando para a tela girando. <strong>Toda chamada externa deve ter timeout</strong>. O <code>fetch</code> nativo do Node aceita um <code>AbortSignal</code>:</p>
 
         <div class="code-wrap">
-          <div class="code-label">TypeScript — fetch com timeout via AbortController<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <div class="code-label">TypeScript, fetch com timeout via AbortController<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code><span class="hl-kw">async function</span> <span class="hl-fn">fetchComTimeout</span>(url: <span class="hl-typ">string</span>, ms = <span class="hl-num">3000</span>) {
   <span class="hl-kw">const</span> controller = <span class="hl-kw">new</span> <span class="hl-typ">AbortController</span>();
   <span class="hl-kw">const</span> t = <span class="hl-fn">setTimeout</span>(() =&gt; controller.<span class="hl-fn">abort</span>(), ms);
@@ -627,13 +630,13 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/produtos'</span>, 
         </div>
 
         <h3>Retry com backoff exponencial</h3>
-        <p>Tentar de novo imediatamente quando falhou ajuda em problemas transitórios (pacote perdido). Mas se o servidor está caído, dezenas de retries em milissegundos só pioram. <strong>Backoff exponencial</strong> aumenta o intervalo entre tentativas: 100ms, 200ms, 400ms, 800ms... — cada falha dobra a espera. Isso reduz pressão no servidor que está se recuperando.</p>
+        <p>Tentar de novo imediatamente quando falhou ajuda em problemas transitórios (pacote perdido). Mas se o servidor está caído, dezenas de retries em milissegundos só pioram. <strong>Backoff exponencial</strong> aumenta o intervalo entre tentativas: 100ms, 200ms, 400ms, 800ms..., cada falha dobra a espera. Isso reduz pressão no servidor que está se recuperando.</p>
 
-        <h3>Jitter — quebrando a sincronia</h3>
-        <p>Imagine 1000 clientes errarem ao mesmo tempo (servidor reiniciou). Todos esperam exatamente 100ms e tentam de novo... ao mesmo tempo. Trovoada. <strong>Jitter</strong> adiciona uma variação aleatória: cada cliente espera entre 50ms e 150ms, espalhando os retries no tempo. Algumas implementações usam jitter "full" (delay aleatório de 0 a 2× o backoff teórico) — costuma ser ainda mais resiliente.</p>
+        <h3>Jitter · quebrando a sincronia</h3>
+        <p>Imagine 1000 clientes errarem ao mesmo tempo (servidor reiniciou). Todos esperam exatamente 100ms e tentam de novo... ao mesmo tempo. Trovoada. <strong>Jitter</strong> adiciona uma variação aleatória: cada cliente espera entre 50ms e 150ms, espalhando os retries no tempo. Algumas implementações usam jitter "full" (delay aleatório de 0 a 2× o backoff teórico), costuma ser ainda mais resiliente.</p>
 
         <div class="code-wrap">
-          <div class="code-label">TypeScript — retry com backoff + jitter<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <div class="code-label">TypeScript, retry com backoff + jitter<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code><span class="hl-kw">async function</span> <span class="hl-fn">retry</span>&lt;<span class="hl-typ">T</span>&gt;(
   fn: () =&gt; <span class="hl-typ">Promise</span>&lt;<span class="hl-typ">T</span>&gt;,
   tentativas = <span class="hl-num">3</span>,
@@ -664,7 +667,7 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/produtos'</span>, 
 
       <section class="mat-section" id="sec-idempotente">
         <h2>14. Idempotência</h2>
-        <p>Uma operação é <strong>idempotente</strong> quando executar N vezes produz o mesmo efeito que executar 1 vez. <code>GET /users/42</code>, <code>PUT /users/42 {nome:"Ada"}</code>, <code>DELETE /users/42</code> — todas idempotentes. <code>POST /pedidos {...}</code>, em geral, NÃO é: dois POSTs criam dois pedidos.</p>
+        <p>Uma operação é <strong>idempotente</strong> quando executar N vezes produz o mesmo efeito que executar 1 vez. <code>GET /users/42</code>, <code>PUT /users/42 {nome:"Ada"}</code>, <code>DELETE /users/42</code>, todas idempotentes. <code>POST /pedidos {...}</code>, em geral, NÃO é: dois POSTs criam dois pedidos.</p>
 
         <p>Por que importa: retries só são seguros em operações idempotentes. Se a rede caiu depois do servidor processar, mas antes do cliente receber a resposta, retentar um POST pode duplicar o efeito. Cobrar um cartão duas vezes. Enviar o e-mail duas vezes. Criar o usuário duas vezes.</p>
 
@@ -672,7 +675,7 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/produtos'</span>, 
         <p>O padrão de mercado para tornar POSTs idempotentes é o <strong>Idempotency-Key</strong>. O cliente gera um UUID, manda no header, e o servidor armazena. Se chega um POST com a mesma Idempotency-Key e mesmo corpo dentro de uma janela (ex.: 24h), o servidor retorna a resposta original sem re-executar a operação.</p>
 
         <div class="code-wrap">
-          <div class="code-label">TypeScript — middleware de idempotência<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <div class="code-label">TypeScript, middleware de idempotência<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code><span class="hl-kw">import</span> <span class="hl-kw">type</span> { <span class="hl-typ">Request</span>, <span class="hl-typ">Response</span>, <span class="hl-typ">NextFunction</span> } <span class="hl-kw">from</span> <span class="hl-str">'express'</span>;
 
 <span class="hl-kw">const</span> store = <span class="hl-kw">new</span> <span class="hl-typ">Map</span>&lt;<span class="hl-typ">string</span>, { status: <span class="hl-typ">number</span>; body: <span class="hl-typ">unknown</span> }&gt;();
@@ -698,17 +701,17 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/produtos'</span>, 
 
       <section class="mat-section" id="sec-circuit">
         <h2>15. Circuit breaker, bulkhead, fallback</h2>
-        <p>Quando uma dependência externa fica lenta ou falha, ficar tentando piora tudo: cada request espera o timeout, workers ficam presos, a CPU sobe, a UX morre. <strong>Circuit breaker</strong> é o padrão para parar de tentar quando a coisa está claramente quebrada — e só voltar a tentar de tempos em tempos para descobrir se ela voltou.</p>
+        <p>Quando uma dependência externa fica lenta ou falha, ficar tentando piora tudo: cada request espera o timeout, workers ficam presos, a CPU sobe, a UX morre. <strong>Circuit breaker</strong> é o padrão para parar de tentar quando a coisa está claramente quebrada, e só voltar a tentar de tempos em tempos para descobrir se ela voltou.</p>
 
         <h3>Os três estados</h3>
         <ul>
-          <li><strong>Closed</strong> — funcionamento normal, requisições passam.</li>
-          <li><strong>Open</strong> — taxa de falha passou do limite. Requisições falham imediatamente, sem chamar a dependência.</li>
-          <li><strong>Half-open</strong> — depois de um intervalo, deixa passar uma requisição "de teste". Se passar, volta a Closed; se falhar, volta a Open.</li>
+          <li><strong>Closed</strong>, funcionamento normal, requisições passam.</li>
+          <li><strong>Open</strong>, taxa de falha passou do limite. Requisições falham imediatamente, sem chamar a dependência.</li>
+          <li><strong>Half-open</strong>, depois de um intervalo, deixa passar uma requisição "de teste". Se passar, volta a Closed; se falhar, volta a Open.</li>
         </ul>
 
         <h3>Bulkhead</h3>
-        <p>Como anteparas em navios: isolar pools para que uma dependência problemática não consuma <em>todas</em> as conexões. Por exemplo: dedicar 10 conexões para chamadas ao serviço X, 10 para Y, 30 para o banco — em vez de um pool único de 50 que o serviço X lento engole inteiro.</p>
+        <p>Como anteparas em navios: isolar pools para que uma dependência problemática não consuma <em>todas</em> as conexões. Por exemplo: dedicar 10 conexões para chamadas ao serviço X, 10 para Y, 30 para o banco, em vez de um pool único de 50 que o serviço X lento engole inteiro.</p>
 
         <h3>Fallback e degradação graciosa</h3>
         <p>Quando a dependência está fora, em vez de quebrar, devolver algo razoável. Exemplos: timeline do feed sem o serviço de recomendações? Mostre a timeline cronológica. Recomendações personalizadas falharam? Mostre as mais populares. Cache local com a última resposta válida? Use mesmo que esteja "velha".</p>
@@ -716,13 +719,13 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/produtos'</span>, 
         <p>Em Node, bibliotecas como <code>cockatiel</code> e <code>opossum</code> implementam circuit breaker, bulkhead, retry e timeout em uma API composável. Vale conhecer antes de escrever na mão.</p>
 
         <div class="callout callout-deep sr">
-          <div class="callout-label">Exemplo real — Netflix Hystrix</div>
-          <p>O padrão circuit breaker virou famoso com o Hystrix da Netflix (depois aposentado, mas conceitualmente vivo nos sucessores). A ideia explícita: "preferimos servir uma página com seções vazias a derrubar a página inteira porque um microserviço de comentários ficou lento". É o oposto da mentalidade "tudo ou nada" — e é o que mantém serviços grandes operando mesmo com partes da arquitetura em chamas.</p>
+          <div class="callout-label">Exemplo real, Netflix Hystrix</div>
+          <p>O padrão circuit breaker virou famoso com o Hystrix da Netflix (depois aposentado, mas conceitualmente vivo nos sucessores). A ideia explícita: "preferimos servir uma página com seções vazias a derrubar a página inteira porque um microserviço de comentários ficou lento". É o oposto da mentalidade "tudo ou nada", e é o que mantém serviços grandes operando mesmo com partes da arquitetura em chamas.</p>
         </div>
       </section>
 
       <section class="mat-section" id="sec-health">
-        <h2>16. Health checks — liveness vs readiness</h2>
+        <h2>16. Health checks · liveness vs readiness</h2>
         <p>Plataformas modernas (Kubernetes, ECS, Cloud Run) precisam saber se sua aplicação está saudável. Para isso, ela bate em endpoints chamados <strong>health checks</strong>. Há dois tipos, e confundi-los causa caos.</p>
 
         <table class="mat-table">
@@ -733,11 +736,11 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/api/produtos'</span>, 
           </tbody>
         </table>
 
-        <p>Liveness deve ser <em>simples</em>: respondeu OK = está vivo. Não chame banco, não chame Redis. Se você incluir o banco na liveness e o banco cai, o orquestrador reinicia toda a sua aplicação em loop — uma cascata desnecessária.</p>
-        <p>Readiness, sim, pode incluir dependências críticas: "o banco está respondendo?", "consigo ler o Redis?". Se essas falharem, o load balancer para de mandar tráfego, mas o processo continua rodando — quando a dependência voltar, ele volta sozinho ao pool.</p>
+        <p>Liveness deve ser <em>simples</em>: respondeu OK = está vivo. Não chame banco, não chame Redis. Se você incluir o banco na liveness e o banco cai, o orquestrador reinicia toda a sua aplicação em loop, uma cascata desnecessária.</p>
+        <p>Readiness, sim, pode incluir dependências críticas: "o banco está respondendo?", "consigo ler o Redis?". Se essas falharem, o load balancer para de mandar tráfego, mas o processo continua rodando, quando a dependência voltar, ele volta sozinho ao pool.</p>
 
         <div class="code-wrap">
-          <div class="code-label">TypeScript — liveness e readiness no Express<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <div class="code-label">TypeScript, liveness e readiness no Express<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code>app.<span class="hl-fn">get</span>(<span class="hl-str">'/healthz'</span>, (_req, res) =&gt; res.<span class="hl-fn">json</span>({ status: <span class="hl-str">'ok'</span> }));
 
 app.<span class="hl-fn">get</span>(<span class="hl-str">'/ready'</span>, <span class="hl-kw">async</span> (_req, res) =&gt; {
@@ -752,14 +755,14 @@ app.<span class="hl-fn">get</span>(<span class="hl-str">'/ready'</span>, <span c
       </section>
 
       <section class="mat-section" id="sec-obs">
-        <h2>17. Observabilidade — logs, métricas, tracing</h2>
-        <p>Quando algo falha em produção, você não tem o luxo de pôr <code>console.log</code> e esperar reproduzir. Precisa de <em>observabilidade</em> — três pilares que, juntos, permitem entender o que aconteceu post-mortem.</p>
+        <h2>17. Observabilidade · logs, métricas, tracing</h2>
+        <p>Quando algo falha em produção, você não tem o luxo de pôr <code>console.log</code> e esperar reproduzir. Precisa de <em>observabilidade</em>, três pilares que, juntos, permitem entender o que aconteceu post-mortem.</p>
 
         <h3>Logs estruturados</h3>
         <p>Logs em texto livre são caros de processar. Logs estruturados (JSON, idealmente) podem ser indexados, filtrados e agregados. Ferramentas como <code>pino</code> e <code>winston</code> emitem JSON nativamente.</p>
 
         <div class="code-wrap">
-          <div class="code-label">TypeScript — pino, log estruturado<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
+          <div class="code-label">TypeScript, pino, log estruturado<button class="code-copy" onclick="copyCode(this)">copiar</button></div>
 <pre class="code-block"><code><span class="hl-kw">import</span> pino <span class="hl-kw">from</span> <span class="hl-str">'pino'</span>;
 
 <span class="hl-kw">const</span> log = <span class="hl-fn">pino</span>({ level: <span class="hl-str">'info'</span> });
@@ -770,35 +773,35 @@ log.<span class="hl-fn">error</span>({ err, requestId: req.id }, <span class="hl
 <span class="hl-cmt">// saída: {"level":30,"time":...,"userId":42,"durationMs":87,"msg":"usuário criado"}</span></code></pre>
         </div>
 
-        <h3>Métricas — RED</h3>
+        <h3>Métricas · RED</h3>
         <p>O modelo <strong>RED</strong> de Tom Wilkie é uma régua simples para o que medir em qualquer serviço:</p>
         <ul>
-          <li><strong>R</strong>ate — requisições por segundo</li>
-          <li><strong>E</strong>rrors — erros por segundo</li>
-          <li><strong>D</strong>uration — distribuição de latências (p50, p95, p99)</li>
+          <li><strong>R</strong>ate, requisições por segundo</li>
+          <li><strong>E</strong>rrors, erros por segundo</li>
+          <li><strong>D</strong>uration, distribuição de latências (p50, p95, p99)</li>
         </ul>
         <p>Com esses três, você cobre a maior parte das perguntas operacionais: "está crescendo?", "está quebrando?", "está lento para os usuários do percentil 99?". Prometheus + Grafana é o stack open-source canônico para coletar e visualizar.</p>
 
         <h3>Tracing distribuído</h3>
-        <p>Quando uma requisição atravessa N serviços (controller → service → repo → cache → API externa), saber onde ela "demorou" exige um identificador único viajando junto. Cada serviço grava um <em>span</em> com o tempo de início/fim e o trace-id da requisição. <strong>OpenTelemetry</strong> é o padrão atual: instrumenta automaticamente Express, pg, fetch — e exporta para Jaeger, Tempo, Datadog, etc.</p>
+        <p>Quando uma requisição atravessa N serviços (controller → service → repo → cache → API externa), saber onde ela "demorou" exige um identificador único viajando junto. Cada serviço grava um <em>span</em> com o tempo de início/fim e o trace-id da requisição. <strong>OpenTelemetry</strong> é o padrão atual: instrumenta automaticamente Express, pg, fetch, e exporta para Jaeger, Tempo, Datadog, etc.</p>
 
         <div class="callout callout-info sr">
           <div class="callout-label">Por onde começar</div>
-          <p>Em projetos pequenos, dois passos já dão muito retorno: (1) trocar <code>console.log</code> por <code>pino</code> e adicionar <code>requestId</code> em todos os logs; (2) instalar <code>@opentelemetry/sdk-node</code> com auto-instrumentation. Você ganha tracing distribuído com pouquíssimas linhas — depois é só apontar para um backend (Jaeger local, ou Honeycomb, ou Datadog).</p>
+          <p>Em projetos pequenos, dois passos já dão muito retorno: (1) trocar <code>console.log</code> por <code>pino</code> e adicionar <code>requestId</code> em todos os logs; (2) instalar <code>@opentelemetry/sdk-node</code> com auto-instrumentation. Você ganha tracing distribuído com pouquíssimas linhas, depois é só apontar para um backend (Jaeger local, ou Honeycomb, ou Datadog).</p>
         </div>
       </section>
 
       <section class="mat-section" id="sec-stack-impl">
-        <h2>18. Implicações no nosso stack — TS + Express + EJS + SSR</h2>
+        <h2>18. Implicações no nosso stack · TS + Express + EJS + SSR</h2>
         <p>Tudo que vimos cai diretamente em decisões do nosso projeto:</p>
 
         <h3>Cache-Control no HTML SSR</h3>
-        <p>Se a página é pública e igual para todos (landing, lista de produtos sem filtro), <code>Cache-Control: public, max-age=300</code> + CDN na frente economiza 95% das renderizações. Se a página depende do usuário logado (perfil, dashboard), <code>Cache-Control: private, no-cache</code> — nunca <code>public</code>.</p>
+        <p>Se a página é pública e igual para todos (landing, lista de produtos sem filtro), <code>Cache-Control: public, max-age=300</code> + CDN na frente economiza 95% das renderizações. Se a página depende do usuário logado (perfil, dashboard), <code>Cache-Control: private, no-cache</code>, nunca <code>public</code>.</p>
 
         <h3>Estáticos em <code>public/</code></h3>
         <p>Use hash no nome do arquivo (<code>main.a8f9b1.css</code>) e cache eterno: <code>Cache-Control: public, max-age=31536000, immutable</code>. Um deploy gera novo hash → nova URL → bypass de cache automático. Sem invalidações manuais, sem stale assets.</p>
 
-        <h3>Endpoints JSON — caso a caso</h3>
+        <h3>Endpoints JSON · caso a caso</h3>
         <ul>
           <li><strong>Listagens públicas</strong> (catálogo): cache curto (60s), ETag, <code>public</code>.</li>
           <li><strong>Mutáveis personalizadas</strong> (notificações): <code>no-store</code>.</li>
@@ -813,13 +816,13 @@ log.<span class="hl-fn">error</span>({ err, requestId: req.id }, <span class="hl
       </section>
 
       <section class="mat-section" id="sec-anti">
-        <h2>19. Anti-padrões — o que evitar</h2>
+        <h2>19. Anti-padrões · o que evitar</h2>
 
         <h3>Retry infinito</h3>
         <p>"Se falhar, tenta de novo" sem limite, sem backoff. Em incidentes, vira amplificador: 1000 clientes errando ao mesmo tempo geram 100.000 retries por segundo, o que mata o servidor que estava se recuperando. Sempre tenha <em>limite de tentativas</em> e <em>backoff exponencial com jitter</em>.</p>
 
         <h3>Sem timeout</h3>
-        <p>Um <code>fetch</code> sem timeout pode ficar pendurado por minutos quando a rede tem problema. Em servidor, isso prende workers, segura conexões de banco, derruba a aplicação inteira. Timeout não é uma "boa prática" — é parte do contrato. Sem ele, sua dependência manda no seu uptime.</p>
+        <p>Um <code>fetch</code> sem timeout pode ficar pendurado por minutos quando a rede tem problema. Em servidor, isso prende workers, segura conexões de banco, derruba a aplicação inteira. Timeout não é uma "boa prática", é parte do contrato. Sem ele, sua dependência manda no seu uptime.</p>
 
         <h3>Side effects em GET</h3>
         <p><code>GET /pedidos/42/cancelar</code> é um anti-padrão clássico. GETs devem ser idempotentes e seguros (sem efeito colateral). Se o usuário recarregar a página, o pedido cancela duas vezes. Se o navegador prefetcher acessar o link, cancela sozinho. Use POST/DELETE para ações que mudam estado.</p>
@@ -865,22 +868,100 @@ log.<span class="hl-fn">error</span>({ err, requestId: req.id }, <span class="hl
         </ul>
       </section>
 
+      <section class="mat-section" id="sec-sebok">
+        <h2>21. SEBoK Parte 3 · Realização e Integração</h2>
+        <p>O <strong>SEBoK</strong> (<em>Guide to the Systems Engineering Body of Knowledge</em>) organiza o conhecimento da engenharia de sistemas em sete partes. A Parte 3, <strong>Systems Engineering and Management</strong>, descreve atividades de ciclo de vida que tocam diretamente em rede: <strong>System Realization</strong> e <strong>System Integration</strong>.</p>
+
+        <h3>System Realization</h3>
+        <p>É a etapa em que o sistema deixa de ser projeto e passa a existir como artefato funcional. Para um sistema web, isso inclui:</p>
+        <ul>
+          <li>Provisionar DNS (zonas, registros A/AAAA/CNAME, TTLs) para o domínio do produto.</li>
+          <li>Emitir e instalar certificado TLS (ex.: Let's Encrypt via ACME) com renovação automática.</li>
+          <li>Configurar CDN com regras de cache coerentes com o desenho de back-end.</li>
+          <li>Instalar agente de observabilidade (logs, métricas RED, tracing OpenTelemetry).</li>
+          <li>Automatizar o pipeline de deploy reprodutível.</li>
+        </ul>
+
+        <h3>System Integration</h3>
+        <p>É a costura entre subsistemas. Toda fronteira entre dois processos é uma chamada de rede que falha de forma independente. SEBoK pede atenção explícita a:</p>
+        <ul>
+          <li>Contratos de API entre módulos (versionamento, idempotência, ETag, retrocompatibilidade).</li>
+          <li>Estratégia de retry, timeout e circuit breaker na borda de cada integração.</li>
+          <li>Testes de integração que exercitem a rede real (não apenas mocks).</li>
+          <li>Plano de degradação graciosa quando um subsistema externo cai.</li>
+        </ul>
+
+        <p>Para o nosso projeto BrPec, posicionar a aula 11 em <strong>Realization + Integration</strong> deixa claro que estes não são "extras de DevOps", são atividades de engenharia que tornam o sistema realmente entregável a um usuário final em ambiente de fazenda com conexão instável.</p>
+      </section>
+
+      <section class="mat-section" id="sec-tools">
+        <h2>22. Ferramentas · Wireshark e Packet Tracer</h2>
+
+        <h3>Wireshark</h3>
+        <p>Analisador de pacotes em tempo real. É a forma mais direta de tornar visível o que normalmente é caixa-preta: handshake TCP, ClientHello/ServerHello TLS, queries DNS, requisições HTTP/1.1 em claro contra um servidor local.</p>
+        <ul>
+          <li>Instalação: <code>brew install wireshark</code> (macOS) ou <code>apt install wireshark</code> (Linux).</li>
+          <li>Captura curta: abra a interface ativa, rode <code>curl -v http://localhost:3000/</code> e pare em ~10 segundos.</li>
+          <li>Filtros úteis: <code>tcp.port == 443</code>, <code>http.request</code>, <code>dns</code>, <code>tls.handshake.type == 1</code> (ClientHello).</li>
+          <li>Marque o trio SYN, SYN-ACK, ACK e veja como cada pacote casa com a teoria.</li>
+        </ul>
+        <p>Para HTTPS, o conteúdo da aplicação está cifrado. Para inspecionar payload em ambiente de teste, exporte <code>SSLKEYLOGFILE</code> do navegador/cliente e configure o Wireshark para descriptografar.</p>
+
+        <h3>Cisco Packet Tracer</h3>
+        <p>Simulador para montar topologias antes de tocar em hardware real. Permite explorar roteamento entre LANs, NAT, DHCP, VLANs e ACLs, e seguir pacote a pacote o caminho lógico no modo simulação.</p>
+        <ul>
+          <li>Monte uma topologia mínima: PC, switch, roteador, servidor.</li>
+          <li>Configure IPs estáticos ou DHCP no roteador.</li>
+          <li>Ative o modo <strong>Simulation</strong> e dispare um <code>ping</code>; observe ARP, ICMP e DNS quadro a quadro.</li>
+          <li>Ótimo para fixar TCP/IP de 4 camadas sem precisar de laboratório físico.</li>
+        </ul>
+      </section>
+
+      <section class="mat-section" id="sec-glossario">
+        <h2>23. Dicionário de Redes (termos-chave)</h2>
+        <p>Glossário curto para alinhar vocabulário antes de provas e entrevistas. Cada termo vale como ponto de partida para aprofundar no Kurose &amp; Ross.</p>
+        <ul>
+          <li><strong>Latência</strong>, tempo para um pacote ir de A até B; medida em ms.</li>
+          <li><strong>RTT</strong> (Round-Trip Time), tempo de ida e volta entre cliente e servidor.</li>
+          <li><strong>Jitter</strong>, variação da latência ao longo do tempo; alto jitter prejudica chamadas de voz e vídeo.</li>
+          <li><strong>Vazão</strong> (throughput), volume de dados por unidade de tempo (bps, Mbps).</li>
+          <li><strong>MTU</strong> (Maximum Transmission Unit), maior tamanho de quadro suportado pela rede (1500 bytes em Ethernet padrão).</li>
+          <li><strong>NAT</strong> (Network Address Translation), tradução de endereços privados para um público compartilhado.</li>
+          <li><strong>CIDR</strong>, notação de rede com máscara variável (ex.: <code>10.0.0.0/24</code>).</li>
+          <li><strong>VLAN</strong>, segmento lógico dentro de uma mesma rede física.</li>
+          <li><strong>ACL</strong> (Access Control List), regras que permitem ou negam tráfego em um dispositivo.</li>
+          <li><strong>BGP</strong>, protocolo de roteamento entre sistemas autônomos da Internet.</li>
+          <li><strong>Peering</strong>, troca direta de tráfego entre dois provedores.</li>
+          <li><strong>Anycast</strong>, mesmo IP anunciado em vários pontos; o usuário cai no mais próximo (usado por DNS público e CDN).</li>
+          <li><strong>PoP</strong> (Point of Presence), site físico onde a CDN serve conteúdo próximo do usuário.</li>
+          <li><strong>SDN</strong> (Software-Defined Networking), separação entre plano de controle e plano de dados, gerência da rede via API.</li>
+          <li><strong>Edge</strong>, borda da rede, próxima do usuário; oposto de origem.</li>
+        </ul>
+
+        <h3>Bibliografia recomendada</h3>
+        <p>Para aprofundar todos os tópicos da aula em ordem coerente com a forma como o desenvolvedor web pensa:</p>
+        <ul>
+          <li><strong>KUROSE, J.; ROSS, K.</strong> <em>Redes de Computadores e a Internet · Uma Abordagem Top-Down</em>. Pearson. Capítulos 1 a 4 cobrem tudo o que vimos hoje (aplicação, transporte, rede, enlace), com profundidade extra em DNS, TCP, HTTP e roteamento.</li>
+          <li><strong>SEBoK Editorial Board.</strong> <em>Guide to the Systems Engineering Body of Knowledge (SEBoK)</em>, Parte 3. Disponível em <code>sebokwiki.org</code>.</li>
+        </ul>
+      </section>
+
       <section class="mat-section" id="sec-refs">
         <h2>Referências</h2>
         <ul>
-          <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP" target="_blank" rel="noopener noreferrer">MDN — HTTP</a> — referência completa de métodos, status, headers</li>
-          <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Caching" target="_blank" rel="noopener noreferrer">MDN — HTTP Caching</a> — guia de Cache-Control, ETag, validação condicional</li>
-          <li><a href="https://datatracker.ietf.org/doc/html/rfc9110" target="_blank" rel="noopener noreferrer">RFC 9110 — HTTP Semantics</a> — fonte canônica do protocolo</li>
-          <li><a href="https://datatracker.ietf.org/doc/html/rfc9000" target="_blank" rel="noopener noreferrer">RFC 9000 — QUIC</a> — o transporte por baixo do HTTP/3</li>
-          <li><a href="https://www.cloudflare.com/learning/" target="_blank" rel="noopener noreferrer">Cloudflare Learning Center</a> — explicações didáticas sobre rede, CDN, segurança</li>
-          <li><a href="https://letsencrypt.org/how-it-works/" target="_blank" rel="noopener noreferrer">Let's Encrypt — How it works</a> — visão geral do ACME</li>
-          <li><a href="https://datatracker.ietf.org/doc/html/rfc8446" target="_blank" rel="noopener noreferrer">RFC 8446 — TLS 1.3</a> — versão atual do TLS</li>
-          <li><a href="https://martinfowler.com/bliki/CircuitBreaker.html" target="_blank" rel="noopener noreferrer">Martin Fowler — CircuitBreaker</a> — artigo de referência sobre o padrão</li>
-          <li><a href="https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/" target="_blank" rel="noopener noreferrer">AWS Builder's Library — Timeouts, Retries, and Backoff with Jitter</a></li>
-          <li><a href="https://opentelemetry.io/docs/" target="_blank" rel="noopener noreferrer">OpenTelemetry — Documentação</a> — padrão de observabilidade</li>
-          <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/API/AbortController" target="_blank" rel="noopener noreferrer">MDN — AbortController</a> — cancelamento de requisições</li>
-          <li><a href="https://stripe.com/docs/api/idempotent_requests" target="_blank" rel="noopener noreferrer">Stripe — Idempotent Requests</a> — referência de implementação de Idempotency-Key</li>
-          <li><a href="https://www.nodejsdesignpatterns.com/" target="_blank" rel="noopener noreferrer">Node.js Design Patterns</a> — capítulos sobre rede e resiliência</li>
+          <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP" target="_blank" rel="noopener noreferrer">MDN, HTTP</a>, referência completa de métodos, status, headers</li>
+          <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/HTTP/Caching" target="_blank" rel="noopener noreferrer">MDN, HTTP Caching</a>, guia de Cache-Control, ETag, validação condicional</li>
+          <li><a href="https://datatracker.ietf.org/doc/html/rfc9110" target="_blank" rel="noopener noreferrer">RFC 9110, HTTP Semantics</a>, fonte canônica do protocolo</li>
+          <li><a href="https://datatracker.ietf.org/doc/html/rfc9000" target="_blank" rel="noopener noreferrer">RFC 9000, QUIC</a>, o transporte por baixo do HTTP/3</li>
+          <li><a href="https://www.cloudflare.com/learning/" target="_blank" rel="noopener noreferrer">Cloudflare Learning Center</a>, explicações didáticas sobre rede, CDN, segurança</li>
+          <li><a href="https://letsencrypt.org/how-it-works/" target="_blank" rel="noopener noreferrer">Let's Encrypt, How it works</a>, visão geral do ACME</li>
+          <li><a href="https://datatracker.ietf.org/doc/html/rfc8446" target="_blank" rel="noopener noreferrer">RFC 8446, TLS 1.3</a>, versão atual do TLS</li>
+          <li><a href="https://martinfowler.com/bliki/CircuitBreaker.html" target="_blank" rel="noopener noreferrer">Martin Fowler, CircuitBreaker</a>, artigo de referência sobre o padrão</li>
+          <li><a href="https://aws.amazon.com/builders-library/timeouts-retries-and-backoff-with-jitter/" target="_blank" rel="noopener noreferrer">AWS Builder's Library, Timeouts, Retries, and Backoff with Jitter</a></li>
+          <li><a href="https://opentelemetry.io/docs/" target="_blank" rel="noopener noreferrer">OpenTelemetry, Documentação</a>, padrão de observabilidade</li>
+          <li><a href="https://developer.mozilla.org/pt-BR/docs/Web/API/AbortController" target="_blank" rel="noopener noreferrer">MDN, AbortController</a>, cancelamento de requisições</li>
+          <li><a href="https://stripe.com/docs/api/idempotent_requests" target="_blank" rel="noopener noreferrer">Stripe, Idempotent Requests</a>, referência de implementação de Idempotency-Key</li>
+          <li><a href="https://www.nodejsdesignpatterns.com/" target="_blank" rel="noopener noreferrer">Node.js Design Patterns</a>, capítulos sobre rede e resiliência</li>
         </ul>
       </section>
 

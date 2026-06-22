@@ -4,7 +4,7 @@
   <link rel="icon" href="data:image/svg+xml,<svg xmlns=%22http://www.w3.org/2000/svg%22 viewBox=%220 0 100 100%22><text y=%22.9em%22 font-size=%2290%22>🌐</text></svg>">
   <meta charset="UTF-8">
   <meta name="viewport" content="width=device-width, initial-scale=1.0">
-  <title>Aula 11 — Plano de Ensino — Mergulhando nas Redes — Inteli</title>
+  <title>Aula 11 · Plano de Ensino · Mergulhando nas Redes · Inteli</title>
   <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
   <link href="../../css/inteli-styles.css" rel="stylesheet">
   <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;500;600;700;800&family=JetBrains+Mono:wght@400;600&display=swap" rel="stylesheet">
@@ -104,8 +104,8 @@
       <span class="mat-badge">Módulo 2 · Ciclo Comum · IN02</span>
       <span class="mat-badge">Plano de Ensino</span>
       <span class="mat-badge">Encerramento do Módulo</span>
-      <h1>Aula 11 — Mergulhando nas Redes</h1>
-      <p class="subtitle">Plano operacional do dia: atravessar TCP/IP, DNS, TLS, HTTP, cache, CDN e padrões de tolerância a falhas — e fechar o módulo amarrando tudo no nosso stack <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">TS+Express+EJS+SSR+pg</code>.</p>
+      <h1>Aula 11 · Mergulhando nas Redes</h1>
+      <p class="subtitle">Plano operacional do dia: atravessar TCP/IP, DNS, TLS, HTTP, cache, CDN e padrões de tolerância a falhas · e fechar o módulo amarrando tudo no nosso stack <code style="background:rgba(255,255,255,.18);color:white;padding:1px 6px;border-radius:5px;">TS+Express+EJS+SSR+pg</code>.</p>
       <a href="../../index.html" class="btn btn-outline-light btn-sm">← Voltar ao Módulo</a>
     </div>
   </header>
@@ -132,7 +132,7 @@
         <h2>Identificação</h2>
         <div class="id-grid">
           <div class="id-cell"><div class="id-lbl">Disciplina</div><div class="id-val">IN02 · Desenvolvimento Web</div></div>
-          <div class="id-cell"><div class="id-lbl">Módulo</div><div class="id-val">2 — Ciclo Comum</div></div>
+          <div class="id-cell"><div class="id-lbl">Módulo</div><div class="id-val">2, Ciclo Comum</div></div>
           <div class="id-cell"><div class="id-lbl">Aula</div><div class="id-val">11 de 11 (encerramento)</div></div>
           <div class="id-cell"><div class="id-lbl">Carga horária do dia</div><div class="id-val">6h (2h + 2h + 2h)</div></div>
           <div class="id-cell"><div class="id-lbl">Modalidade</div><div class="id-val">Presencial · Metodologia ativa</div></div>
@@ -144,7 +144,7 @@
         <h2>Resumo</h2>
         <div class="intro-card">
           <p>A aula 11 conecta a stack à <strong>internet real</strong>. Os alunos atravessam o <strong>modelo TCP/IP de 4 camadas</strong>, comparam <strong>TCP × UDP</strong> com 3-way handshake, percorrem o <strong>DNS</strong> registro por registro, entendem o <strong>TLS handshake</strong> conceitual, exploram <strong>HTTP/1.1 × 2 × 3</strong>, dominam <strong>cache HTTP</strong> (<code>Cache-Control</code>, <code>ETag</code>, <code>304</code>), atravessam uma <strong>CDN</strong> (origem/edge/PoP) e fecham com <strong>padrões de tolerância a falhas</strong> (retry com backoff exponencial + jitter, timeout, idempotência, circuit breaker, fallback, health checks, observabilidade RED).</p>
-          <p>O encerramento amarra tudo no nosso stack <strong>TS + Express + EJS + SSR + pg</strong> — a infraestrutura de rede deixa de ser caixa-preta para virar superfície de design.</p>
+          <p>O encerramento amarra tudo no nosso stack <strong>TS + Express + EJS + SSR + pg</strong>, a infraestrutura de rede deixa de ser caixa-preta para virar superfície de design.</p>
         </div>
       </section>
 
@@ -169,7 +169,7 @@
         </ul>
         <div class="callout callout-info">
           <div class="callout-label">Importante</div>
-          <p>Aqui a equipe <strong>blinda o projeto contra falhas reais de rede</strong> — não é teoria abstrata: cada conceito vira mudança de código no projeto integrador antes das 16h.</p>
+          <p>Aqui a equipe <strong>blinda o projeto contra falhas reais de rede</strong>, não é teoria abstrata: cada conceito vira mudança de código no projeto integrador antes das 16h.</p>
         </div>
       </section>
 
@@ -177,29 +177,32 @@
         <h2>Cronograma do dia</h2>
         <div class="day-timeline">
           <div class="day-block autoest">
-            <div class="blk-head"><h3 class="blk-title">📚 Bloco 1 · Autoestudo</h3><span class="blk-time">08h00 — 10h00</span></div>
-            <p>Estudo individual orientado pelo material da aula 11.</p>
+            <div class="blk-head"><h3 class="blk-title">📚 Bloco 1 · Autoestudo</h3><span class="blk-time">08h00 · 10h00</span></div>
+            <p>Estudo individual orientado pelo material da aula 11 e pelos autoestudos da Semana 10.</p>
             <ul>
               <li>Leitura completa do <strong>Material da Aula 11</strong> (TCP/IP, DNS, TLS, HTTP, cache, CDN, resiliência).</li>
+              <li>Folhear o <strong>Dicionário de Redes</strong> e anotar os 10 termos menos familiares (ex.: jitter, RTT, MTU, CIDR, anycast, PoP, BGP, peering, ACL, SDN).</li>
+              <li>Ler o capítulo introdutório do <strong>SEBoK Parte 3</strong> (System Realization &amp; Integration) para situar a rede dentro do ciclo de vida do sistema.</li>
               <li>Rodar <code>dig</code> (ou <code>nslookup</code>) no domínio do projeto e registrar os registros encontrados (A, CNAME, MX, NS, TTL).</li>
+              <li>Abrir o <strong>Wireshark</strong> em uma captura curta de um <code>curl https://...</code> e localizar o 3-way handshake TCP + ClientHello TLS.</li>
               <li>Mapear quais respostas do back-end fazem sentido cachear e <strong>por quanto tempo</strong> (HTML SSR, estáticos, JSON dinâmico, JSON privado).</li>
               <li>Caderno de bordo: anotar dúvidas sobre TLS handshake e diferenças HTTP/1.1 × 2 × 3.</li>
             </ul>
           </div>
           <div class="day-block pe">
-            <div class="blk-head"><h3 class="blk-title">🎓 Bloco 2 · Instrução PE — Aula em metodologia ativa</h3><span class="blk-time">10h00 — 12h00</span></div>
+            <div class="blk-head"><h3 class="blk-title">🎓 Bloco 2 · Instrução PE · Aula em metodologia ativa</h3><span class="blk-time">10h00 · 12h00</span></div>
             <p>Encontro síncrono com o professor especialista. 15 minutos de daily seguidos de 1h45 de aula.</p>
             <ul>
-              <li><strong>10h00 — 10h15</strong> · Daily: registros DNS e plano de cache trazidos do autoestudo.</li>
-              <li><strong>10h15 — 12h00</strong> · TCP/IP, DNS, TLS, cache, retry/timeout, idempotência e circuit breaker.</li>
+              <li><strong>10h00, 10h15</strong> · Daily: registros DNS e plano de cache trazidos do autoestudo.</li>
+              <li><strong>10h15, 12h00</strong> · TCP/IP, DNS, TLS, cache, retry/timeout, idempotência e circuit breaker.</li>
             </ul>
           </div>
           <div class="day-block lunch">
-            <div class="blk-head"><h3 class="blk-title">🍴 Intervalo · Almoço</h3><span class="blk-time">12h00 — 14h00</span></div>
+            <div class="blk-head"><h3 class="blk-title">🍴 Intervalo · Almoço</h3><span class="blk-time">12h00 · 14h00</span></div>
             <p>Janela livre.</p>
           </div>
           <div class="day-block dev">
-            <div class="blk-head"><h3 class="blk-title">🛠️ Bloco 3 · Desenvolvimento do projeto</h3><span class="blk-time">14h00 — 16h00</span></div>
+            <div class="blk-head"><h3 class="blk-title">🛠️ Bloco 3 · Desenvolvimento do projeto</h3><span class="blk-time">14h00 · 16h00</span></div>
             <p>Janela de trabalho da equipe sobre o projeto integrador.</p>
             <ul>
               <li>Aplicar <code>Cache-Control</code> coerente nos endpoints (HTML SSR, estáticos, JSON público, JSON privado).</li>
@@ -213,7 +216,7 @@
       </section>
 
       <section class="mat-section" id="sec-class">
-        <h2>Detalhamento da instrução PE (10h00 — 12h00)</h2>
+        <h2>Detalhamento da instrução PE (10h00 · 12h00)</h2>
         <div class="class-line">
           <div class="cl-time">10h00<br>10h15</div>
           <div class="cl-content"><h4><span class="cl-tag cl-tag-dy">Daily</span>Daily de abertura</h4><p>Cada aluno apresenta, em 1 minuto, o resultado do <code>dig</code> no domínio do projeto e o item mais surpreendente que encontrou (TTL alto demais, CNAME inesperado, etc).</p></div>
@@ -228,7 +231,7 @@
         </div>
         <div class="class-line">
           <div class="cl-time">10h45<br>11h00</div>
-          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>DNS — registros + resolução + TTL</h4><p>Caminho completo: stub resolver → recursivo → root → TLD → autoritativo. Tipos de registro (A, AAAA, CNAME, MX, TXT, NS) e o papel do <strong>TTL</strong> em cache de resolução.</p></div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>DNS · registros + resolução + TTL</h4><p>Caminho completo: stub resolver → recursivo → root → TLD → autoritativo. Tipos de registro (A, AAAA, CNAME, MX, TXT, NS) e o papel do <strong>TTL</strong> em cache de resolução.</p></div>
         </div>
         <div class="class-line">
           <div class="cl-time">11h00<br>11h15</div>
@@ -243,8 +246,12 @@
           <div class="cl-content"><h4><span class="cl-tag cl-tag-co">Coding</span>Timeout + retry com backoff exponencial + jitter (TS)</h4><p>Em pares: implementar wrapper TS com <code>AbortController</code> para timeout e função de retry com backoff exponencial (2^n) + jitter aleatório. Discussão sobre quando retry é seguro (idempotente) e quando é catastrófico.</p></div>
         </div>
         <div class="class-line">
-          <div class="cl-time">11h45<br>11h55</div>
+          <div class="cl-time">11h45<br>11h50</div>
           <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>Idempotência + circuit breaker</h4><p>Por que <code>PUT</code> e <code>DELETE</code> são idempotentes por design e <code>POST</code> precisa de <code>Idempotency-Key</code>. Conceito de circuit breaker (closed → open → half-open) e quando ele protege a origem de cascata de falhas.</p></div>
+        </div>
+        <div class="class-line">
+          <div class="cl-time">11h50<br>11h55</div>
+          <div class="cl-content"><h4><span class="cl-tag cl-tag-tk">Talk</span>SEBoK Parte 3 + Ferramentas (Wireshark, Packet Tracer, Kurose)</h4><p>Como a aula de hoje se posiciona em <strong>System Realization</strong> e <strong>System Integration</strong> (SEBoK). Tour rápido pelo Wireshark abrindo o handshake TCP+TLS de um <code>curl</code> e por uma topologia simples no Packet Tracer. Bibliografia de aprofundamento, Kurose &amp; Ross capítulos 1 a 4 (Top-Down).</p></div>
         </div>
         <div class="class-line">
           <div class="cl-time">11h55<br>12h00</div>
@@ -255,9 +262,9 @@
       <section class="mat-section" id="sec-am">
         <h2>Estratégias de metodologia ativa</h2>
         <ul>
-          <li><strong>Simulação de falha</strong> — o professor "mata" um endpoint da CDN ou da origem; cada equipe diagnostica pelo comportamento (status, headers, latência) qual camada falhou.</li>
-          <li><strong>Competição de cache</strong> — em rodadas rápidas, qual time acerta o <code>Cache-Control</code> ideal para cada rota (HTML SSR, estáticos, JSON público, JSON privado, redirect)?</li>
-          <li><strong>Debate retry seguro × perigoso</strong> — turma classifica chamadas reais do projeto em "pode dar retry" vs "nunca dar retry sem Idempotency-Key", justificando.</li>
+          <li><strong>Simulação de falha</strong>, o professor "mata" um endpoint da CDN ou da origem; cada equipe diagnostica pelo comportamento (status, headers, latência) qual camada falhou.</li>
+          <li><strong>Competição de cache</strong>, em rodadas rápidas, qual time acerta o <code>Cache-Control</code> ideal para cada rota (HTML SSR, estáticos, JSON público, JSON privado, redirect)?</li>
+          <li><strong>Debate retry seguro × perigoso</strong>, turma classifica chamadas reais do projeto em "pode dar retry" vs "nunca dar retry sem Idempotency-Key", justificando.</li>
         </ul>
       </section>
 
@@ -273,6 +280,11 @@
             <tr><td>Timeout</td><td><code>AbortController</code> (TS)</td><td>Cancelar fetch interno antes do limite</td></tr>
             <tr><td>Retry</td><td>Backoff exponencial + jitter</td><td>Wrapper TS para chamada externa principal</td></tr>
             <tr><td>Documentação</td><td><code>docs/redes/resiliencia.md</code></td><td>Plano de tolerância a falhas do projeto</td></tr>
+            <tr><td>Análise de pacotes</td><td>Wireshark</td><td>Inspecionar handshakes TCP, TLS, requisições DNS e HTTP em capturas reais</td></tr>
+            <tr><td>Simulação de rede</td><td>Cisco Packet Tracer</td><td>Montar topologias e seguir pacotes camada a camada antes de tocar em hardware</td></tr>
+            <tr><td>Glossário</td><td>Dicionário de Redes</td><td>Alinhar vocabulário operacional (jitter, RTT, MTU, anycast, PoP, BGP, peering)</td></tr>
+            <tr><td>Bibliografia</td><td>Kurose &amp; Ross, "Redes de Computadores · Abordagem Top-Down"</td><td>Aprofundar do nível de aplicação para baixo · capítulos 1 a 4</td></tr>
+            <tr><td>Engenharia de Sistemas</td><td>SEBoK Parte 3 (System Realization &amp; Integration)</td><td>Ligar as atividades de rede ao ciclo de vida de engenharia de sistemas</td></tr>
           </tbody>
         </table>
       </section>
@@ -288,7 +300,7 @@
         </ul>
         <div class="callout callout-warn">
           <div class="callout-label">Critério mínimo</div>
-          <p>Aluno que sair às 16h sem <strong>Cache-Control coerente</strong>, <strong>timeout em todos os fetch</strong> e <strong>retry com jitter na chamada externa principal</strong> está em débito técnico — o projeto não pode ser entregue ao avaliador final sem rede de proteção contra falhas reais de rede.</p>
+          <p>Aluno que sair às 16h sem <strong>Cache-Control coerente</strong>, <strong>timeout em todos os fetch</strong> e <strong>retry com jitter na chamada externa principal</strong> está em débito técnico, o projeto não pode ser entregue ao avaliador final sem rede de proteção contra falhas reais de rede.</p>
         </div>
       </section>
 
@@ -303,7 +315,7 @@
           <li><strong>Aula 11</strong> · Infraestrutura de rede: cache, CDN, TLS, resiliência e idempotência.</li>
         </ul>
         <h3>Ponte para os próximos módulos</h3>
-        <p>O Módulo 3 (e os módulos seguintes do ciclo) parte deste projeto integrador como base — o stack TS + Express + EJS + SSR + pg permanece, e os próximos módulos vão adicionar autenticação, observabilidade, deploy avançado e arquiteturas distribuídas.</p>
+        <p>O Módulo 3 (e os módulos seguintes do ciclo) parte deste projeto integrador como base, o stack TS + Express + EJS + SSR + pg permanece, e os próximos módulos vão adicionar autenticação, observabilidade, deploy avançado e arquiteturas distribuídas.</p>
         <h3>Checklist final para entrega do projeto integrador</h3>
         <ul>
           <li>DER + minimundo + dicionário de dados publicados em <code>docs/banco/</code>.</li>
@@ -315,7 +327,7 @@
         </ul>
         <div class="callout callout-tip">
           <div class="callout-label">Encerramento</div>
-          <p>Você sai do Módulo 2 sabendo construir um sistema web inteiro — do banco até o cache da CDN — com qualidade testável e tolerância a falhas. É a fundação sobre a qual todo o resto do ciclo será construído.</p>
+          <p>Você sai do Módulo 2 sabendo construir um sistema web inteiro, do banco até o cache da CDN, com qualidade testável e tolerância a falhas. É a fundação sobre a qual todo o resto do ciclo será construído.</p>
         </div>
       </section>
 
